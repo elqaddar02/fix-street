@@ -35,4 +35,9 @@ class Report extends Model
     {
         return $this->belongsTo(City::class);
     }
+
+    public function comments()
+    {
+        return $this->hasMany(ReportComment::class);
+    }
 }

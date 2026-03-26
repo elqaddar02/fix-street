@@ -21,10 +21,10 @@
                     <x-nav-link :href="route('reports.create')" :active="request()->routeIs('reports.create')">
                         {{ __('Create Report') }}
                     </x-nav-link>
-                    @if (Auth::user()->is_admin)
-                        <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
-                            {{ __('Manage Reports') }}
-                        </x-nav-link>
+                    @if (auth()->check() && auth()->user()->is_admin)
+                    <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+                        {{ __('Manage Reports') }}
+                    </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -34,7 +34,9 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                            <div>
+                                {{ Auth::check() ? Auth::user()->name : 'Guest' }}
+                            </div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -54,7 +56,7 @@
                             @csrf
 
                             <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
+                                onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
@@ -87,18 +89,20 @@
             <x-responsive-nav-link :href="route('reports.create')" :active="request()->routeIs('reports.create')">
                 {{ __('Create Report') }}
             </x-responsive-nav-link>
-            @if (Auth::user()->is_admin)
-                <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
-                    {{ __('Manage Reports') }}
-                </x-responsive-nav-link>
+            @if (auth()->check() && auth()->user()->is_admin)
+            <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+                {{ __('Manage Reports') }}
+            </x-responsive-nav-link>
             @endif
         </div>
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="font-medium text-base text-gray-800">
+                    {{ optional(Auth::user())->name ?? 'Guest' }}
+                </div>
+                <div class="font-medium text-sm text-gray-500">{{ optional(Auth::user())->email ?? 'Guest' }}</div>
             </div>
 
             <div class="mt-3 space-y-1">
@@ -111,7 +115,7 @@
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
+                        onclick="event.preventDefault();
                                         this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>

@@ -13,7 +13,7 @@ class ReportController extends Controller
 {
     public function index()
     {
-        $reports = Report::with(['user', 'category', 'city'])
+        $reports = Report::with(['user', 'category', 'city', 'comments.user'])
             ->latest()
             ->paginate(12);
 
@@ -50,5 +50,26 @@ class ReportController extends Controller
         Report::create($validated);
 
         return redirect()->route('dashboard')->with('success', 'Report submitted successfully!');
+    }
+
+    public function show(Report $report)
+    {
+        $report->load(['comments.user', 'category', 'city', 'user']);
+
+        return view('reports.show', compact('report'));
+    }
+
+    public function storeComment(Request $request, Report $report)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:1000',
+        ]);
+
+        $report->comments()->create([
+            'user_id' => Auth::id(),
+            'comment' => $request->comment,
+        ]);
+
+        return redirect()->back()->with('success', 'Comment submitted successfully.');
     }
 }
