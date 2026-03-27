@@ -11,13 +11,37 @@ use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $reports = Report::with(['user', 'category', 'city', 'comments.user'])
-            ->latest()
-            ->paginate(12);
+        $categories = Category::all();
+        $cities = City::all(); // Keep cities for now, but focus on category and date
 
-        return view('reports.index', compact('reports'));
+        $selectedCategory = $request->query('category');
+        $selectedDate = $request->query('date');
+
+        $reportsQuery = Report::with(['user', 'category', 'city', 'comments.user'])->latest();
+
+        if ($selectedCategory) {
+            $reportsQuery->where('category_id', $selectedCategory);
+        }
+
+        if ($selectedDate) {
+            switch ($selectedDate) {
+                case 'today':
+                    $reportsQuery->whereDate('created_at', today());
+                    break;
+                case 'week':
+                    $reportsQuery->where('created_at', '>=', now()->startOfWeek());
+                    break;
+                case 'month':
+                    $reportsQuery->where('created_at', '>=', now()->startOfMonth());
+                    break;
+            }
+        }
+
+        $reports = $reportsQuery->paginate(12)->withQueryString();
+
+        return view('reports.index', compact('reports', 'categories', 'cities', 'selectedCategory', 'selectedDate'));
     }
 
     public function create()

@@ -37,12 +37,23 @@ Route::get('/', function () {
     return view('home', compact('latestReports', 'reportsJson', 'isAuthenticated'));
 });
 
+Route::view('/about', 'about')->name('about');
+Route::view('/contact', 'contact')->name('contact');
+Route::view('/privacy', 'privacy')->name('privacy');
+Route::view('/terms', 'terms')->name('terms');
+Route::view('/help', 'help')->name('help');
+
+Route::get('/login-redirect', function () {
+    session(['url.intended' => url()->current()]);
+    return redirect()->route('login');
+})->name('login.redirect');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    // Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
     Route::post('/reports/{report}/comments', [ReportController::class, 'storeComment'])->name('reports.comments.store');
@@ -57,5 +68,6 @@ Route::middleware('auth')->group(function () {
 
 // Public report details (no login required)
 Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+ Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
 require __DIR__.'/auth.php';

@@ -1,36 +1,37 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
-                </div>
-
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.index')">
-                        {{ __('Reports') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('reports.create')" :active="request()->routeIs('reports.create')">
-                        {{ __('Create Report') }}
-                    </x-nav-link>
-                    @if (auth()->check() && auth()->user()->is_admin)
-                    <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
-                        {{ __('Manage Reports') }}
-                    </x-nav-link>
-                    @endif
-                </div>
+        <div class="flex justify-between items-center h-16">
+            <!-- Left: logo -->
+            <div class="shrink-0 flex items-center">
+                <a href="{{ url('/') }}">
+                    <x-application-logo class="block h-16 w-auto fill-current text-gray-800" />
+                </a>
             </div>
 
-            <!-- Settings Dropdown -->
+            <!-- Center: primary nav links -->
+            <div class="hidden sm:flex flex-1 justify-center space-x-8">
+                <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.index')">
+                    {{ __('All Reports') }}
+                </x-nav-link>
+                <x-nav-link :href="route('about')" :active="request()->routeIs('about')">
+                    {{ __('About') }}
+                </x-nav-link>
+                <x-nav-link :href="route('help')" :active="request()->routeIs('help')">
+                    {{ __('Help') }}
+                </x-nav-link>
+                @auth
+                    @if (auth()->user()->is_admin)
+                        <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+                            {{ __('Manage Reports') }}
+                        </x-nav-link>
+                    @endif
+                @endauth
+            </div>
+
+            <!-- Right: settings dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+                @auth
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -63,6 +64,12 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
+                @else
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('login') }}" class="rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">Login</a>
+                        <a href="{{ route('register') }}" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Register</a>
+                    </div>
+                @endauth
             </div>
 
             <!-- Hamburger -->
@@ -80,23 +87,32 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.index')">
-                {{ __('Reports') }}
+                {{ __('All Reports') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('reports.create')" :active="request()->routeIs('reports.create')">
-                {{ __('Create Report') }}
+            <x-responsive-nav-link :href="route('about')" :active="request()->routeIs('about')">
+                {{ __('About') }}
             </x-responsive-nav-link>
-            @if (auth()->check() && auth()->user()->is_admin)
-            <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
-                {{ __('Manage Reports') }}
+            <x-responsive-nav-link :href="route('help')" :active="request()->routeIs('help')">
+                {{ __('Help') }}
             </x-responsive-nav-link>
-            @endif
+            @auth
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.index')">
+                    {{ __('Reports') }}
+                </x-responsive-nav-link>
+                @if (auth()->user()->is_admin)
+                    <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+                        {{ __('Manage Reports') }}
+                    </x-responsive-nav-link>
+                @endif
+            @endauth
         </div>
 
         <!-- Responsive Settings Options -->
+        @auth
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800">
@@ -122,5 +138,17 @@
                 </form>
             </div>
         </div>
+        @else
+        <div class="pt-4 pb-1 border-t border-gray-200">
+            <div class="mt-3 space-y-1">
+                <x-responsive-nav-link :href="route('login')">
+                    {{ __('Login') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('register')">
+                    {{ __('Register') }}
+                </x-responsive-nav-link>
+            </div>
+        </div>
+        @endauth
     </div>
 </nav>
