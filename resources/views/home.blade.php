@@ -126,7 +126,7 @@
         </div>
     </section>
 
-    <section class="py-16 bg-slate-900 text-white">
+    <!-- <section class="py-16 bg-slate-900 text-white">
         <div class="max-w-4xl mx-auto px-6 text-center">
             <h2 class="text-3xl font-bold mb-4">Contribute to a Safer City</h2>
             <p class="text-slate-300 text-lg mb-8 leading-relaxed">Your reports help city officials prioritize and address street maintenance issues efficiently. Together, we can maintain safe and well-maintained public infrastructure.</p>
@@ -135,7 +135,7 @@
                 <a href="{{ route('reports.index') }}" class="gov-button border-white text-white px-8 py-4 hover:bg-white hover:text-slate-900">View All Reports</a>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <div id="home-server-data" data-latest-reports='@json($latestReports ?? [])' data-authenticated='{{ auth()->check() ? 'true' : 'false' }}' style="display:none;"></div>
 
