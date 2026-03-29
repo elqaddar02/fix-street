@@ -227,7 +227,7 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
                 <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">Process</span>
-                <h2 class="text-4xl font-black text-gray-900 mb-4">How It Works</h2>
+                <h2 class="text-4xl font-black text-gray-900 mb-4">How It Works </h2>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">Simple steps to report and track street issues</p>
             </div>
 
