@@ -31,23 +31,23 @@
                         <!-- Title -->
                         <div>
                             <x-input-label for="title" :value="__('Report Title')" class="text-lg font-semibold" />
-                            <x-text-input id="title" name="title" type="text" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
-                                placeholder="Brief description of the issue" :value="old('title')" required />
+                            <x-text-input id="title" name="title" type="text" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
+                                placeholder="Description brève du problème" :value="old('title')" required />
                         </div>
 
                         <!-- Description -->
                         <div>
                             <x-input-label for="description" :value="__('Detailed Description')" class="text-lg font-semibold" />
-                            <textarea id="description" name="description" rows="5" class="mt-2 block w-full border border-gray-300 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
-                                placeholder="Provide detailed information about the issue..." required>{{ old('description') }}</textarea>
+                            <textarea id="description" name="description" rows="5" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
+                                placeholder="Fournir des informations détaillées sur le problème..." required>{{ old('description') }}</textarea>
                         </div>
 
-                        <!-- Category and City -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Category, City and Quartier -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <x-input-label for="category_id" :value="__('Category')" class="text-lg font-semibold" />
-                                <select id="category_id" name="category_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
-                                    <option value="">-- Select category --</option>
+                                <select id="category_id" name="category_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
+                                    <option value="">-- Sélectionner une catégorie --</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>
                                             {{ $category->name }}
@@ -58,11 +58,23 @@
 
                             <div>
                                 <x-input-label for="city_id" :value="__('City')" class="text-lg font-semibold" />
-                                <select id="city_id" name="city_id" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
-                                    <option value="">-- Select city --</option>
+                                <select id="city_id" name="city_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
+                                    <option value="">-- Sélectionner une ville --</option>
                                     @foreach ($cities as $city)
-                                        <option value="{{ $city->id }}" @selected(old('city_id') == $city->id)>
-                                            {{ $city->name }}
+                                        <option value="{{ $city->id }}" @selected(old('city_id') == $city->id) @disabled(!$city->active)>
+                                            {{ $city->name }} @if(!$city->active) (Bientôt disponible) @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <x-input-label for="quartier_id" :value="__('Quartier')" class="text-lg font-semibold" />
+                                <select id="quartier_id" name="quartier_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4">
+                                    <option value="">-- Sélectionner un quartier --</option>
+                                    @foreach ($quartiers as $quartier)
+                                        <option value="{{ $quartier->id }}" @selected(old('quartier_id') == $quartier->id)>
+                                            {{ $quartier->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -73,16 +85,16 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <x-input-label for="latitude" :value="__('Latitude (optional)')" class="text-lg font-semibold" />
-                                <x-text-input id="latitude" name="latitude" type="number" step="0.0000001" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
-                                    placeholder="e.g., 40.7128" :value="old('latitude')" />
-                                <p class="text-xs text-gray-500 mt-1">GPS coordinate - leave blank if unsure</p>
+                                <x-text-input id="latitude" name="latitude" type="number" step="0.0000001" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
+                                    placeholder="ex: 40.7128" :value="old('latitude')" />
+                                <p class="text-xs text-gray-500 mt-1">Coordonnée GPS - laisser vide si inconnu</p>
                             </div>
 
                             <div>
                                 <x-input-label for="longitude" :value="__('Longitude (optional)')" class="text-lg font-semibold" />
-                                <x-text-input id="longitude" name="longitude" type="number" step="0.0000001" class="mt-2 block w-full border-gray-300 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
-                                    placeholder="e.g., -74.0060" :value="old('longitude')" />
-                                <p class="text-xs text-gray-500 mt-1">GPS coordinate - leave blank if unsure</p>
+                                <x-text-input id="longitude" name="longitude" type="number" step="0.0000001" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
+                                    placeholder="ex: -74.0060" :value="old('longitude')" />
+                                <p class="text-xs text-gray-500 mt-1">Coordonnée GPS - laisser vide si inconnu</p>
                             </div>
                         </div>
 

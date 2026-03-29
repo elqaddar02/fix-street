@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\City;
+use App\Models\Quartier;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,10 +47,17 @@ class ReportController extends Controller
 
     public function create()
     {
-        $categories = Category::all();
-        $cities = City::all();
+        if (auth()->check() && auth()->user()->is_admin) {
+            abort(403, 'Admins are not allowed to create reports.');
+        }
 
-        return view('reports.create', compact('categories', 'cities'));
+        $categories = Category::all();
+        $cities = City::where('active', true)->get();
+        $quartiers = Quartier::whereHas('city', function($query) {
+            $query->where('active', true);
+        })->where('active', true)->get();
+
+        return view('reports.create', compact('categories', 'cities', 'quartiers'));
     }
 
     public function store(Request $request)
@@ -59,6 +67,7 @@ class ReportController extends Controller
             'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'city_id'     => 'required|exists:cities,id',
+            'quartier_id' => 'nullable|exists:quartiers,id',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
@@ -66,6 +75,10 @@ class ReportController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('reports', 'public');
+        }
+
+        if (auth()->check() && auth()->user()->is_admin) {
+            abort(403, 'Admins cannot store reports.');
         }
 
         $validated['status'] = 'OPEN';

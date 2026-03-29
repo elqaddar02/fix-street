@@ -10,20 +10,24 @@ class CitySeeder extends Seeder
     public function run(): void
     {
         $cities = [
-            'Casablanca',
-            'Rabat',
-            'Marrakech',
-            'Fes',
-            'Tangier',
-            'Agadir',
-            'Meknes',
-            'Oujda',
-            'Kenitra',
-            'Tetouan',
+            ['name' => 'Casablanca', 'active' => false],
+            ['name' => 'Rabat', 'active' => false],
+            ['name' => 'Marrakech', 'active' => false],
+            ['name' => 'Fes', 'active' => false],
+            ['name' => 'Tangier', 'active' => false],
+            ['name' => 'Agadir', 'active' => false],
+            ['name' => 'Meknes', 'active' => false],
+            ['name' => 'Oujda', 'active' => false],
+            ['name' => 'Kenitra', 'active' => false],
+            ['name' => 'Tetouan', 'active' => false],
+            ['name' => 'Salé', 'active' => true],
         ];
 
-        foreach ($cities as $name) {
-            City::firstOrCreate(['name' => $name]);
+        foreach ($cities as $cityData) {
+            City::firstOrCreate(
+                ['name' => $cityData['name']],
+                ['active' => $cityData['active']]
+            );
         }
     }
 }

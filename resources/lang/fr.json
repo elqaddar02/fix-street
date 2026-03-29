@@ -12,5 +12,21 @@
     "Terms": "Conditions",
     "Contact": "Contact",
     "Report a Problem": "Signaler un problème",
-    "View All Reports": "Voir tous les rapports"
+    "View All Reports": "Voir tous les rapports",
+    "Dashboard": "Tableau de bord",
+    "This is a secure area of the application. Please confirm your password before continuing.": "Ceci est une zone sécurisée de l'application. Veuillez confirmer votre mot de passe avant de continuer.",
+    "Password": "Mot de passe",
+    "Confirm": "Confirmer",
+    "Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.": "Vous avez oublié votre mot de passe? Aucun problème. Dites-nous simplement votre adresse e-mail et nous vous enverrons un lien de réinitialisation de mot de passe qui vous permettra d'en choisir un nouveau.",
+    "Email": "E-mail",
+    "Email Password Reset Link": "Envoyer le lien de réinitialisation du mot de passe",
+    "Help & Support": "Aide et support",
+    "Welcome back,": "Bienvenue,",
+    "Remember me": "Se souvenir de moi",
+    "Forgot your password?": "Vous avez oublié votre mot de passe?",
+    "Log in": "Se connecter",
+    "Name": "Nom",
+    "Confirm Password": "Confirmer le mot de passe",
+    "Already registered?": "Déjà inscrit?",
+    "Reports": "Rapports"
 }

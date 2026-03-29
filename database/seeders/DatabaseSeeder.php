@@ -36,6 +36,14 @@ class DatabaseSeeder extends Seeder
             City::firstOrCreate(['name' => $name]);
         }
 
+        // Seed default quartiers for Salé if exists
+        $sale = City::where('name', 'Salé')->first();
+        if ($sale) {
+            foreach (['Hay Essalam', 'Tabriquet', 'Bettana'] as $q) {
+                \App\Models\Quartier::firstOrCreate(['name' => $q, 'city_id' => $sale->id]);
+            }
+        }
+
         Report::firstOrCreate(
             ['title' => 'Pothole on Main Road', 'user_id' => $user->id],
             [

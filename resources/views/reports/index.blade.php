@@ -66,6 +66,9 @@
                                 <div class="flex flex-wrap gap-2 text-xs font-medium">
                                     <span class="rounded-full bg-yellow-100 px-2 py-1 text-yellow-800">{{ $report->category->name }}</span>
                                     <span class="rounded-full bg-yellow-100 px-2 py-1 text-yellow-800">{{ $report->city->name }}</span>
+                                    @if($report->quartier)
+                                        <span class="rounded-full bg-green-100 px-2 py-1 text-green-800">{{ $report->quartier->name }}</span>
+                                    @endif
                                 </div>
                                 <div class="mt-4 text-xs text-slate-500">{{ __('Reported by') }} {{ $report->user->name }}</div>
                                 <a href="{{ route('reports.show', $report) }}" class="mt-3 inline-block text-sm font-semibold text-red-600 hover:text-red-800">{{ __('View details') }} →</a>

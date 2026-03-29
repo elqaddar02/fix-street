@@ -12,10 +12,14 @@
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         .float-animation { animation: float 3s ease-in-out infinite; }
+        .fade-in { animation: fadeIn 1s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-blink { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
     </style>
 
     <!-- Hero Section -->
-    <section class="hero-gradient text-white py-24 relative overflow-hidden">
+    <section class="hero-gradient text-white py-24 relative overflow-hidden fade-in">
         <div class="absolute inset-0 opacity-5">
             <div class="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
             <div class="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
@@ -29,8 +33,9 @@
                         <div class="w-2 h-2 bg-yellow-300 rounded-full pulse-dot"></div>
                         <span class="text-yellow-100 text-sm font-bold uppercase tracking-widest">Improving Your City</span>
                     </div>
-                    <h1 class="text-5xl md:text-6xl font-black mb-6 leading-tight tracking-tight">
-                        Report Streets,<br><span class="text-yellow-300">Get Them Fixed</span>
+                    <h1 class="text-5xl md:text-6xl font-black mb-6 leading-[1.5] tracking-tight" aria-label="Report Streets, Get Them Fixed">
+                        <span id="line1" data-text="Report Streets," class="inline-block"></span><br>
+                        <span id="line2" data-text="Get Them Fixed" class="text-yellow-300 inline-block"></span>
                     </h1>
                     <p class="text-lg text-gray-100 mb-10 leading-relaxed max-w-xl">
                         Help us maintain safe, clean streets. Report potholes, broken lights, damaged infrastructure, and more. Your reports empower city officials to act fast.
@@ -267,3 +272,47 @@
         </div>
     </section>
 </x-app-layout>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const line1 = document.getElementById('line1');
+    const line2 = document.getElementById('line2');
+    const cursor = document.createElement('span');
+    cursor.className = 'inline-block w-1 h-12 bg-yellow-300 animate-blink ml-1';
+    const text1 = line1.dataset.text;
+    const text2 = line2.dataset.text;
+    let index1 = 0;
+    let index2 = 0;
+    line1.innerHTML = '';
+    line2.innerHTML = '';
+    line1.appendChild(cursor);
+
+    function typeLine1() {
+        if (index1 < text1.length) {
+            line1.innerHTML = text1.substring(0, index1 + 1);
+            line1.appendChild(cursor);
+            index1++;
+            setTimeout(typeLine1, 50);
+        } else {
+            setTimeout(() => {
+                line1.removeChild(cursor);
+                line2.appendChild(cursor);
+                typeLine2();
+            }, 500);
+        }
+    }
+
+    function typeLine2() {
+        if (index2 < text2.length) {
+            line2.innerHTML = text2.substring(0, index2 + 1);
+            line2.appendChild(cursor);
+            index2++;
+            setTimeout(typeLine2, 50);
+        } else {
+            line2.removeChild(cursor);
+        }
+    }
+
+    typeLine1();
+});
+</script>

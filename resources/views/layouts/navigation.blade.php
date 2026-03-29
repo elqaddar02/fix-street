@@ -1,11 +1,11 @@
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <div class="flex justify-between items-center h-16">
             <!-- Left: logo -->
             <div class="shrink-0 flex items-center">
                 <a href="{{ url('/') }}">
-                    <x-application-logo class="block h-16 w-auto fill-current text-gray-800" />
+                    <x-application-logo class="block h-32 w-auto fill-current text-gray-800" />
                 </a>
             </div>
 
@@ -29,8 +29,19 @@
                 @endauth
             </div>
 
-            <!-- Right: settings dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <!-- Right: language toggle and settings dropdown -->
+            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-4">
+                <!-- Language Toggle -->
+                <div class="flex items-center space-x-2">
+                    <a href="{{ url()->current() }}?lang=fr" class="px-2 py-1 text-sm rounded {{ app()->getLocale() === 'fr' ? 'bg-red-600 text-white' : 'text-gray-600 hover:text-gray-800' }}">
+                        FR
+                    </a>
+                    <span class="text-gray-400">|</span>
+                    <a href="{{ url()->current() }}?lang=en" class="px-2 py-1 text-sm rounded {{ app()->getLocale() === 'en' ? 'bg-red-600 text-white' : 'text-gray-600 hover:text-gray-800' }}">
+                        EN
+                    </a>
+                </div>
+
                 @auth
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
