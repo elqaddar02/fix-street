@@ -1,3 +1,5 @@
+<?php
+$homeContent = <<<'BLADE'
 @php($title = 'Madinova - Official City Street Maintenance Portal')
 
 <x-app-layout>
@@ -227,27 +229,31 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
                 <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">Process</span>
-                <h2 class="text-4xl font-black text-gray-900 mb-4">How It Works </h2>
+                <h2 class="text-4xl font-black text-gray-900 mb-4">How It Works</h2>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">Simple steps to report and track street issues</p>
             </div>
 
-            <div class="flex justify-center items-center">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl">
-                    <div class="text-center flex flex-col items-center justify-center">
-                        <div class="w-20 h-20 bg-red-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">1</div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-3">Take a Photo</h3>
-                        <p class="text-gray-600">Capture a clear image of the street issue you found.</p>
-                    </div>
-                    <div class="text-center flex flex-col items-center justify-center">
-                        <div class="w-20 h-20 bg-orange-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">2</div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-3">Describe Issue</h3>
-                        <p class="text-gray-600">Fill in category, location, and detailed description.</p>
-                    </div>
-                    <div class="text-center flex flex-col items-center justify-center">
-                        <div class="w-20 h-20 bg-green-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">3</div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-3">Get Fixed</h3>
-                        <p class="text-gray-600">City team reviews and schedules maintenance action.</p>
-                    </div>
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-red-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">1</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Take a Photo</h3>
+                    <p class="text-gray-600">Capture a clear image of the street issue you found.</p>
+                </div>
+                <div class="hidden md:flex items-center justify-center">
+                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-orange-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">2</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Describe Issue</h3>
+                    <p class="text-gray-600">Fill in category, location, and detailed description.</p>
+                </div>
+                <div class="hidden md:flex items-center justify-center">
+                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-green-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">3</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Get Fixed</h3>
+                    <p class="text-gray-600">City team reviews and schedules maintenance action.</p>
                 </div>
             </div>
         </div>
@@ -267,3 +273,8 @@
         </div>
     </section>
 </x-app-layout>
+BLADE;
+
+file_put_contents('resources/views/home.blade.php', $homeContent);
+echo "Home page updated successfully!\n";
+?>
