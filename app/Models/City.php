@@ -15,4 +15,9 @@ class City extends Model
     {
         return $this->hasMany(Report::class);
     }
+
+    public function quartiers()
+    {
+        return $this->hasMany(Quartier::class);
+    }
 }

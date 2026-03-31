@@ -70,13 +70,8 @@
 
                             <div>
                                 <x-input-label for="quartier_id" :value="__('Quartier')" class="text-lg font-semibold" />
-                                <select id="quartier_id" name="quartier_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4">
-                                    <option value="">-- Sélectionner un quartier --</option>
-                                    @foreach ($quartiers as $quartier)
-                                        <option value="{{ $quartier->id }}" @selected(old('quartier_id') == $quartier->id)>
-                                            {{ $quartier->name }}
-                                        </option>
-                                    @endforeach
+                                <select id="quartier_id" name="quartier_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" disabled>
+                                    <option value="">-- Sélectionner d'abord une ville --</option>
                                 </select>
                             </div>
                         </div>
@@ -171,5 +166,40 @@
                 reader.readAsDataURL(imageInput.files[0]);
             }
         }
+
+        // Dynamic quartier loading based on city selection
+        const citySelect = document.getElementById('city_id');
+        const quartierSelect = document.getElementById('quartier_id');
+
+        citySelect.addEventListener('change', function() {
+            const cityId = this.value;
+            
+            if (cityId) {
+                // Enable quartier select
+                quartierSelect.disabled = false;
+                quartierSelect.innerHTML = '<option value="">Chargement...</option>';
+                
+                // Fetch quartiers for the selected city
+                fetch(`/api/quartiers/${cityId}`)
+                    .then(response => response.json())
+                    .then(quartiers => {
+                        quartierSelect.innerHTML = '<option value="">-- Sélectionner un quartier --</option>';
+                        quartiers.forEach(quartier => {
+                            const option = document.createElement('option');
+                            option.value = quartier.id;
+                            option.textContent = quartier.name;
+                            quartierSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading quartiers:', error);
+                        quartierSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+                    });
+            } else {
+                // Disable quartier select if no city selected
+                quartierSelect.disabled = true;
+                quartierSelect.innerHTML = '<option value="">-- Sélectionner d'abord une ville --</option>';
+            }
+        });
     </script>
 </x-app-layout>

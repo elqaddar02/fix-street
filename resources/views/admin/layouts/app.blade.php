@@ -21,6 +21,7 @@
                 <a href="{{ route('admin.users.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Users</a>
                 <a href="{{ route('admin.reports.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.reports.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Reports</a>
                 <a href="{{ route('admin.cities.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.cities.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Cities</a>
+                <a href="{{ route('admin.quartiers.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.quartiers.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Quartiers</a>
             </nav>
         </aside>
 

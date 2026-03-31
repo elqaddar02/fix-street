@@ -54,6 +54,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
     Route::post('/reports/{report}/comments', [ReportController::class, 'storeComment'])->name('reports.comments.store');
@@ -85,10 +87,16 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
     Route::get('/cities/{city}/edit', [\App\Http\Controllers\Admin\CityController::class, 'edit'])->name('cities.edit');
     Route::patch('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'update'])->name('cities.update');
     Route::delete('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'destroy'])->name('cities.destroy');
+
+    Route::get('/quartiers', [\App\Http\Controllers\Admin\QuartierController::class, 'index'])->name('quartiers.index');
+    Route::post('/quartiers', [\App\Http\Controllers\Admin\QuartierController::class, 'store'])->name('quartiers.store');
+    Route::get('/quartiers/{quartier}/edit', [\App\Http\Controllers\Admin\QuartierController::class, 'edit'])->name('quartiers.edit');
+    Route::patch('/quartiers/{quartier}', [\App\Http\Controllers\Admin\QuartierController::class, 'update'])->name('quartiers.update');
+    Route::delete('/quartiers/{quartier}', [\App\Http\Controllers\Admin\QuartierController::class, 'destroy'])->name('quartiers.destroy');
 });
 
-// Public report details (no login required)
-Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
- Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/api/quartiers/{city}', function (\App\Models\City $city) {
+    return $city->quartiers()->where('active', true)->get(['id', 'name']);
+});
 
 require __DIR__.'/auth.php';
