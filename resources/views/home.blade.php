@@ -1,4 +1,4 @@
-@php($title = 'Madinova - Official City Street Maintenance Portal')
+@php($title = __('Madinova - Official City Street Maintenance Portal'))
 
 <x-app-layout>
     <style>
@@ -31,23 +31,23 @@
                 <div>
                     <div class="mb-6 flex items-center gap-3">
                         <div class="w-2 h-2 bg-yellow-300 rounded-full pulse-dot"></div>
-                        <span class="text-yellow-100 text-sm font-bold uppercase tracking-widest">Improving Your City</span>
+                        <span class="text-yellow-100 text-sm font-bold uppercase tracking-widest">{{ __('Improving Your City') }}</span>
                     </div>
                     <h1 class="text-5xl md:text-6xl font-black mb-6 leading-[1.5] tracking-tight" aria-label="Report Streets, Get Them Fixed">
-                        <span id="line1" data-text="Report Streets," class="inline-block"></span><br>
-                        <span id="line2" data-text="Get Them Fixed" class="text-yellow-300 inline-block"></span>
+                        <span id="line1" data-text="{{ __('Report Streets,') }}" class="inline-block"></span><br>
+                        <span id="line2" data-text="{{ __('Get Them Fixed') }}" class="text-yellow-300 inline-block"></span>
                     </h1>
                     <p class="text-lg text-gray-100 mb-10 leading-relaxed max-w-xl">
-                        Help us maintain safe, clean streets. Report potholes, broken lights, damaged infrastructure, and more. Your reports empower city officials to act fast.
+                        {{ __('Help us maintain safe, clean streets. Report potholes, broken lights, damaged infrastructure, and more. Your reports empower city officials to act fast.') }}
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="inline-flex items-center justify-center px-8 py-4 bg-white text-red-600 font-bold rounded-xl hover:bg-yellow-100 transition-all shadow-xl hover:shadow-2xl hover:scale-105">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                            Report a Problem
+                            {{ __('Report a Problem') }}
                         </a>
                         <a href="#recent-reports" class="inline-flex items-center justify-center px-8 py-4 bg-white/20 text-white font-bold rounded-xl hover:bg-white/30 transition-all border-2 border-white/60 hover:border-white">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                            View Reports
+                            {{ __('View Reports') }}
                         </a>
                     </div>
                 </div>
@@ -74,15 +74,15 @@
             <div class="grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-white/20">
                 <div class="text-center">
                     <div class="text-3xl font-black text-yellow-300 mb-2">{{ \App\Models\Report::count() }}</div>
-                    <p class="text-sm text-white/80">Total Reports</p>
+                    <p class="text-sm text-white/80">{{ __('Total Reports') }}</p>
                 </div>
                 <div class="text-center">
                     <div class="text-3xl font-black text-yellow-300 mb-2">{{ \App\Models\Report::where('status', 'RESOLVED')->count() }}</div>
-                    <p class="text-sm text-white/80">Resolved Issues</p>
+                    <p class="text-sm text-white/80">{{ __('Resolved Issues') }}</p>
                 </div>
                 <div class="text-center">
                     <div class="text-3xl font-black text-yellow-300 mb-2">{{ \App\Models\City::count() }}</div>
-                    <p class="text-sm text-white/80">Cities Covered</p>
+                    <p class="text-sm text-white/80">{{ __('Cities Covered') }}</p>
                 </div>
             </div>
         </div>
@@ -97,9 +97,9 @@
     <section class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
-                <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">Categories</span>
-                <h2 class="text-4xl font-black text-gray-900 mb-4">Report What You See</h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Choose from these common street maintenance issues</p>
+                <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">{{ __('Categories') }}</span>
+                <h2 class="text-4xl font-black text-gray-900 mb-4">{{ __('Report What You See') }}</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('Choose from these common street maintenance issues') }}</p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
@@ -109,8 +109,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Road Damage</h3>
-                    <p class="text-gray-600 leading-relaxed">Potholes, cracks, uneven pavement, and other surface damage that poses safety risks.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ __('Road Damage') }}</h3>
+                    <p class="text-gray-600 leading-relaxed">{{ __('Potholes, cracks, uneven pavement, and other surface damage that poses safety risks.') }}</p>
                 </div>
 
                 <div class="card-hover bg-white rounded-2xl p-8 border-2 border-transparent hover:border-yellow-200">
@@ -119,8 +119,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Street Lighting</h3>
-                    <p class="text-gray-600 leading-relaxed">Broken, malfunctioning, or missing street lights affecting pedestrian and driver safety.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ __('Street Lighting') }}</h3>
+                    <p class="text-gray-600 leading-relaxed">{{ __('Broken, malfunctioning, or missing street lights affecting pedestrian and driver safety.') }}</p>
                 </div>
 
                 <div class="card-hover bg-white rounded-2xl p-8 border-2 border-transparent hover:border-blue-200">
@@ -129,8 +129,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Infrastructure</h3>
-                    <p class="text-gray-600 leading-relaxed">Damaged signs, barriers, sidewalks, curbs, drainage issues, and other street infrastructure.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ __('Infrastructure') }}</h3>
+                    <p class="text-gray-600 leading-relaxed">{{ __('Damaged signs, barriers, sidewalks, curbs, drainage issues, and other street infrastructure.') }}</p>
                 </div>
             </div>
         </div>
@@ -141,11 +141,11 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between mb-16">
                 <div>
-                    <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">Recent Activity</span>
-                    <h2 class="text-4xl font-black text-gray-900">Latest Reports</h2>
+                    <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">{{ __('Recent Activity') }}</span>
+                    <h2 class="text-4xl font-black text-gray-900">{{ __('Latest Reports') }}</h2>
                 </div>
                 <a href="{{ route('reports.index') }}" class="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all">
-                    View All Reports
+                    {{ __('View All Reports') }}
                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                 </a>
             </div>
@@ -206,7 +206,7 @@
                                 </div>
 
                                 <a href="{{ route('reports.show', $report) }}" class="mt-4 inline-flex items-center justify-center w-full px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all text-sm">
-                                    View Details
+                                    {{ __('View Details') }}
                                 </a>
                             </div>
                         </article>
@@ -217,10 +217,10 @@
                     <svg class="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
-                    <p class="text-gray-600 font-semibold mb-4">No reports yet</p>
-                    <p class="text-gray-500 mb-6">Be the first to report an issue in your area.</p>
+                    <p class="text-gray-600 font-semibold mb-4">{{ __('No reports yet') }}</p>
+                    <p class="text-gray-500 mb-6">{{ __('Be the first to report an issue in your area.') }}</p>
                     <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all">
-                        Create First Report
+                        {{ __('Create First Report') }}
                     </a>
                 </div>
             @endif
@@ -231,27 +231,27 @@
     <section class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
-                <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">Process</span>
-                <h2 class="text-4xl font-black text-gray-900 mb-4">How It Works </h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">Simple steps to report and track street issues</p>
+                <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">{{ __('Process') }}</span>
+                <h2 class="text-4xl font-black text-gray-900 mb-4">{{ __('How It Works') }}</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('Simple steps to report and track street issues') }}</p>
             </div>
 
             <div class="flex justify-center items-center">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl">
                     <div class="text-center flex flex-col items-center justify-center">
                         <div class="w-20 h-20 bg-red-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">1</div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-3">Take a Photo</h3>
-                        <p class="text-gray-600">Capture a clear image of the street issue you found.</p>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">{{ __('Take a Photo') }}</h3>
+                        <p class="text-gray-600">{{ __('Capture a clear image of the street issue you found.') }}</p>
                     </div>
                     <div class="text-center flex flex-col items-center justify-center">
                         <div class="w-20 h-20 bg-orange-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">2</div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-3">Describe Issue</h3>
-                        <p class="text-gray-600">Fill in category, location, and detailed description.</p>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">{{ __('Describe Issue') }}</h3>
+                        <p class="text-gray-600">{{ __('Fill in category, location, and detailed description.') }}</p>
                     </div>
                     <div class="text-center flex flex-col items-center justify-center">
                         <div class="w-20 h-20 bg-green-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">3</div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-3">Get Fixed</h3>
-                        <p class="text-gray-600">City team reviews and schedules maintenance action.</p>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">{{ __('Get Fixed') }}</h3>
+                        <p class="text-gray-600">{{ __('City team reviews and schedules maintenance action.') }}</p>
                     </div>
                 </div>
             </div>
@@ -261,10 +261,10 @@
     <!-- CTA Section -->
     <section class="py-20 bg-white">
         <div class="max-w-4xl mx-auto px-6 text-center">
-            <h2 class="text-4xl font-black text-gray-900 mb-6">Make a Difference Today</h2>
-            <p class="text-xl text-gray-600 mb-10">Every report helps improve our city. Be part of the solution.</p>
+            <h2 class="text-4xl font-black text-gray-900 mb-6">{{ __('Make a Difference Today') }}</h2>
+            <p class="text-xl text-gray-600 mb-10">{{ __('Every report helps improve our city. Be part of the solution.') }}</p>
             <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="inline-flex items-center justify-center px-10 py-5 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold rounded-xl hover:from-red-700 hover:to-red-800 transition-all shadow-xl hover:shadow-2xl text-lg">
-                Start Reporting Now
+                {{ __('Start Reporting Now') }}
                 <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                 </svg>

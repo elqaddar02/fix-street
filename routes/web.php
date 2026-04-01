@@ -55,8 +55,9 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
+    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+    
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
     Route::post('/reports/{report}/comments', [ReportController::class, 'storeComment'])->name('reports.comments.store');
 
@@ -78,7 +79,10 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
     Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
 
     Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::get('/reports/{report}', [\App\Http\Controllers\Admin\ReportController::class, 'show'])->name('reports.show');
+
+
     Route::patch('/reports/{report}/status', [\App\Http\Controllers\Admin\ReportController::class, 'updateStatus'])->name('reports.updateStatus');
     Route::delete('/reports/{report}', [\App\Http\Controllers\Admin\ReportController::class, 'destroy'])->name('reports.destroy');
 
@@ -98,5 +102,8 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
 Route::get('/api/quartiers/{city}', function (\App\Models\City $city) {
     return $city->quartiers()->where('active', true)->get(['id', 'name']);
 });
+
+// Language switcher
+Route::get('/language/{language}', [App\Http\Controllers\LanguageController::class, 'switchLanguage'])->name('language.switch');
 
 require __DIR__.'/auth.php';

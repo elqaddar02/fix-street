@@ -10,13 +10,13 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-2xl">
                 <div class="p-8 text-gray-900">
                     <div class="mb-8">
-                        <h3 class="text-2xl font-bold text-gray-900">Report a Street Issue</h3>
-                        <p class="text-gray-600 mt-1">Share details about the street maintenance problem you've found.</p>
+                        <h3 class="text-2xl font-bold text-gray-900">{{ __('Report a Street Issue') }}</h3>
+                        <p class="text-gray-600 mt-1">{{ __('Share details about the street maintenance problem you\'ve found.') }}</p>
                     </div>
 
                     @if ($errors->any())
                         <div class="mb-6 rounded-xl border-l-4 border-red-600 bg-red-50 p-4 text-red-700">
-                            <p class="font-semibold mb-2">Please fix the following errors:</p>
+                            <p class="font-semibold mb-2">{{ __('Please fix the following errors:') }}</p>
                             <ul class="list-disc list-inside space-y-1">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -32,14 +32,14 @@
                         <div>
                             <x-input-label for="title" :value="__('Report Title')" class="text-lg font-semibold" />
                             <x-text-input id="title" name="title" type="text" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
-                                placeholder="Description brève du problème" :value="old('title')" required />
+                                placeholder="{{ __('Brief description of the problem') }}" :value="old('title')" required />
                         </div>
 
                         <!-- Description -->
                         <div>
                             <x-input-label for="description" :value="__('Detailed Description')" class="text-lg font-semibold" />
                             <textarea id="description" name="description" rows="5" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
-                                placeholder="Fournir des informations détaillées sur le problème..." required>{{ old('description') }}</textarea>
+                                placeholder="{{ __('Provide detailed information about the problem...') }}" required>{{ old('description') }}</textarea>
                         </div>
 
                         <!-- Category, City and Quartier -->
@@ -47,7 +47,7 @@
                             <div>
                                 <x-input-label for="category_id" :value="__('Category')" class="text-lg font-semibold" />
                                 <select id="category_id" name="category_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
-                                    <option value="">-- Sélectionner une catégorie --</option>
+                                    <option value="">{{ __('-- Select a category --') }}</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>
                                             {{ $category->name }}
@@ -59,7 +59,7 @@
                             <div>
                                 <x-input-label for="city_id" :value="__('City')" class="text-lg font-semibold" />
                                 <select id="city_id" name="city_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
-                                    <option value="">-- Sélectionner une ville --</option>
+                                    <option value="">{{ __('-- Select a city --') }}</option>
                                     @foreach ($cities as $city)
                                         <option value="{{ $city->id }}" @selected(old('city_id') == $city->id) @disabled(!$city->active)>
                                             {{ $city->name }} @if(!$city->active) (Bientôt disponible) @endif
@@ -71,7 +71,7 @@
                             <div>
                                 <x-input-label for="quartier_id" :value="__('Quartier')" class="text-lg font-semibold" />
                                 <select id="quartier_id" name="quartier_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" disabled>
-                                    <option value="">-- Sélectionner d'abord une ville --</option>
+                                    <option value="">{{ __('-- Select a city first --') }}</option>
                                 </select>
                             </div>
                         </div>
@@ -103,8 +103,8 @@
                                         <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
-                                        <p class="text-gray-700 font-semibold">Click to upload or drag and drop</p>
-                                        <p class="text-sm text-gray-500">PNG, JPG, GIF up to 2MB</p>
+                                        <p class=\"text-gray-700 font-semibold\">{{ __('Click to upload or drag and drop') }}</p>
+                                        <p class="text-sm text-gray-500">{{ __('PNG, JPG, GIF up to 2MB') }}</p>
                                     </div>
                                 </div>
                                 <div id="image-preview" class="mt-4 hidden">
@@ -115,7 +115,7 @@
 
                         <!-- Actions -->
                         <div class="flex items-center justify-between pt-8 border-t border-gray-200">
-                            <a href="{{ route('dashboard') }}" class="text-gray-600 hover:text-gray-900 font-semibold">← Back</a>
+                            <a href="{{ route('dashboard') }}" class="text-gray-600 hover:text-gray-900 font-semibold">← {{ __('Back') }}</a>
                             <x-primary-button class="px-8 py-3 text-lg">{{ __('Submit Report') }}</x-primary-button>
                         </div>
                     </form>
@@ -198,7 +198,7 @@
             } else {
                 // Disable quartier select if no city selected
                 quartierSelect.disabled = true;
-                quartierSelect.innerHTML = '<option value="">-- Sélectionner d'abord une ville --</option>';
+                quartierSelect.innerHTML = '<option value="">-- Sélectionner dabord une ville --</option>';
             }
         });
     </script>

@@ -47,9 +47,9 @@ class ReportController extends Controller
 
     public function create()
     {
-        if (auth()->check() && auth()->user()->is_admin) {
-            abort(403, 'Admins are not allowed to create reports.');
-        }
+        // if (auth()->check() && auth()->user()->is_admin) {
+        //     abort(403, 'Admins are not allowed to create reports.');
+        // }
 
         $categories = Category::all();
         $cities = City::where('active', true)->get();

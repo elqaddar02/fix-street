@@ -10,37 +10,33 @@
             </div>
 
             <!-- Center: primary nav links -->
-            <div class="hidden sm:flex flex-1 justify-center space-x-8">
-                <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.index')">
-                    {{ __('All Reports') }}
-                </x-nav-link>
-                <x-nav-link :href="route('about')" :active="request()->routeIs('about')">
-                    {{ __('About') }}
-                </x-nav-link>
-                <x-nav-link :href="route('help')" :active="request()->routeIs('help')">
-                    {{ __('Help') }}
-                </x-nav-link>
-                @auth
-                    @if (auth()->user()->is_admin)
-                        <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
-                            {{ __('Manage Reports') }}
-                        </x-nav-link>
-                    @endif
-                @endauth
+            <div class="hidden sm:flex flex-1 justify-center">
+                <div class="flex items-center space-x-5 bg-gray-50/80 backdrop-blur-sm rounded-full px-2 py-1 border border-gray-200/50">
+                    <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.index')" class="flex items-center gap-2 px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white hover:shadow-sm hover:scale-105">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        {{ __('nav.all_reports') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('about')" :active="request()->routeIs('about')" class="flex items-center gap-2 px-6 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white hover:shadow-sm hover:scale-105">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ __('nav.about') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('help')" :active="request()->routeIs('help')" class="flex items-center gap-2 px-8 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white hover:shadow-sm hover:scale-105">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ __('nav.help') }}
+                    </x-nav-link>
+                </div>
             </div>
 
             <!-- Right: language toggle and settings dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 gap-4">
-                <!-- Language Toggle -->
-                <div class="flex items-center space-x-2">
-                    <a href="{{ url()->current() }}?lang=fr" class="px-2 py-1 text-sm rounded {{ app()->getLocale() === 'fr' ? 'bg-red-600 text-white' : 'text-gray-600 hover:text-gray-800' }}">
-                        FR
-                    </a>
-                    <span class="text-gray-400">|</span>
-                    <a href="{{ url()->current() }}?lang=en" class="px-2 py-1 text-sm rounded {{ app()->getLocale() === 'en' ? 'bg-red-600 text-white' : 'text-gray-600 hover:text-gray-800' }}">
-                        EN
-                    </a>
-                </div>
+                <!-- Language Toggle Component -->
+                <x-language-switcher />
 
                 @auth
                 <x-dropdown align="right" width="48">
@@ -161,5 +157,21 @@
             </div>
         </div>
         @endauth
+        
+        <!-- Mobile Language Switcher -->
+        <div class="pt-4 pb-1 border-t border-gray-200">
+            <div class="px-4 py-2 text-sm font-medium text-gray-700">{{ __('Language') }}</div>
+            <div class="space-y-1">
+                <a href="{{ route('language.switch', 'en') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 @if(app()->getLocale() == 'en') bg-gray-50 font-semibold @endif">
+                    🇬🇧 English
+                </a>
+                <a href="{{ route('language.switch', 'fr') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 @if(app()->getLocale() == 'fr') bg-gray-50 font-semibold @endif">
+                    🇫🇷 Français
+                </a>
+                <a href="{{ route('language.switch', 'ar') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 @if(app()->getLocale() == 'ar') bg-gray-50 font-semibold @endif">
+                    🇸🇦 العربية
+                </a>
+            </div>
+        </div>
     </div>
 </nav>
