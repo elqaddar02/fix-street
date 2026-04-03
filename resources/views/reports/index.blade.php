@@ -16,7 +16,7 @@
                             <select name="category" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 focus:border-red-500 focus:ring-2 focus:ring-red-200">
                                 <option value="">{{ __('All Categories') }}</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" @selected($selectedCategory == $category->id)>{{ $category->name }}</option>
+                                    <option value="{{ $category->id }}" @selected($selectedCategory == $category->id)>{{ $category->display_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -64,8 +64,8 @@
                                 <h4 class="text-lg font-bold text-red-800 mb-2">{{ $report->title }}</h4>
                                 <p class="text-sm text-slate-700 mb-3">{{ \Illuminate\Support\Str::limit($report->description, 110) }}</p>
                                 <div class="flex flex-wrap gap-2 text-xs font-medium">
-                                    <span class="rounded-full bg-yellow-100 px-2 py-1 text-yellow-800">{{ $report->category->name }}</span>
-                                    <span class="rounded-full bg-yellow-100 px-2 py-1 text-yellow-800">{{ $report->city->name }}</span>
+                                    <span class="rounded-full bg-yellow-100 px-2 py-1 text-yellow-800">{{ $report->category->display_name }}</span>
+                                    <span class="rounded-full bg-yellow-100 px-2 py-1 text-yellow-800">{{ $report->city->display_name }}</span>
                                     @if($report->quartier)
                                         <span class="rounded-full bg-green-100 px-2 py-1 text-green-800">{{ $report->quartier->name }}</span>
                                     @endif

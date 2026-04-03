@@ -183,9 +183,19 @@
 
                             <div class="p-6">
                                 <div class="flex items-start justify-between mb-3">
-                                    <span class="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
-                                        {{ $report->category->name ?? 'Unknown' }}
-                                    </span>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
+                                            {{ $report->category->display_name ?? 'Unknown' }}
+                                        </span>
+                                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                                            {{ $report->city->display_name ?? 'Unknown' }}
+                                        </span>
+                                        @if($report->quartier)
+                                            <span class="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                                                {{ $report->quartier->display_name }}
+                                            </span>
+                                        @endif
+                                    </div>
                                     <time class="text-xs text-gray-500 font-semibold">{{ $report->created_at->format('M d, Y') }}</time>
                                 </div>
 

@@ -9,7 +9,7 @@ class City extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'active'];
+    protected $fillable = ['name', 'name_ar', 'active'];
 
     public function reports()
     {
@@ -19,5 +19,14 @@ class City extends Model
     public function quartiers()
     {
         return $this->hasMany(Quartier::class);
+    }
+
+    public function getDisplayNameAttribute()
+    {
+        $locale = app()->getLocale();
+        if ($locale === 'ar' && $this->name_ar) {
+            return $this->name_ar;
+        }
+        return $this->name;
     }
 }

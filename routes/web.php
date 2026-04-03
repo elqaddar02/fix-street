@@ -17,9 +17,9 @@ Route::get('/', function () {
             'id' => $report->id,
             'title' => $report->title,
             'description' => $report->description,
-            'category' => optional($report->category)->name ?? 'Unknown',
-            'city' => optional($report->city)->name ?? 'Unknown',
-            'quartier' => optional($report->quartier)->name ?? null,
+            'category' => optional($report->category)->display_name ?? 'Unknown',
+            'city' => optional($report->city)->display_name ?? 'Unknown',
+            'quartier' => optional($report->quartier)->display_name ?? null,
             'status' => $report->status,
             'user' => optional($report->user)->name ?? 'Anonymous',
             'created_at' => $report->created_at->format('M j, Y'),
@@ -36,7 +36,7 @@ Route::get('/', function () {
     $isAuthenticated = auth()->check() ? 'true' : 'false';
 
     return view('home', compact('latestReports', 'reportsJson', 'isAuthenticated'));
-});
+})->name('home');
 
 Route::view('/about', 'about')->name('about');
 Route::view('/contact', 'contact')->name('contact');
@@ -100,7 +100,12 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
 });
 
 Route::get('/api/quartiers/{city}', function (\App\Models\City $city) {
-    return $city->quartiers()->where('active', true)->get(['id', 'name']);
+    return $city->quartiers()->where('active', true)->get()->map(function ($quartier) {
+        return [
+            'id' => $quartier->id,
+            'name' => $quartier->display_name,
+        ];
+    });
 });
 
 // Language switcher

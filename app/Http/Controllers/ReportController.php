@@ -75,6 +75,14 @@ class ReportController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('reports', 'public');
+            
+            // Copy to public/storage for Windows compatibility
+            $source = storage_path('app/public/' . $validated['image']);
+            $destination = public_path('storage/' . $validated['image']);
+            if (!file_exists(dirname($destination))) {
+                mkdir(dirname($destination), 0755, true);
+            }
+            copy($source, $destination);
         }
 
         if (auth()->check() && auth()->user()->is_admin) {

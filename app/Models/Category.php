@@ -9,10 +9,19 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'name_ar'];
 
     public function reports()
     {
         return $this->hasMany(Report::class);
+    }
+
+    public function getDisplayNameAttribute()
+    {
+        $locale = app()->getLocale();
+        if ($locale === 'ar' && $this->name_ar) {
+            return $this->name_ar;
+        }
+        return $this->name;
     }
 }

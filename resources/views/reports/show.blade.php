@@ -39,14 +39,14 @@
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-700">Category</h3>
                                         <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium mt-1">
-                                            {{ $report->category->name }}
+                                            {{ $report->category->display_name }}
                                         </span>
                                     </div>
 
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-700">City</h3>
                                         <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium mt-1">
-                                            {{ $report->city->name }}
+                                            {{ $report->city->display_name }}
                                         </span>
                                     </div>
 
@@ -54,7 +54,7 @@
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-700">Quartier</h3>
                                         <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium mt-1">
-                                            {{ $report->quartier->name }}
+                                            {{ $report->quartier->display_name }}
                                         </span>
                                     </div>
                                     @endif

@@ -50,7 +50,7 @@
                                     <option value="">{{ __('-- Select a category --') }}</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>
-                                            {{ $category->name }}
+                                            {{ $category->display_name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -58,11 +58,11 @@
 
                             <div>
                                 <x-input-label for="city_id" :value="__('City')" class="text-lg font-semibold" />
-                                <select id="city_id" name="city_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
+                                        <select id="city_id" name="city_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
                                     <option value="">{{ __('-- Select a city --') }}</option>
                                     @foreach ($cities as $city)
                                         <option value="{{ $city->id }}" @selected(old('city_id') == $city->id) @disabled(!$city->active)>
-                                            {{ $city->name }} @if(!$city->active) (Bientôt disponible) @endif
+                                            {{ $city->display_name }} @if(!$city->active) (Bientôt disponible) @endif
                                         </option>
                                     @endforeach
                                 </select>

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('reports', function (Blueprint $table) {
-            $table->foreignId('quartier_id')->nullable()->constrained('quartiers')->onDelete('cascade')->after('city_id');
+        Schema::table('quartiers', function (Blueprint $table) {
+            $table->string('name_ar')->nullable()->after('name');
         });
     }
 
@@ -21,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('reports', function (Blueprint $table) {
-            $table->dropForeign(['quartier_id']);
-            $table->dropColumn('quartier_id');
+        Schema::table('quartiers', function (Blueprint $table) {
+            $table->dropColumn('name_ar');
         });
     }
 };

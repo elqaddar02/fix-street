@@ -20,7 +20,7 @@
             </div>
             <div>
                 <p class="font-semibold">Catégorie:</p>
-                <p>{{ $report->category->name ?? 'N/A' }}</p>
+                <p>{{ $report->category->display_name ?? 'N/A' }}</p>
             </div>
             <div>
                 <p class="font-semibold">Ville:</p>
@@ -28,7 +28,7 @@
             </div>
             <div>
                 <p class="font-semibold">Quartier:</p>
-                <p>{{ $report->quartier->name ?? 'N/A' }}</p>
+                <p>{{ $report->quartier->display_name ?? 'N/A' }}</p>
             </div>
             <div>
                 <p class="font-semibold">Utilisateur:</p>

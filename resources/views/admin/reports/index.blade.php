@@ -45,10 +45,10 @@
                         <div class="text-sm text-gray-500">{{ Str::limit($report->description, 50) }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ $report->city->name ?? '-' }}</div>
+                        <div class="text-sm text-gray-900">{{ $report->city->display_name ?? '-' }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ $report->quartier->name ?? '-' }}</div>
+                        <div class="text-sm text-gray-900">{{ $report->quartier->display_name ?? '-' }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
