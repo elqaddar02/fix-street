@@ -1,0 +1,158 @@
+{
+    "Madinova - Official City Street Maintenance Portal": "مادينوفا - البوابة الرسمية لصيانة شوارع المدينة",
+    "Improving Your City": "تحسين مدينتك",
+    "Report Streets,": "أبلِغ عن مشاكل الشوارع،",
+    "Get Them Fixed": "وساهم في إصلاحها",
+    "Help us maintain safe, clean streets. Report potholes, broken lights, damaged infrastructure, and more. Your reports empower city officials to act fast.": "ساعدنا في الحفاظ على شوارع آمنة ونظيفة. أبلِغ عن الحفر، والأضواء المعطلة، والبنية التحتية المتضررة، والمزيد. تُمكّن إبلاغاتك مسؤولي المدينة من التحرك بسرعة.",
+    
+    "Report a Problem": "الإبلاغ عن مشكلة",
+    "View Reports": "عرض الإبلاغات",
+    "Total Reports": "إجمالي الإبلاغات",
+    "Resolved Issues": "المشكلات التي تم حلها",
+    "Cities Covered": "المدن المشمولة",
+    "Categories": "الفئات",
+
+    "Report What You See": "أبلِغ عمّا تراه",
+    "Choose from these common street maintenance issues": "اختر من بين مشاكل الصيانة الشائعة التالية",
+    
+    "Road Damage": "أضرار الطريق",
+    "Potholes, cracks, uneven pavement, and other surface damage that poses safety risks.": "الحفر، والتشققات، وعدم استواء الطريق، وغيرها من الأضرار السطحية التي تشكل خطراً على السلامة.",
+    
+    "Street Lighting": "إنارة الشوارع",
+    "Broken, malfunctioning, or missing street lights affecting pedestrian and driver safety.": "أضواء الشوارع المعطلة أو غير العاملة أو المفقودة والتي تؤثر على سلامة المشاة والسائقين.",
+    
+    "Infrastructure": "البنية التحتية",
+    "Damaged signs, barriers, sidewalks, curbs, drainage issues, and other street infrastructure.": "اللافتات والحواجز والأرصفة والأرصفة الجانبية المتضررة، ومشاكل تصريف المياه، وغيرها من عناصر البنية التحتية.",
+
+    "Recent Activity": "النشاط الأخير",
+    "Latest Reports": "أحدث الإبلاغات",
+    "View All Reports": "عرض جميع الإبلاغات",
+    "No reports yet": "لا توجد إبلاغات حتى الآن",
+    "Be the first to report an issue in your area.": "كن أول من يُبلّغ عن مشكلة في منطقتك.",
+    "Create First Report": "إنشاء أول إبلاغ",
+
+    "Process": "العملية",
+    "How It Works": "كيف يعمل",
+    "Simple steps to report and track street issues": "خطوات بسيطة للإبلاغ عن مشاكل الشوارع وتتبعها",
+    
+    "Take a Photo": "التقط صورة",
+    "Capture a clear image of the street issue you found.": "التقط صورة واضحة للمشكلة التي لاحظتها في الشارع.",
+    
+    "Describe Issue": "وصف المشكلة",
+    "Fill in category, location, and detailed description.": "حدّد الفئة والموقع، وأضف وصفاً تفصيلياً.",
+    
+    "Submit & Track": "الإرسال والمتابعة",
+    "Track your report status and see when issues are resolved.": "تابع حالة إبلاغك واعرف متى يتم حل المشكلة.",
+
+    "All Reports": "جميع الإبلاغات",
+    "About": "حول",
+    "Help": "مساعدة",
+    "Manage Reports": "إدارة الإبلاغات",
+    "Profile": "الملف الشخصي",
+    "Log Out": "تسجيل الخروج",
+    "Login": "تسجيل الدخول",
+    "Register": "إنشاء حساب",
+    "Home": "الرئيسية",
+    "Privacy": "الخصوصية",
+    "Terms": "الشروط",
+    "Contact": "اتصل بنا",
+    "Dashboard": "لوحة التحكم",
+
+    "This is a secure area of the application. Please confirm your password before continuing.": "هذه منطقة آمنة في التطبيق. يرجى تأكيد كلمة المرور قبل المتابعة.",
+    "Password": "كلمة المرور",
+    "Confirm": "تأكيد",
+
+    "Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.": "هل نسيت كلمة المرور؟ لا مشكلة. أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.",
+    "Email": "البريد الإلكتروني",
+    "Email Password Reset Link": "إرسال رابط إعادة تعيين كلمة المرور",
+
+    "Help & Support": "المساعدة والدعم",
+    "Welcome back,": "مرحباً بعودتك،",
+    "Remember me": "تذكرني",
+    "Forgot your password?": "هل نسيت كلمة المرور؟",
+    "Log in": "تسجيل الدخول",
+
+    "Name": "الاسم",
+    "Confirm Password": "تأكيد كلمة المرور",
+    "Already registered?": "هل لديك حساب بالفعل؟",
+
+    "Reports": "الإبلاغات",
+    "Create Report": "إنشاء إبلاغ",
+    "Report Title": "عنوان الإبلاغ",
+    "Brief description of the problem": "وصف مختصر للمشكلة",
+    "Detailed Description": "الوصف التفصيلي",
+    "Provide detailed information about the problem...": "قدّم تفاصيل دقيقة حول المشكلة...",
+
+    "Category": "الفئة",
+    "-- Select a category --": "-- اختر فئة --",
+
+    "City": "المدينة",
+    "-- Select a city --": "-- اختر مدينة --",
+
+    "Quartier": "الحي",
+    "-- Select a city first --": "-- اختر المدينة أولاً --",
+
+    "Latitude (optional)": "خط العرض (اختياري)",
+    "GPS coordinate - leave blank if unknown": "إحداثيات GPS (اتركها فارغة إن لم تكن معروفة)",
+
+    "Longitude (optional)": "خط الطول (اختياري)",
+
+    "Upload Photo (optional but recommended)": "إرفاق صورة (اختياري ولكن يُنصح به)",
+    "Click to upload or drag and drop": "انقر للرفع أو اسحب الملف وأفلته هنا",
+    "PNG, JPG, GIF up to 2MB": "PNG، JPG، GIF بحجم يصل إلى 2MB",
+
+    "Back": "رجوع",
+    "Submit Report": "إرسال الإبلاغ",
+    "Report submitted successfully!": "تم إرسال الإبلاغ بنجاح!",
+
+    "Filter Reports": "تصفية الإبلاغات",
+    "All Categories": "جميع الفئات",
+    "All Dates": "جميع التواريخ",
+    "Today": "اليوم",
+    "This Week": "هذا الأسبوع",
+    "This Month": "هذا الشهر",
+    "Filter": "تطبيق",
+    "Reset": "إعادة تعيين",
+
+    "Reports found": "عدد الإبلاغات",
+    "Explore reported street issues, sorted by neighborhood and status.": "استعرض مشاكل الشوارع المُبلّغ عنها حسب الحي والحالة.",
+    "View Details": "عرض التفاصيل",
+
+    "Please fix the following errors:": "يرجى تصحيح الأخطاء التالية:",
+
+    "English": "English",
+    "French": "Français",
+    "Arabic": "العربية",
+
+    "Get Fixed": "قيد المعالجة",
+    "City team reviews and schedules maintenance action.": "يقوم فريق المدينة بمراجعة الإبلاغ وجدولة أعمال الصيانة.",
+
+    "Make a Difference Today": "ساهم في إحداث فرق اليوم",
+    "Every report helps improve our city. Be part of the solution.": "كل إبلاغ يساهم في تحسين مدينتنا. كن جزءاً من الحل.",
+    "Start Reporting Now": "ابدأ الإبلاغ الآن",
+
+    "Loading...": "جارٍ التحميل...",
+    "Select a quartier": "-- اختر الحي --",
+    "Error loading quartiers": "حدث خطأ أثناء تحميل الأحياء",
+
+    "Report a Street Issue": "الإبلاغ عن مشكلة في الشارع",
+    "Share details about the street maintenance problem you've found.": "شارك تفاصيل مشكلة صيانة الشارع التي لاحظتها.",
+
+    "About Fix Street": "حول Fix Street",
+    "nav.all_reports": "جميع التقارير",
+    "nav.about": "حول",
+    "nav.help": "مساعدة",
+    "footer.tagline": "أبلغ عن مشاكل صيانة الطرق وساعد في تحسين مدينتك.",
+    "footer.navigation": "التنقل",
+    "footer.home": "الرئيسية",
+    "footer.contact": "اتصل",
+    "footer.resources": "الموارد",
+    "footer.privacy_policy": "سياسة الخصوصية",
+    "footer.terms_of_service": "شروط الخدمة",
+    "footer.view_reports": "عرض التقارير",
+    "footer.account": "الحساب",
+    "footer.my_profile": "ملفي",
+    "footer.all_rights_reserved": "جميع الحقوق محفوظة.",
+    "footer.built_with_care": "تم بناؤه بعناية لمدينتك.",
+    "language.change": "تغيير اللغة"
+}

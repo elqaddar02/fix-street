@@ -9,10 +9,15 @@ class City extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'active'];
 
     public function reports()
     {
         return $this->hasMany(Report::class);
+    }
+
+    public function quartiers()
+    {
+        return $this->hasMany(Quartier::class);
     }
 }

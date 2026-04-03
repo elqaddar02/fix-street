@@ -1,223 +1,318 @@
-@php($title = 'Madinova - Official City Street Maintenance Portal')
+@php($title = __('Madinova - Official City Street Maintenance Portal'))
 
 <x-app-layout>
     <style>
-        .gov-header { background-color: #7f1d1d; }
-        .gov-primary { background-color: #b91c1c; color: white; }
-        .gov-secondary { background-color: #dc2626; color: white; }
-        .gov-accent { background-color: #dc2626; color: white; }
-        .gov-light-bg { background-color: #fef2f2; }
-        .gov-border { border-color: #e2e8f0; }
-        .gov-text-primary { color: #374151; }
-        .gov-text-secondary { color: #64748b; }
-        .gov-button { border: 2px solid; transition: all 0.2s ease; }
-        .gov-button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .hero-gradient { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .stat-gradient { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); }
+        .gradient-text { background: linear-gradient(135deg, #dc2626, #991b1b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .pulse-dot { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .report-card-image { aspect-ratio: 16/9; object-fit: cover; background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        .float-animation { animation: float 3s ease-in-out infinite; }
+        .fade-in { animation: fadeIn 1s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-blink { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
     </style>
 
-    <section class="bg-gradient-to-r from-red-50 to-red-100 py-16">
-        <div class="max-w-7xl mx-auto px-6">
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white py-24 relative overflow-hidden fade-in">
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
             <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Hero Content -->
                 <div>
-                    <div class="mb-6">
-                        <span class="inline-block bg-red-600 text-white px-3 py-1 text-sm font-medium uppercase tracking-wide">Official City Service</span>
+                    <div class="mb-6 flex items-center gap-3">
+                        <div class="w-2 h-2 bg-yellow-300 rounded-full pulse-dot"></div>
+                        <span class="text-yellow-100 text-sm font-bold uppercase tracking-widest">{{ __('Improving Your City') }}</span>
                     </div>
-                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">Report Street Maintenance Issues</h1>
-                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
-                        Submit official reports for damaged roads, broken streetlights, potholes, and other public infrastructure issues.
-                        Your reports help maintain safe streets for all citizens.
+                    <h1 class="text-5xl md:text-6xl font-black mb-6 leading-[1.5] tracking-tight" aria-label="Report Streets, Get Them Fixed">
+                        <span id="line1" data-text="{{ __('Report Streets,') }}" class="inline-block"></span><br>
+                        <span id="line2" data-text="{{ __('Get Them Fixed') }}" class="text-yellow-300 inline-block"></span>
+                    </h1>
+                    <p class="text-lg text-gray-100 mb-10 leading-relaxed max-w-xl">
+                        {{ __('Help us maintain safe, clean streets. Report potholes, broken lights, damaged infrastructure, and more. Your reports empower city officials to act fast.') }}
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="gov-button gov-primary px-8 py-4 text-center font-semibold hover:bg-red-800">Report a Problem</a>
-                        <a href="#reports" class="gov-button border-gray-300 px-8 py-4 text-center hover:bg-gray-50">View Recent Reports</a>
+                        <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="inline-flex items-center justify-center px-8 py-4 bg-white text-red-600 font-bold rounded-xl hover:bg-yellow-100 transition-all shadow-xl hover:shadow-2xl hover:scale-105">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                            {{ __('Report a Problem') }}
+                        </a>
+                        <a href="#recent-reports" class="inline-flex items-center justify-center px-8 py-4 bg-white/20 text-white font-bold rounded-xl hover:bg-white/30 transition-all border-2 border-white/60 hover:border-white">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                            {{ __('View Reports') }}
+                        </a>
                     </div>
                 </div>
-                <div class="relative">
-                    <img src="{{ asset('assets/hero-street.svg') }}" alt="City street maintenance and repair" class="w-full h-80 object-cover shadow-lg" />
-                    <div class="absolute inset-0 bg-red-600 opacity-10"></div>
+
+                <!-- Hero Illustration -->
+                <div class="hidden md:block relative">
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl blur-2xl"></div>
+                    <div class="float-animation">
+                        <svg class="w-full h-auto" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g opacity="0.8">
+                                <circle cx="200" cy="200" r="180" stroke="white" stroke-width="1.5" opacity="0.2"/>
+                                <circle cx="200" cy="200" r="140" stroke="white" stroke-width="1.5" opacity="0.15"/>
+                                <circle cx="200" cy="200" r="100" fill="white" opacity="0.05"/>
+                                <rect x="140" y="140" width="120" height="120" fill="white" opacity="0.1" rx="20"/>
+                                <path d="M100 200H300" stroke="white" stroke-width="1.5" opacity="0.15"/>
+                                <path d="M200 100V300" stroke="white" stroke-width="1.5" opacity="0.15"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-white/20">
+                <div class="text-center">
+                    <div class="text-3xl font-black text-yellow-300 mb-2">{{ \App\Models\Report::count() }}</div>
+                    <p class="text-sm text-white/80">{{ __('Total Reports') }}</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-black text-yellow-300 mb-2">{{ \App\Models\Report::where('status', 'RESOLVED')->count() }}</div>
+                    <p class="text-sm text-white/80">{{ __('Resolved Issues') }}</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-black text-yellow-300 mb-2">{{ \App\Models\City::count() }}</div>
+                    <p class="text-sm text-white/80">{{ __('Cities Covered') }}</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-6">
-        <div class="my-6">
-            <x-ad-banner type="horizontal" />
-        </div>
+    <!-- Ad Banner -->
+    <section class="max-w-7xl mx-auto px-6 py-8">
+        <x-ad-banner type="horizontal" />
     </section>
 
-    <section class="py-16 bg-white">
+    <!-- Categories Section -->
+    <section class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Report Categories</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Select the type of street maintenance issue you wish to report</p>
+            <div class="text-center mb-16">
+                <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">{{ __('Categories') }}</span>
+                <h2 class="text-4xl font-black text-gray-900 mb-4">{{ __('Report What You See') }}</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('Choose from these common street maintenance issues') }}</p>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
-                    <div class="w-12 h-12 bg-red-100 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="card-hover bg-white rounded-2xl p-8 border-2 border-transparent hover:border-red-200">
+                    <div class="w-16 h-16 bg-red-100 flex items-center justify-center mb-6 rounded-xl">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Road Damage</h3>
-                    <p class="text-gray-600">Report potholes, cracks, and other road surface issues</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ __('Road Damage') }}</h3>
+                    <p class="text-gray-600 leading-relaxed">{{ __('Potholes, cracks, uneven pavement, and other surface damage that poses safety risks.') }}</p>
                 </div>
 
-                <div class="border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
-                    <div class="w-12 h-12 bg-red-100 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="card-hover bg-white rounded-2xl p-8 border-2 border-transparent hover:border-yellow-200">
+                    <div class="w-16 h-16 bg-yellow-100 flex items-center justify-center mb-6 rounded-xl">
+                        <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Street Lighting</h3>
-                    <p class="text-gray-600">Report broken or malfunctioning street lights</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ __('Street Lighting') }}</h3>
+                    <p class="text-gray-600 leading-relaxed">{{ __('Broken, malfunctioning, or missing street lights affecting pedestrian and driver safety.') }}</p>
                 </div>
 
-                <div class="border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
-                    <div class="w-12 h-12 bg-red-100 flex items-center justify-center mb-4">
-                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="card-hover bg-white rounded-2xl p-8 border-2 border-transparent hover:border-blue-200">
+                    <div class="w-16 h-16 bg-blue-100 flex items-center justify-center mb-6 rounded-xl">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Infrastructure</h3>
-                    <p class="text-gray-600">Report damaged signs, barriers, and other street infrastructure</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">{{ __('Infrastructure') }}</h3>
+                    <p class="text-gray-600 leading-relaxed">{{ __('Damaged signs, barriers, sidewalks, curbs, drainage issues, and other street infrastructure.') }}</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="reports" class="py-16 gov-light-bg">
+    <!-- Recent Reports Section -->
+    <section id="recent-reports" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">How to File a Street Report</h2>
-                <p class="text-gray-600">Follow these simple steps to help city maintenance teams act quickly.</p>
+            <div class="flex items-center justify-between mb-16">
+                <div>
+                    <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">{{ __('Recent Activity') }}</span>
+                    <h2 class="text-4xl font-black text-gray-900">{{ __('Latest Reports') }}</h2>
+                </div>
+                <a href="{{ route('reports.index') }}" class="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all">
+                    {{ __('View All Reports') }}
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                </a>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="bg-white border border-gray-200 p-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Report Submission Process</h3>
-                    <ol class="list-decimal pl-5 space-y-4 text-gray-700">
-                        <li><strong>Choose report type</strong> (Road Damage, Street Lighting, Infrastructure).</li>
-                        <li><strong>Describe the issue</strong> clearly with location, severity, and details.</li>
-                        <li><strong>Upload evidence</strong> (photo optional but very helpful for inspection).</li>
-                        <li><strong>Submit</strong> and track response status from the portal.</li>
-                    </ol>
-                    <div class="mt-6">
-                        <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="gov-button gov-primary px-6 py-2 inline-block font-semibold hover:bg-red-800">Start a New Report</a>
+            @if($latestReports->isNotEmpty())
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach($latestReports as $report)
+                        <article class="card-hover bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-lg hover:shadow-2xl">
+                            <div class="relative h-48 bg-gray-100 overflow-hidden">
+                                @if($report->image && file_exists(storage_path('app/public/' . $report->image)))
+                                    <img src="{{ asset('storage/' . $report->image) }}" alt="{{ $report->title }}" class="report-card-image w-full h-full">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50">
+                                        <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                @endif
+                                <div class="absolute top-3 right-3">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase"
+                                        @switch($report->status)
+                                            @case('OPEN')
+                                                style="background-color: #fee2e2; color: #991b1b;"
+                                            @break
+                                            @case('IN_PROGRESS')
+                                                style="background-color: #fed7aa; color: #92400e;"
+                                            @break
+                                            @case('RESOLVED')
+                                                style="background-color: #dcfce7; color: #166534;"
+                                            @break
+                                        @endswitch
+                                    >{{ $report->status }}</span>
+                                </div>
+                            </div>
+
+                            <div class="p-6">
+                                <div class="flex items-start justify-between mb-3">
+                                    <span class="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
+                                        {{ $report->category->name ?? 'Unknown' }}
+                                    </span>
+                                    <time class="text-xs text-gray-500 font-semibold">{{ $report->created_at->format('M d, Y') }}</time>
+                                </div>
+
+                                <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{{ $report->title }}</h3>
+                                <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $report->description }}</p>
+
+                                <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 bg-red-200 rounded-full flex items-center justify-center">
+                                            <span class="text-xs font-bold text-red-700">{{ substr($report->user->name ?? 'A', 0, 1) }}</span>
+                                        </div>
+                                        <span class="text-xs text-gray-700 font-semibold">{{ $report->user->name ?? 'Anonymous' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-1 text-gray-500">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10a2 2 0 104 0 2 2 0 00-4 0zM14 10a2 2 0 104 0 2 2 0 00-4 0z"/></svg>
+                                        <span class="text-xs font-semibold">{{ $report->comments->count() }}</span>
+                                    </div>
+                                </div>
+
+                                <a href="{{ route('reports.show', $report) }}" class="mt-4 inline-flex items-center justify-center w-full px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all text-sm">
+                                    {{ __('View Details') }}
+                                </a>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-16">
+                    <svg class="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p class="text-gray-600 font-semibold mb-4">{{ __('No reports yet') }}</p>
+                    <p class="text-gray-500 mb-6">{{ __('Be the first to report an issue in your area.') }}</p>
+                    <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all">
+                        {{ __('Create First Report') }}
+                    </a>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">{{ __('Process') }}</span>
+                <h2 class="text-4xl font-black text-gray-900 mb-4">{{ __('How It Works') }}</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ __('Simple steps to report and track street issues') }}</p>
+            </div>
+
+            <div class="flex justify-center items-center">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl">
+                    <div class="text-center flex flex-col items-center justify-center">
+                        <div class="w-20 h-20 bg-red-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">1</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">{{ __('Take a Photo') }}</h3>
+                        <p class="text-gray-600">{{ __('Capture a clear image of the street issue you found.') }}</p>
+                    </div>
+                    <div class="text-center flex flex-col items-center justify-center">
+                        <div class="w-20 h-20 bg-orange-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">2</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">{{ __('Describe Issue') }}</h3>
+                        <p class="text-gray-600">{{ __('Fill in category, location, and detailed description.') }}</p>
+                    </div>
+                    <div class="text-center flex flex-col items-center justify-center">
+                        <div class="w-20 h-20 bg-green-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">3</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">{{ __('Get Fixed') }}</h3>
+                        <p class="text-gray-600">{{ __('City team reviews and schedules maintenance action.') }}</p>
                     </div>
                 </div>
-
-                <div class="space-y-4">
-                    @forelse ($latestReports as $report)
-                        <article class="bg-white border border-gray-200 p-4 flex items-center h-36">
-                            <img src="{{ asset('assets/report-placeholder.svg') }}" alt="{{ $report->title }}" class="w-28 h-full object-cover border border-red-200" />
-                            <div class="ml-4 flex-1">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-1 truncate">{{ $report->title }}</h3>
-                                <p class="text-sm text-gray-600 truncate">{{ Str::limit($report->description, 80) }}</p>
-                                <div class="text-xs text-red-700 mt-2">{{ $report->category->name }} � {{ $report->city->name }} � {{ $report->created_at->format('M j, Y') }}</div>
-                            </div>
-                            <button type="button" class="gov-button gov-secondary px-4 py-2 text-sm font-medium hover:bg-red-700 report-open-modal" data-report-id="{{ $report->id }}">View</button>
-                        </article>
-                    @empty
-                        <div class="bg-white border border-gray-200 p-6 text-center"><p class="text-gray-600">No reports currently. Your contribution can help.</p></div>
-                    @endforelse
-                </div>
             </div>
         </div>
     </section>
 
-    <section class="py-16 bg-slate-900 text-white">
+    <!-- CTA Section -->
+    <section class="py-20 bg-white">
         <div class="max-w-4xl mx-auto px-6 text-center">
-            <h2 class="text-3xl font-bold mb-4">Contribute to a Safer City</h2>
-            <p class="text-slate-300 text-lg mb-8 leading-relaxed">Your reports help city officials prioritize and address street maintenance issues efficiently. Together, we can maintain safe and well-maintained public infrastructure.</p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="gov-button bg-white text-slate-900 px-8 py-4 font-semibold hover:bg-gray-100">Report an Issue</a>
-                <a href="{{ route('reports.index') }}" class="gov-button border-white text-white px-8 py-4 hover:bg-white hover:text-slate-900">View All Reports</a>
-            </div>
+            <h2 class="text-4xl font-black text-gray-900 mb-6">{{ __('Make a Difference Today') }}</h2>
+            <p class="text-xl text-gray-600 mb-10">{{ __('Every report helps improve our city. Be part of the solution.') }}</p>
+            <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="inline-flex items-center justify-center px-10 py-5 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold rounded-xl hover:from-red-700 hover:to-red-800 transition-all shadow-xl hover:shadow-2xl text-lg">
+                {{ __('Start Reporting Now') }}
+                <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+            </a>
         </div>
     </section>
-
-    <div id="home-server-data" data-latest-reports='@json($latestReports ?? [])' data-authenticated='{{ auth()->check() ? 'true' : 'false' }}' style="display:none;"></div>
-
-    <div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white w-full max-w-3xl shadow-2xl border border-red-200 p-6 relative">
-            <button id="report-modal-close" class="absolute top-4 right-4 text-red-700 font-bold">X</button>
-            <h3 id="modal-title" class="text-2xl font-bold text-gray-900 mb-2">Report title</h3>
-            <p id="modal-status" class="text-sm text-red-700 font-semibold mb-2">Status</p>
-            <p id="modal-category" class="text-sm text-gray-600 mb-1">Category</p>
-            <p id="modal-city" class="text-sm text-gray-600 mb-1">City</p>
-            <p id="modal-description" class="text-gray-700 mb-4">Description goes here</p>
-            <p id="modal-user" class="text-sm text-gray-500 mb-4">Reported by</p>
-
-            <div class="mb-4">
-                <h4 class="font-semibold text-gray-800">Comments</h4>
-                <div id="modal-comments" class="mt-3 space-y-2 max-h-60 overflow-y-auto"></div>
-            </div>
-
-            <form id="modal-comment-form" method="POST" action="">
-                @csrf
-                <div class="mb-3">
-                    <textarea id="modal-comment-input" name="comment" rows="3" class="w-full border border-gray-300 p-2" placeholder="Add your comment"></textarea>
-                </div>
-                <button id="modal-comment-submit" type="submit" class="gov-button gov-secondary px-4 py-2 font-medium">Send comment</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        const serverData = document.getElementById('home-server-data');
-        const latestReports = serverData ? JSON.parse(serverData.dataset.latestReports || '[]') : [];
-        const isAuthenticated = serverData ? serverData.dataset.authenticated === 'true' : false;
-
-        const reportModal = document.getElementById('report-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalStatus = document.getElementById('modal-status');
-        const modalCategory = document.getElementById('modal-category');
-        const modalCity = document.getElementById('modal-city');
-        const modalDescription = document.getElementById('modal-description');
-        const modalUser = document.getElementById('modal-user');
-        const modalComments = document.getElementById('modal-comments');
-        const modalCommentForm = document.getElementById('modal-comment-form');
-        const modalCommentInput = document.getElementById('modal-comment-input');
-
-        function closeReportModal() {
-            reportModal.classList.add('hidden');
-            reportModal.classList.remove('flex');
-        }
-
-        document.querySelectorAll('.report-open-modal').forEach((button) => {
-            button.addEventListener('click', function () {
-                const reportId = Number(this.dataset.reportId);
-                const report = latestReports.find(r => r.id === reportId);
-                if (!report) return;
-
-                modalTitle.textContent = report.title;
-                modalStatus.textContent = report.status;
-                modalCategory.textContent = 'Category: ' + report.category;
-                modalCity.textContent = 'City: ' + report.city;
-                modalDescription.textContent = report.description;
-                modalUser.textContent = 'Reported by: ' + report.user + ' on ' + report.created_at;
-
-                modalComments.innerHTML = report.comments.length
-                    ? report.comments.map(c => `<div class="p-2 border border-red-100 rounded"><p class="text-sm"><strong>${c.user}</strong> <span class="text-gray-500">${c.created_at}</span></p><p class="text-gray-700 text-sm">${c.comment}</p></div>`).join('')
-                    : '<p class="text-gray-500">No comments yet.</p>';
-
-                modalCommentForm.action = '/reports/' + report.id + '/comments';
-                modalCommentInput.value = '';
-
-                reportModal.classList.remove('hidden');
-                reportModal.classList.add('flex');
-            });
-        });
-
-        document.getElementById('report-modal-close').addEventListener('click', closeReportModal);
-
-        modalCommentForm.addEventListener('submit', function (event) {
-            if (!isAuthenticated) {
-                event.preventDefault();
-                alert('Please log in to post a comment.');
-                window.location.href = '/login';
-            }
-        });
-    </script>
 </x-app-layout>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const line1 = document.getElementById('line1');
+    const line2 = document.getElementById('line2');
+    const cursor = document.createElement('span');
+    cursor.className = 'inline-block w-1 h-12 bg-yellow-300 animate-blink ml-1';
+    const text1 = line1.dataset.text;
+    const text2 = line2.dataset.text;
+    let index1 = 0;
+    let index2 = 0;
+    line1.innerHTML = '';
+    line2.innerHTML = '';
+    line1.appendChild(cursor);
+
+    function typeLine1() {
+        if (index1 < text1.length) {
+            line1.innerHTML = text1.substring(0, index1 + 1);
+            line1.appendChild(cursor);
+            index1++;
+            setTimeout(typeLine1, 50);
+        } else {
+            setTimeout(() => {
+                line1.removeChild(cursor);
+                line2.appendChild(cursor);
+                typeLine2();
+            }, 500);
+        }
+    }
+
+    function typeLine2() {
+        if (index2 < text2.length) {
+            line2.innerHTML = text2.substring(0, index2 + 1);
+            line2.appendChild(cursor);
+            index2++;
+            setTimeout(typeLine2, 50);
+        } else {
+            line2.removeChild(cursor);
+        }
+    }
+
+    typeLine1();
+});
+</script>
