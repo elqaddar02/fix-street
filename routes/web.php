@@ -3,7 +3,10 @@
 use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CommentController;
 use App\Models\Report;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -43,28 +46,38 @@ Route::view('/contact', 'contact')->name('contact');
 Route::view('/privacy', 'privacy')->name('privacy');
 Route::view('/terms', 'terms')->name('terms');
 Route::view('/help', 'help')->name('help');
+Route::get('/api/quartiers/{city}', function (\App\Models\City $city) {
+    return $city->quartiers()->where('active', true)->get(['id', 'name']);
+});
 
-Route::get('/login-redirect', function () {
-    session(['url.intended' => url()->current()]);
+Route::get('/login-redirect', function (Request $request) {
+    $intendedUrl = $request->get('intended', url()->previous());
+    $request->session()->put('url.intended', $intendedUrl);
     return redirect()->route('login');
 })->name('login.redirect');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+   
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
-    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
     
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
     Route::post('/reports/{report}/comments', [ReportController::class, 'storeComment'])->name('reports.comments.store');
+    Route::post('/reports/{report}/likes/toggle', [\App\Http\Controllers\ReportLikeController::class, 'toggle'])->name('reports.likes.toggle');
+
+    Route::get('/reports/{report}/edit', [ReportController::class, 'edit'])->name('reports.edit');
+    Route::patch('/reports/{report}', [ReportController::class, 'update'])->name('reports.update');
+    Route::delete('/reports/{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// Public report show route
+Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
 Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
@@ -79,6 +92,7 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
     Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
 
     Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::post('/reports/bulk-status', [\App\Http\Controllers\Admin\ReportController::class, 'bulkUpdateStatus'])->name('reports.bulkUpdateStatus');
         Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::get('/reports/{report}', [\App\Http\Controllers\Admin\ReportController::class, 'show'])->name('reports.show');
 
@@ -86,16 +100,27 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
     Route::patch('/reports/{report}/status', [\App\Http\Controllers\Admin\ReportController::class, 'updateStatus'])->name('reports.updateStatus');
     Route::delete('/reports/{report}', [\App\Http\Controllers\Admin\ReportController::class, 'destroy'])->name('reports.destroy');
 
+    // Categories
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+
+    // Comments
+    Route::get('/comments', [\App\Http\Controllers\Admin\CommentController::class, 'index'])->name('comments.index');
+    Route::post('/comments/{comment}/approve', [\App\Http\Controllers\Admin\CommentController::class, 'approve'])->name('comments.approve');
+    Route::post('/comments/{comment}/reject', [\App\Http\Controllers\Admin\CommentController::class, 'reject'])->name('comments.reject');
+    Route::delete('/comments/{comment}', [\App\Http\Controllers\Admin\CommentController::class, 'destroy'])->name('comments.destroy');
+
     Route::get('/cities', [\App\Http\Controllers\Admin\CityController::class, 'index'])->name('cities.index');
     Route::post('/cities', [\App\Http\Controllers\Admin\CityController::class, 'store'])->name('cities.store');
     Route::get('/cities/{city}/edit', [\App\Http\Controllers\Admin\CityController::class, 'edit'])->name('cities.edit');
     Route::patch('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'update'])->name('cities.update');
+    Route::patch('/cities/{city}/status', [\App\Http\Controllers\Admin\CityController::class, 'updateStatus'])->name('cities.updateStatus');
     Route::delete('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'destroy'])->name('cities.destroy');
 
     Route::get('/quartiers', [\App\Http\Controllers\Admin\QuartierController::class, 'index'])->name('quartiers.index');
     Route::post('/quartiers', [\App\Http\Controllers\Admin\QuartierController::class, 'store'])->name('quartiers.store');
     Route::get('/quartiers/{quartier}/edit', [\App\Http\Controllers\Admin\QuartierController::class, 'edit'])->name('quartiers.edit');
     Route::patch('/quartiers/{quartier}', [\App\Http\Controllers\Admin\QuartierController::class, 'update'])->name('quartiers.update');
+    Route::patch('/quartiers/{quartier}/status', [\App\Http\Controllers\Admin\QuartierController::class, 'updateStatus'])->name('quartiers.updateStatus');
     Route::delete('/quartiers/{quartier}', [\App\Http\Controllers\Admin\QuartierController::class, 'destroy'])->name('quartiers.destroy');
 });
 

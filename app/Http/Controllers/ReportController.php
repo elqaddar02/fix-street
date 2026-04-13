@@ -15,15 +15,27 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         $categories = Category::all();
-        $cities = City::all(); // Keep cities for now, but focus on category and date
+        $cities = City::where('active', true)->get();
 
         $selectedCategory = $request->query('category');
+        $selectedCity = $request->query('city');
+        $selectedQuartier = $request->query('quartier');
         $selectedDate = $request->query('date');
+        $sortBy = $request->query('sort', 'latest'); // 'latest', 'mostLiked', 'oldest'
 
-        $reportsQuery = Report::with(['user', 'category', 'city', 'comments.user'])->latest();
+        $reportsQuery = Report::with(['user', 'category', 'city', 'quartier', 'comments.user', 'likes'])
+            ->withCount('likes');
 
         if ($selectedCategory) {
             $reportsQuery->where('category_id', $selectedCategory);
+        }
+
+        if ($selectedCity) {
+            $reportsQuery->where('city_id', $selectedCity);
+        }
+
+        if ($selectedQuartier) {
+            $reportsQuery->where('quartier_id', $selectedQuartier);
         }
 
         if ($selectedDate) {
@@ -40,9 +52,30 @@ class ReportController extends Controller
             }
         }
 
+        // Apply sorting
+        switch ($sortBy) {
+            case 'mostLiked':
+                $reportsQuery->orderByDesc('likes_count');
+                break;
+            case 'oldest':
+                $reportsQuery->oldest();
+                break;
+            case 'latest':
+            default:
+                $reportsQuery->latest();
+                break;
+        }
+
         $reports = $reportsQuery->paginate(12)->withQueryString();
 
-        return view('reports.index', compact('reports', 'categories', 'cities', 'selectedCategory', 'selectedDate'));
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('reports.partials.results', compact('reports'))->render(),
+            ]);
+        }
+
+        return view('reports.index', compact('reports', 'categories', 'cities', 'selectedCategory', 'selectedCity', 'selectedQuartier', 'selectedDate', 'sortBy'));
     }
 
     public function create()
@@ -99,9 +132,91 @@ class ReportController extends Controller
 
     public function show(Report $report)
     {
-        $report->load(['comments.user', 'category', 'city', 'user']);
+        $report->load(['comments.user', 'category', 'city', 'user', 'likes']);
+        $report->loadCount('likes');
 
         return view('reports.show', compact('report'));
+    }
+
+    public function edit(Report $report)
+    {
+        // Ensure user owns the report
+        if ($report->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $categories = Category::all();
+        $cities = City::where('active', true)->get();
+        $quartiers = Quartier::whereHas('city', function($query) {
+            $query->where('active', true);
+        })->where('active', true)->get();
+
+        return view('reports.edit', compact('report', 'categories', 'cities', 'quartiers'));
+    }
+
+    public function update(Request $request, Report $report)
+    {
+        // Ensure user owns the report
+        if ($report->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'title'       => 'required|string|max:255',
+            'description' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'city_id'     => 'required|exists:cities,id',
+            'quartier_id' => 'nullable|exists:quartiers,id',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'latitude'    => 'nullable|numeric|between:-90,90',
+            'longitude'   => 'nullable|numeric|between:-180,180',
+        ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($report->image) {
+                Storage::disk('public')->delete($report->image);
+                $oldPath = public_path('storage/' . $report->image);
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+            $validated['image'] = $request->file('image')->store('reports', 'public');
+            
+            // Copy to public/storage for Windows compatibility
+            $source = storage_path('app/public/' . $validated['image']);
+            $destination = public_path('storage/' . $validated['image']);
+            if (!file_exists(dirname($destination))) {
+                mkdir(dirname($destination), 0755, true);
+            }
+            copy($source, $destination);
+        }
+
+        $report->update($validated);
+
+        return redirect()->route('dashboard')->with('success', 'Report updated successfully!');
+    }
+
+    public function destroy(Report $report)
+    {
+        // Ensure user owns the report
+        if ($report->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Delete image if exists
+        if ($report->image) {
+            Storage::disk('public')->delete($report->image);
+            $path = public_path('storage/' . $report->image);
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+
+        $report->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Report deleted successfully!');
     }
 
     public function storeComment(Request $request, Report $report)
@@ -110,10 +225,26 @@ class ReportController extends Controller
             'comment' => 'required|string|max:1000',
         ]);
 
-        $report->comments()->create([
+        $comment = $report->comments()->create([
             'user_id' => Auth::id(),
             'comment' => $request->comment,
         ]);
+
+        // Load the comment with user relationship for response
+        $comment->load('user');
+
+        // If it's an AJAX request, return JSON
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'comment' => [
+                    'id' => $comment->id,
+                    'user' => $comment->user->name,
+                    'text' => $comment->comment,
+                    'created_at' => $comment->created_at->diffForHumans(),
+                ],
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Comment submitted successfully.');
     }

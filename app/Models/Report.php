@@ -46,4 +46,15 @@ class Report extends Model
     {
         return $this->hasMany(ReportComment::class);
     }
+
+    public function likes()
+    {
+        return $this->hasMany(ReportLike::class);
+    }
+
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'report_likes', 'report_id', 'user_id')
+                    ->withTimestamps();
+    }
 }

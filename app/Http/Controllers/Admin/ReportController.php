@@ -11,19 +11,35 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         $status = $request->input('status');
+        $sortBy = $request->input('sort', 'latest'); // 'latest', 'oldest', 'mostLiked'
 
-        $reports = Report::with(['user', 'category', 'city', 'quartier'])
-            ->when($status, fn($q) => $q->where('status', $status))
-            ->latest()
-            ->paginate(15)
-            ->withQueryString();
+        $reportsQuery = Report::with(['user', 'category', 'city', 'quartier'])
+            ->withCount('likes')
+            ->when($status, fn($q) => $q->where('status', $status));
 
-        return view('admin.reports.index', compact('reports', 'status'));
+        // Apply sorting
+        switch ($sortBy) {
+            case 'mostLiked':
+                $reportsQuery->orderByDesc('likes_count');
+                break;
+            case 'oldest':
+                $reportsQuery->oldest();
+                break;
+            case 'latest':
+            default:
+                $reportsQuery->latest();
+                break;
+        }
+
+        $reports = $reportsQuery->paginate(15)->withQueryString();
+
+        return view('admin.reports.index', compact('reports', 'status', 'sortBy'));
     }
 
     public function show(Report $report)
     {
-        $report->load(['user', 'category', 'city', 'quartier', 'comments.user']);
+        $report->load(['user', 'category', 'city', 'quartier', 'comments.user', 'likes']);
+        $report->loadCount('likes');
 
         return view('admin.reports.show', compact('report'));
     }
@@ -35,6 +51,19 @@ class ReportController extends Controller
         $report->update(['status' => $request->status]);
 
         return back()->with('success', 'Statut du signalement mis à jour.');
+    }
+
+    public function bulkUpdateStatus(Request $request)
+    {
+        $data = $request->validate([
+            'report_ids' => 'required|array|min:1',
+            'report_ids.*' => 'integer|exists:reports,id',
+            'status' => 'required|in:OPEN,IN_PROGRESS,RESOLVED,REJECTED',
+        ]);
+
+        $updatedCount = Report::whereIn('id', $data['report_ids'])->update(['status' => $data['status']]);
+
+        return back()->with('success', "Statut appliqué à {$updatedCount} signalement(s).");
     }
 
     public function destroy(Report $report)

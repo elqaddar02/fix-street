@@ -36,10 +36,19 @@
                                 <div class="text-sm font-medium text-gray-900">{{ $city->name }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                    {{ $city->active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $city->active ? 'Actif' : 'Inactif' }}
-                                </span>
+                                <form action="{{ route('admin.cities.updateStatus', $city) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <div class="status-field inline-flex items-center gap-3">
+                                        <span class="status-badge inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold {{ $city->active ? 'text-emerald-800 bg-emerald-100 border-emerald-300' : 'text-slate-700 bg-slate-100 border-slate-300' }}">
+                                            {{ $city->active ? 'Actif' : 'Inactif' }}
+                                        </span>
+                                        <select name="active" data-current="{{ $city->active ? 1 : 0 }}" data-confirm-change="true" data-confirm-message="Changer le statut de la ville ?" class="status-select rounded-xl border-2 px-3 py-2 {{ $city->active ? 'border-emerald-400 bg-emerald-50 text-emerald-900' : 'border-slate-400 bg-slate-50 text-slate-900' }} text-sm font-medium shadow-sm focus:outline-none focus:ring-2 transition-colors">
+                                            <option value="1" {{ $city->active ? 'selected' : '' }}>Actif</option>
+                                            <option value="0" {{ !$city->active ? 'selected' : '' }}>Inactif</option>
+                                        </select>
+                                    </div>
+                                </form>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                 <a href="{{ route('admin.cities.edit', $city) }}"

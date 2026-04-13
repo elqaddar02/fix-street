@@ -54,4 +54,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Report::class);
     }
+
+    public function likedReports()
+    {
+        return $this->belongsToMany(Report::class, 'report_likes', 'user_id', 'report_id')
+                    ->withTimestamps();
+    }
 }

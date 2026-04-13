@@ -33,6 +33,7 @@
                 <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Dashboard</a>
                 <a href="{{ route('admin.users.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Users</a>
                 <a href="{{ route('admin.reports.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.reports.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Reports</a>
+                <a href="{{ route('admin.comments.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.comments.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Comments</a>
                 <a href="{{ route('admin.cities.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.cities.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Cities</a>
                 <a href="{{ route('admin.quartiers.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.quartiers.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Quartiers</a>
             </nav>
@@ -59,5 +60,63 @@
             @yield('content')
         </main>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[data-confirm-change]').forEach(function (element) {
+                element.addEventListener('change', function () {
+                    var message = this.dataset.confirmMessage || 'Confirmer la modification ?';
+                    var previous = this.dataset.current;
+                    if (confirm(message)) {
+                        this.form.submit();
+                    } else {
+                        this.value = previous;
+                    }
+                });
+            });
+
+            const STATUS_STYLES = {
+                OPEN: { label: 'Ouvert', badge: 'bg-amber-100 text-amber-800 border border-amber-300', border: 'border-amber-400 focus:ring-amber-200', bgColor: '#fef3c7', textColor: '#92400e' },
+                IN_PROGRESS: { label: 'En cours', badge: 'bg-sky-100 text-sky-800 border border-sky-300', border: 'border-sky-400 focus:ring-sky-200', bgColor: '#e0f2fe', textColor: '#0c4a6e' },
+                RESOLVED: { label: 'Résolu', badge: 'bg-emerald-100 text-emerald-800 border border-emerald-300', border: 'border-emerald-400 focus:ring-emerald-200', bgColor: '#dcfce7', textColor: '#14532d' },
+                REJECTED: { label: 'Rejeté', badge: 'bg-rose-100 text-rose-800 border border-rose-300', border: 'border-rose-400 focus:ring-rose-200', bgColor: '#ffe4e6', textColor: '#9f1239' },
+                ACTIVE: { label: 'Actif', badge: 'bg-emerald-100 text-emerald-800 border border-emerald-300', border: 'border-emerald-400 focus:ring-emerald-200', bgColor: '#dcfce7', textColor: '#14532d' },
+                INACTIVE: { label: 'Inactif', badge: 'bg-slate-100 text-slate-700 border border-slate-300', border: 'border-slate-400 focus:ring-slate-200', bgColor: '#f8fafc', textColor: '#334155' },
+                DEFAULT: { label: 'Non défini', badge: 'bg-slate-100 text-slate-700 border border-slate-300', border: 'border-slate-400 focus:ring-slate-200', bgColor: '#f8fafc', textColor: '#334155' }
+            };
+
+            function getStatusKey(select) {
+                if (select.name === 'active') {
+                    return select.value === '1' ? 'ACTIVE' : 'INACTIVE';
+                }
+                return select.value || 'DEFAULT';
+            }
+
+            function updateStatusSelect(select) {
+                const status = getStatusKey(select);
+                const style = STATUS_STYLES[status] || STATUS_STYLES.DEFAULT;
+                select.classList.remove('border-amber-400', 'border-sky-400', 'border-emerald-400', 'border-rose-400', 'border-slate-400', 'focus:ring-amber-200', 'focus:ring-sky-200', 'focus:ring-emerald-200', 'focus:ring-rose-200', 'focus:ring-slate-200');
+                select.classList.add(style.border);
+                select.style.backgroundColor = style.bgColor;
+                select.style.color = style.textColor;
+
+                let badge = select.closest('.status-field')?.querySelector('.status-badge');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'status-badge inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold';
+                    const wrapper = select.closest('.status-field') || select.parentNode;
+                    wrapper.insertBefore(badge, select);
+                }
+                badge.className = 'status-badge inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ' + style.badge;
+                badge.textContent = style.label;
+            }
+
+            document.querySelectorAll('select.status-select').forEach(function (select) {
+                updateStatusSelect(select);
+                select.addEventListener('change', function () {
+                    updateStatusSelect(this);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

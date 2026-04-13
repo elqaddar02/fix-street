@@ -68,6 +68,15 @@ class QuartierController extends Controller
         return redirect()->route('admin.quartiers.index')->with('success', 'Quartier mis à jour.');
     }
 
+    public function updateStatus(Request $request, Quartier $quartier)
+    {
+        $request->validate(['active' => 'required|boolean']);
+
+        $quartier->update(['active' => $request->active]);
+
+        return back()->with('success', 'Statut du quartier mis à jour.');
+    }
+
     public function destroy(Quartier $quartier)
     {
         $quartier->delete();
