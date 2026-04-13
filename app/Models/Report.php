@@ -19,7 +19,7 @@ class Report extends Model
         'user_id',
         'category_id',
         'city_id',
-        'quartier_id',
+        'district_id',
     ];
 
     public function user()
@@ -37,9 +37,9 @@ class Report extends Model
         return $this->belongsTo(City::class);
     }
 
-    public function quartier()
+    public function district()
     {
-        return $this->belongsTo(Quartier::class);
+        return $this->belongsTo(District::class);
     }
 
     public function comments()

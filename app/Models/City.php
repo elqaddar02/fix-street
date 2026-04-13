@@ -16,9 +16,9 @@ class City extends Model
         return $this->hasMany(Report::class);
     }
 
-    public function quartiers()
+    public function districts()
     {
-        return $this->hasMany(Quartier::class);
+        return $this->hasMany(District::class);
     }
 
     public function getDisplayNameAttribute()

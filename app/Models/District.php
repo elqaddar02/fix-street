@@ -15,6 +15,7 @@ class District extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'city_id',
         'name_ar',
         'name_fr',
         'slug',
@@ -30,5 +31,21 @@ class District extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * Get the city that the district belongs to.
+     */
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    /**
+     * Get the reports for the district.
+     */
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
     }
 }

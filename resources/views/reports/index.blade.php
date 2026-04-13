@@ -61,13 +61,16 @@
 
                                 <div class="group">
                                     <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-red-600 transition">{{ __('District') }}</label>
-                                    <select name="quartier" id="quartier-select" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none" @if(!$selectedCity) disabled @endif>
+                                    <select name="district" id="district-select" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none" @if(!$selectedCity) disabled @endif>
                                         <option value="">{{ __('All Districts') }}</option>
                                         @if($selectedCity)
-                                            @foreach (\App\Models\Quartier::where('city_id', $selectedCity)->where('active', true)->get() as $quartier)
-                                                <option value="{{ $quartier->id }}" @selected($selectedQuartier == $quartier->id)>{{ $quartier->display_name }}</option>
+                                            @foreach ($districts->where('city_id', $selectedCity) as $district)
+                                                <option value="{{ $district->id }}" @selected($selectedDistrict == $district->id) data-city="{{ $district->city_id }}">{{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}</option>
                                             @endforeach
                                         @endif
+                                        @foreach ($districts as $district)
+                                            <option value="{{ $district->id }}" data-city="{{ $district->city_id }}" @selected($selectedDistrict == $district->id) style="display:none;">{{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
 
@@ -223,33 +226,37 @@
             }));
         });
 
-        // Quartier dynamic loading
-        document.getElementById('city-select')?.addEventListener('change', function() {
-            const cityId = this.value;
-            const select = document.getElementById('quartier-select');
-            if (!select) return;
+        // District filtering based on city selection
+        const citySelect = document.getElementById('city-select');
+        const districtSelect = document.getElementById('district-select');
+        const allDistrictOptions = Array.from(districtSelect.options);
 
-            if (cityId) {
-                fetch(`/api/quartiers/${cityId}`)
-                    .then(r => r.json())
-                    .then(quartiers => {
-                        select.innerHTML = '<option value="">{{ __("All Districts") }}</option>';
-                        quartiers.forEach(q => {
-                            const opt = document.createElement('option');
-                            opt.value = q.id;
-                            opt.textContent = q.name;
-                            select.appendChild(opt);
-                        });
-                        select.disabled = false;
-                    })
-                    .catch(e => {
-                        console.error('Error:', e);
-                        select.innerHTML = '<option value="">{{ __("All Districts") }}</option>';
-                        select.disabled = true;
+        citySelect.addEventListener('change', function() {
+            const selectedCityId = this.value;
+            
+            // Reset district select
+            districtSelect.innerHTML = '<option value="">{{ __("All Districts") }}</option>';
+            
+            if (selectedCityId) {
+                // Filter and show districts for the selected city
+                const filteredDistricts = allDistrictOptions.filter(option => 
+                    option.value === '' || option.dataset.city == selectedCityId
+                );
+                
+                if (filteredDistricts.length > 1) {
+                    filteredDistricts.forEach(option => {
+                        if (option.value !== '') {
+                            districtSelect.appendChild(option.cloneNode(true));
+                        }
                     });
+                    districtSelect.disabled = false;
+                } else {
+                    districtSelect.disabled = true;
+                    districtSelect.innerHTML = '<option value="">{{ __("-- No districts available --") }}</option>';
+                }
             } else {
-                select.innerHTML = '<option value="">{{ __("All Districts") }}</option>';
-                select.disabled = true;
+                districtSelect.disabled = true;
+                districtSelect.innerHTML = '<option value="">{{ __("All Districts") }}</option>';
             }
         });
     </script>

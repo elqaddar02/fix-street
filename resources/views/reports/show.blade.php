@@ -77,15 +77,6 @@
                                         </span>
                                     </div>
 
-                                    @if($report->quartier)
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-700">Quartier</h3>
-                                        <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium mt-1">
-                                            {{ $report->quartier->display_name }}
-                                        </span>
-                                    </div>
-                                    @endif
-
                                     <div>
                                         <h3 class="text-lg font-semibold text-gray-700">Status</h3>
                                         @php

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\City;
-use App\Models\Quartier;
+use App\Models\District;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,14 +16,15 @@ class ReportController extends Controller
     {
         $categories = Category::all();
         $cities = City::where('active', true)->get();
+        $districts = District::all();
 
         $selectedCategory = $request->query('category');
         $selectedCity = $request->query('city');
-        $selectedQuartier = $request->query('quartier');
+        $selectedDistrict = $request->query('district');
         $selectedDate = $request->query('date');
         $sortBy = $request->query('sort', 'latest'); // 'latest', 'mostLiked', 'oldest'
 
-        $reportsQuery = Report::with(['user', 'category', 'city', 'quartier', 'comments.user', 'likes'])
+        $reportsQuery = Report::with(['user', 'category', 'city', 'district', 'comments.user', 'likes'])
             ->withCount('likes');
 
         if ($selectedCategory) {
@@ -34,8 +35,8 @@ class ReportController extends Controller
             $reportsQuery->where('city_id', $selectedCity);
         }
 
-        if ($selectedQuartier) {
-            $reportsQuery->where('quartier_id', $selectedQuartier);
+        if ($selectedDistrict) {
+            $reportsQuery->where('district_id', $selectedDistrict);
         }
 
         if ($selectedDate) {
@@ -75,7 +76,7 @@ class ReportController extends Controller
             ]);
         }
 
-        return view('reports.index', compact('reports', 'categories', 'cities', 'selectedCategory', 'selectedCity', 'selectedQuartier', 'selectedDate', 'sortBy'));
+        return view('reports.index', compact('reports', 'categories', 'cities', 'districts', 'selectedCategory', 'selectedCity', 'selectedDistrict', 'selectedDate', 'sortBy'));
     }
 
     public function create()
@@ -86,11 +87,9 @@ class ReportController extends Controller
 
         $categories = Category::all();
         $cities = City::where('active', true)->get();
-        $quartiers = Quartier::whereHas('city', function($query) {
-            $query->where('active', true);
-        })->where('active', true)->get();
+        $districts = District::all();
 
-        return view('reports.create', compact('categories', 'cities', 'quartiers'));
+        return view('reports.create', compact('categories', 'cities', 'districts'));
     }
 
     public function store(Request $request)
@@ -100,7 +99,7 @@ class ReportController extends Controller
             'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'city_id'     => 'required|exists:cities,id',
-            'quartier_id' => 'nullable|exists:quartiers,id',
+            'district_id' => 'nullable|exists:districts,id',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
@@ -147,11 +146,9 @@ class ReportController extends Controller
 
         $categories = Category::all();
         $cities = City::where('active', true)->get();
-        $quartiers = Quartier::whereHas('city', function($query) {
-            $query->where('active', true);
-        })->where('active', true)->get();
+        $districts = District::all();
 
-        return view('reports.edit', compact('report', 'categories', 'cities', 'quartiers'));
+        return view('reports.edit', compact('report', 'categories', 'cities', 'districts'));
     }
 
     public function update(Request $request, Report $report)
@@ -166,7 +163,7 @@ class ReportController extends Controller
             'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'city_id'     => 'required|exists:cities,id',
-            'quartier_id' => 'nullable|exists:quartiers,id',
+            'district_id' => 'nullable|exists:districts,id',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',

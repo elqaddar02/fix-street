@@ -14,7 +14,7 @@ class DashboardController extends Controller
 
         // Get user's reports
         $reports = Report::where('user_id', $user->id)
-            ->with(['category', 'city', 'quartier', 'comments'])
+            ->with(['category', 'city', 'district', 'comments'])
             ->latest()
             ->get();
 

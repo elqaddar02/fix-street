@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\District;
+use App\Models\City;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -13,6 +14,13 @@ class DistrictSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get Salé city
+        $saleCity = City::where('name', 'Salé')->first();
+        
+        if (!$saleCity) {
+            return;
+        }
+
         $districts = [
             [
                 'name_fr' => 'Bab Lamrissa',
@@ -47,13 +55,13 @@ class DistrictSeeder extends Seeder
         ];
 
         foreach ($districts as $district) {
-            District::create([
-                'name_fr' => $district['name_fr'],
-                'name_ar' => $district['name_ar'],
-                'slug' => Str::slug($district['name_fr']),
-                'description_fr' => $district['description_fr'],
-                'description_ar' => $district['description_ar'],
-            ]);
+            District::firstOrCreate(
+                ['slug' => Str::slug($district['name_fr'])],
+                array_merge($district, [
+                    'city_id' => $saleCity->id,
+                    'slug' => Str::slug($district['name_fr']),
+                ])
+            );
         }
     }
 }

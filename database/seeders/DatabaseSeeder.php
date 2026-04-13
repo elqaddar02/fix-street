@@ -31,7 +31,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CategorySeeder::class,
             CitySeeder::class,
-            QuartierSeeder::class,
             DistrictSeeder::class
         ]);
     }

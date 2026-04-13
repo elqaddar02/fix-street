@@ -43,7 +43,7 @@
                                 placeholder="{{ __('Provide detailed information about the problem...') }}" required>{{ old('description', $report->description) }}</textarea>
                         </div>
 
-                        <!-- Category, City and Quartier -->
+                        <!-- Category, City and District -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <x-input-label for="category_id" :value="__('Category')" class="text-lg font-semibold" />
@@ -70,16 +70,14 @@
                             </div>
 
                             <div>
-                                <x-input-label for="quartier_id" :value="__('Quartier')" class="text-lg font-semibold" />
-                                <select id="quartier_id" name="quartier_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" {{ $report->city ? '' : 'disabled' }}>
-                                    <option value="">{{ $report->city ? __('-- Select a quartier --') : __('-- Select a city first --') }}</option>
-                                    @if($report->city)
-                                        @foreach ($report->city->quartiers->where('active', true) as $quartier)
-                                            <option value="{{ $quartier->id }}" @selected(old('quartier_id', $report->quartier_id) == $quartier->id)>
-                                                {{ $quartier->display_name }}
-                                            </option>
-                                        @endforeach
-                                    @endif
+                                <x-input-label for="district_id" :value="__('District')" class="text-lg font-semibold" />
+                                <select id="district_id" name="district_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4">
+                                    <option value="">{{ __('-- Select a district --') }}</option>
+                                    @foreach ($districts as $district)
+                                        <option value="{{ $district->id }}" data-city="{{ $district->city_id }}" @selected(old('district_id', $report->district_id) == $district->id)>
+                                            {{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -185,39 +183,43 @@
             }
         }
 
-        // Dynamic quartier loading based on city selection
+        // District filtering based on city selection
         const citySelect = document.getElementById('city_id');
-        const quartierSelect = document.getElementById('quartier_id');
+        const districtSelect = document.getElementById('district_id');
+        const allDistrictOptions = Array.from(districtSelect.options);
 
         citySelect.addEventListener('change', function() {
-            const cityId = this.value;
-
-            if (cityId) {
-                // Enable quartier select
-                quartierSelect.disabled = false;
-                quartierSelect.innerHTML = '<option value="">Chargement...</option>';
-
-                // Fetch quartiers for the selected city
-                fetch(`/api/quartiers/${cityId}`)
-                    .then(response => response.json())
-                    .then(quartiers => {
-                        quartierSelect.innerHTML = '<option value="">-- Sélectionner un quartier --</option>';
-                        quartiers.forEach(quartier => {
-                            const option = document.createElement('option');
-                            option.value = quartier.id;
-                            option.textContent = quartier.name;
-                            quartierSelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error loading quartiers:', error);
-                        quartierSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+            const selectedCityId = this.value;
+            
+            // Reset district select
+            districtSelect.innerHTML = '<option value="">{{ __("-- Select a district --") }}</option>';
+            
+            if (selectedCityId) {
+                // Filter and show districts for the selected city
+                const filteredDistricts = allDistrictOptions.filter(option => 
+                    option.value === '' || option.dataset.city == selectedCityId
+                );
+                
+                if (filteredDistricts.length > 1) {
+                    filteredDistricts.forEach(option => {
+                        if (option.value !== '') {
+                            districtSelect.appendChild(option.cloneNode(true));
+                        }
                     });
+                    districtSelect.disabled = false;
+                } else {
+                    districtSelect.disabled = true;
+                    districtSelect.innerHTML = '<option value="">{{ __("-- No districts available --") }}</option>';
+                }
             } else {
-                // Disable quartier select if no city selected
-                quartierSelect.disabled = true;
-                quartierSelect.innerHTML = '<option value="">-- Sélectionner dabord une ville --</option>';
+                districtSelect.disabled = true;
+                districtSelect.innerHTML = '<option value="">{{ __("-- Select a city first --") }}</option>';
             }
         });
+
+        // Trigger city change on page load to show districts for current city
+        if (citySelect.value) {
+            citySelect.dispatchEvent(new Event('change'));
+        }
     </script>
 </x-app-layout>

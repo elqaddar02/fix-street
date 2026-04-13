@@ -41,10 +41,6 @@
                 <p>{{ $report->city->name ?? 'N/A' }}</p>
             </div>
             <div>
-                <p class="font-semibold">Quartier:</p>
-                <p>{{ $report->quartier->display_name ?? 'N/A' }}</p>
-            </div>
-            <div>
                 <p class="font-semibold">Utilisateur:</p>
                 <p>{{ $report->user->name ?? '-' }}</p>
             </div>

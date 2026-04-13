@@ -22,7 +22,6 @@ Route::get('/', function () {
             'description' => $report->description,
             'category' => optional($report->category)->display_name ?? 'Unknown',
             'city' => optional($report->city)->display_name ?? 'Unknown',
-            'quartier' => optional($report->quartier)->display_name ?? null,
             'status' => $report->status,
             'user' => optional($report->user)->name ?? 'Anonymous',
             'created_at' => $report->created_at->format('M j, Y'),
@@ -46,9 +45,6 @@ Route::view('/contact', 'contact')->name('contact');
 Route::view('/privacy', 'privacy')->name('privacy');
 Route::view('/terms', 'terms')->name('terms');
 Route::view('/help', 'help')->name('help');
-Route::get('/api/quartiers/{city}', function (\App\Models\City $city) {
-    return $city->quartiers()->where('active', true)->get(['id', 'name']);
-});
 
 Route::get('/login-redirect', function (Request $request) {
     $intendedUrl = $request->get('intended', url()->previous());
@@ -115,22 +111,6 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
     Route::patch('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'update'])->name('cities.update');
     Route::patch('/cities/{city}/status', [\App\Http\Controllers\Admin\CityController::class, 'updateStatus'])->name('cities.updateStatus');
     Route::delete('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'destroy'])->name('cities.destroy');
-
-    Route::get('/quartiers', [\App\Http\Controllers\Admin\QuartierController::class, 'index'])->name('quartiers.index');
-    Route::post('/quartiers', [\App\Http\Controllers\Admin\QuartierController::class, 'store'])->name('quartiers.store');
-    Route::get('/quartiers/{quartier}/edit', [\App\Http\Controllers\Admin\QuartierController::class, 'edit'])->name('quartiers.edit');
-    Route::patch('/quartiers/{quartier}', [\App\Http\Controllers\Admin\QuartierController::class, 'update'])->name('quartiers.update');
-    Route::patch('/quartiers/{quartier}/status', [\App\Http\Controllers\Admin\QuartierController::class, 'updateStatus'])->name('quartiers.updateStatus');
-    Route::delete('/quartiers/{quartier}', [\App\Http\Controllers\Admin\QuartierController::class, 'destroy'])->name('quartiers.destroy');
-});
-
-Route::get('/api/quartiers/{city}', function (\App\Models\City $city) {
-    return $city->quartiers()->where('active', true)->get()->map(function ($quartier) {
-        return [
-            'id' => $quartier->id,
-            'name' => $quartier->display_name,
-        ];
-    });
 });
 
 // Language switcher

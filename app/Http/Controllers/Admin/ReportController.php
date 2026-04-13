@@ -13,7 +13,7 @@ class ReportController extends Controller
         $status = $request->input('status');
         $sortBy = $request->input('sort', 'latest'); // 'latest', 'oldest', 'mostLiked'
 
-        $reportsQuery = Report::with(['user', 'category', 'city', 'quartier'])
+        $reportsQuery = Report::with(['user', 'category', 'city', 'district'])
             ->withCount('likes')
             ->when($status, fn($q) => $q->where('status', $status));
 
@@ -38,7 +38,7 @@ class ReportController extends Controller
 
     public function show(Report $report)
     {
-        $report->load(['user', 'category', 'city', 'quartier', 'comments.user', 'likes']);
+        $report->load(['user', 'category', 'city', 'district', 'comments.user', 'likes']);
         $report->loadCount('likes');
 
         return view('admin.reports.show', compact('report'));

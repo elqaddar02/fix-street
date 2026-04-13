@@ -62,7 +62,7 @@ class DashboardController extends Controller
             ->toArray();
 
         // Latest data
-        $latestReports = Report::with(['user', 'category', 'city', 'quartier'])
+        $latestReports = Report::with(['user', 'category', 'city', 'district'])
             ->latest()
             ->take(8)
             ->get();
