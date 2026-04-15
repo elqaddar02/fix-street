@@ -13,13 +13,14 @@ class Report extends Model
         'title',
         'description',
         'image',
-        'latitude',
-        'longitude',
         'status',
         'user_id',
         'category_id',
         'city_id',
         'district_id',
+        'quartier_id',
+        'latitude',
+        'longitude',
     ];
 
     public function user()
@@ -40,6 +41,11 @@ class Report extends Model
     public function district()
     {
         return $this->belongsTo(District::class);
+    }
+
+    public function quartier()
+    {
+        return $this->belongsTo(Quartier::class);
     }
 
     public function comments()

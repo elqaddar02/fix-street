@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('quartiers', function (Blueprint $table) {
-            $table->string('name_ar')->nullable()->after('name');
+        Schema::table('reports', function (Blueprint $table) {
+            $table->decimal('latitude', 10, 8)->nullable()->after('quartier_id');
+            $table->decimal('longitude', 11, 8)->nullable()->after('latitude');
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('quartiers', function (Blueprint $table) {
-            $table->dropColumn('name_ar');
+        Schema::table('reports', function (Blueprint $table) {
+            $table->dropColumn(['latitude', 'longitude']);
         });
     }
 };

@@ -48,4 +48,12 @@ class District extends Model
     {
         return $this->hasMany(Report::class);
     }
+
+    /**
+     * Get the quartiers for the district.
+     */
+    public function quartiers()
+    {
+        return $this->hasMany(Quartier::class);
+    }
 }

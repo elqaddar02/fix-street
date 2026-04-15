@@ -331,5 +331,14 @@
     "help.tabs.citizens": "مساعدة للمواطنين",
     "help.tabs.conditions": "شروط الاستخدام",
     "help.tabs.privacy": "سياسة الخصوصية",
-    "help.tabs.contact": "اتصل بنا"
+    "help.tabs.contact": "اتصل بنا",
+    "validation.image_required": "يجب أن يكون الملف صورة.",
+    "validation.image_types": "يجب أن تكون الصورة من نوع JPG أو JPEG أو PNG.",
+    "validation.image_size": "لا يجب أن يتجاوز حجم الصورة 2 ميجابايت.",
+    "validation.latitude_required": "حقل خط العرض مطلوب.",
+    "validation.latitude_numeric": "يجب أن يكون خط العرض رقماً.",
+    "validation.latitude_range": "يجب أن يكون خط العرض بين -90 و 90.",
+    "validation.longitude_required": "حقل خط الطول مطلوب.",
+    "validation.longitude_numeric": "يجب أن يكون خط الطول رقماً.",
+    "validation.longitude_range": "يجب أن يكون خط الطول بين -180 و 180."
 }

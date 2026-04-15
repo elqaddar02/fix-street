@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\City;
 use App\Models\District;
+use App\Models\Quartier;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,10 +18,22 @@ class ReportController extends Controller
         $categories = Category::all();
         $cities = City::where('active', true)->get();
         $districts = District::all();
+        $quartiers = Quartier::all();
+
+        $cityCoordinates = [];
+        foreach ($cities as $city) {
+            $name = strtolower($city->name);
+            $nameAr = strtolower($city->name_ar ?? '');
+
+            if (str_contains($name, 'sal') || str_contains($nameAr, 'سلا')) {
+                $cityCoordinates[$city->id] = ['lat' => 34.053126, 'lng' => -6.788346];
+            }
+        }
 
         $selectedCategory = $request->query('category');
         $selectedCity = $request->query('city');
         $selectedDistrict = $request->query('district');
+        $selectedQuartier = $request->query('quartier');
         $selectedDate = $request->query('date');
         $sortBy = $request->query('sort', 'latest'); // 'latest', 'mostLiked', 'oldest'
 
@@ -37,6 +50,10 @@ class ReportController extends Controller
 
         if ($selectedDistrict) {
             $reportsQuery->where('district_id', $selectedDistrict);
+        }
+
+        if ($selectedQuartier) {
+            $reportsQuery->where('quartier_id', $selectedQuartier);
         }
 
         if ($selectedDate) {
@@ -76,7 +93,20 @@ class ReportController extends Controller
             ]);
         }
 
-        return view('reports.index', compact('reports', 'categories', 'cities', 'districts', 'selectedCategory', 'selectedCity', 'selectedDistrict', 'selectedDate', 'sortBy'));
+        return view('reports.index', compact(
+            'reports',
+            'categories',
+            'cities',
+            'districts',
+            'quartiers',
+            'cityCoordinates',
+            'selectedCategory',
+            'selectedCity',
+            'selectedDistrict',
+            'selectedQuartier',
+            'selectedDate',
+            'sortBy'
+        ));
     }
 
     public function create()
@@ -88,8 +118,9 @@ class ReportController extends Controller
         $categories = Category::all();
         $cities = City::where('active', true)->get();
         $districts = District::all();
+        $quartiers = Quartier::all();
 
-        return view('reports.create', compact('categories', 'cities', 'districts'));
+        return view('reports.create', compact('categories', 'cities', 'districts', 'quartiers'));
     }
 
     public function store(Request $request)
@@ -99,10 +130,21 @@ class ReportController extends Controller
             'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'city_id'     => 'required|exists:cities,id',
-            'district_id' => 'nullable|exists:districts,id',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'latitude'    => 'nullable|numeric|between:-90,90',
-            'longitude'   => 'nullable|numeric|between:-180,180',
+            'district_id' => 'required|exists:districts,id',
+            'quartier_id' => 'required|exists:quartiers,id',
+            'latitude'    => 'required|numeric|between:-90,90',
+            'longitude'   => 'required|numeric|between:-180,180',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'image.image' => __('validation.image_required'),
+            'image.mimes' => __('validation.image_types'),
+            'image.max' => __('validation.image_size'),
+            'latitude.required' => __('validation.latitude_required'),
+            'latitude.numeric' => __('validation.latitude_numeric'),
+            'latitude.between' => __('validation.latitude_range'),
+            'longitude.required' => __('validation.longitude_required'),
+            'longitude.numeric' => __('validation.longitude_numeric'),
+            'longitude.between' => __('validation.longitude_range'),
         ]);
 
         if ($request->hasFile('image')) {
@@ -214,6 +256,16 @@ class ReportController extends Controller
         $report->delete();
 
         return redirect()->route('dashboard')->with('success', 'Report deleted successfully!');
+    }
+
+    public function getQuartierCoordinates(Quartier $quartier)
+    {
+        return response()->json([
+            'latitude' => $quartier->latitude,
+            'longitude' => $quartier->longitude,
+            'name_fr' => $quartier->name_fr,
+            'name_ar' => $quartier->name_ar,
+        ]);
     }
 
     public function storeComment(Request $request, Report $report)

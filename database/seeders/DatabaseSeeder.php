@@ -31,7 +31,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CategorySeeder::class,
             CitySeeder::class,
-            DistrictSeeder::class
+            DistrictSeeder::class,
+            QuartierSeeder::class,
+            QuartierCoordinatesSeeder::class,
         ]);
     }
 }

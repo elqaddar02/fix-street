@@ -33,6 +33,9 @@
                             <x-input-label for="title" :value="__('Report Title')" class="text-lg font-semibold" />
                             <x-text-input id="title" name="title" type="text" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
                                 placeholder="{{ __('Brief description of the problem') }}" :value="old('title')" required />
+                            @error('title')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Description -->
@@ -40,10 +43,13 @@
                             <x-input-label for="description" :value="__('Detailed Description')" class="text-lg font-semibold" />
                             <textarea id="description" name="description" rows="5" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
                                 placeholder="{{ __('Provide detailed information about the problem...') }}" required>{{ old('description') }}</textarea>
+                            @error('description')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Category, City and District -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <x-input-label for="category_id" :value="__('Category')" class="text-lg font-semibold" />
                                 <select id="category_id" name="category_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
@@ -54,6 +60,9 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('category_id')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div>
@@ -66,11 +75,14 @@
                                         </option>
                                     @endforeach
                                 </select>
+                                @error('city_id')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div>
                                 <x-input-label for="district_id" :value="__('District')" class="text-lg font-semibold" />
-                                <select id="district_id" name="district_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" disabled>
+                                <select id="district_id" name="district_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required disabled>
                                     <option value="">{{ __('-- Select a city first --') }}</option>
                                     @foreach ($districts as $district)
                                         <option value="{{ $district->id }}" data-city="{{ $district->city_id }}" @selected(old('district_id') == $district->id)>
@@ -78,43 +90,87 @@
                                         </option>
                                     @endforeach
                                 </select>
-                            </div>
-                        </div>
-
-                        <!-- Location -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <x-input-label for="latitude" :value="__('Latitude (optional)')" class="text-lg font-semibold" />
-                                <x-text-input id="latitude" name="latitude" type="number" step="0.0000001" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
-                                    placeholder="ex: 40.7128" :value="old('latitude')" />
-                                <p class="text-xs text-gray-500 mt-1">Coordonnée GPS - laisser vide si inconnu</p>
+                                @error('district_id')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <div>
-                                <x-input-label for="longitude" :value="__('Longitude (optional)')" class="text-lg font-semibold" />
-                                <x-text-input id="longitude" name="longitude" type="number" step="0.0000001" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" 
-                                    placeholder="ex: -74.0060" :value="old('longitude')" />
-                                <p class="text-xs text-gray-500 mt-1">Coordonnée GPS - laisser vide si inconnu</p>
+                                <x-input-label for="quartier_id" :value="__('Quartier')" class="text-lg font-semibold" />
+                                <select id="quartier_id" name="quartier_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required disabled>
+                                    <option value="">{{ __('-- Select a district first --') }}</option>
+                                    @foreach ($quartiers as $quartier)
+                                        <option value="{{ $quartier->id }}" data-district="{{ $quartier->district_id }}" @selected(old('quartier_id') == $quartier->id)>
+                                            {{ app()->getLocale() === 'ar' ? $quartier->name_ar : $quartier->name_fr }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('quartier_id')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        <!-- Location Map -->
+                        <div>
+                            <x-input-label :value="__('Location')" class="text-lg font-semibold" />
+                            <div class="mt-2">
+                                <div id="map" class="w-full h-64 rounded-lg border-2 border-gray-300 shadow-sm"></div>
+                                <div class="mt-3 flex flex-col sm:flex-row gap-3">
+                                    <button type="button" id="use-location-btn" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        {{ __('Use My Location') }}
+                                    </button>
+                                    <div class="flex gap-3 flex-1">
+                                        <div class="flex-1">
+                                            <x-input-label for="latitude" :value="__('Latitude')" class="text-sm font-medium" />
+                                            <x-text-input id="latitude" name="latitude" type="text" class="mt-1 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-2 px-3 text-sm" 
+                                                placeholder="33.9716" :value="old('latitude')" readonly />
+                                            @error('latitude')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                        <div class="flex-1">
+                                            <x-input-label for="longitude" :value="__('Longitude')" class="text-sm font-medium" />
+                                            <x-text-input id="longitude" name="longitude" type="text" class="mt-1 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-2 px-3 text-sm" 
+                                                placeholder="-6.8498" :value="old('longitude')" readonly />
+                                            @error('longitude')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-sm text-gray-500">{{ __('Click on the map to set the exact location, or use your current location.') }}</p>
                             </div>
                         </div>
-
-                        <!-- Image Upload -->
                         <div>
                             <x-input-label for="image" :value="__('Upload Photo (optional but recommended)')" class="text-lg font-semibold" />
                             <div class="mt-2">
                                 <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-6 transition hover:border-red-500 hover:bg-red-50 cursor-pointer" id="image-upload-area">
-                                    <input id="image" name="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                                    <input id="image" name="image" type="file" accept=".jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                                     <div class="text-center">
                                         <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
                                         <p class=\"text-gray-700 font-semibold\">{{ __('Click to upload or drag and drop') }}</p>
-                                        <p class="text-sm text-gray-500">{{ __('PNG, JPG, GIF up to 2MB') }}</p>
+                                        <p class="text-sm text-gray-500">{{ __('JPG, JPEG, PNG up to 2MB') }}</p>
                                     </div>
                                 </div>
                                 <div id="image-preview" class="mt-4 hidden">
                                     <img id="preview-image" src="" alt="Preview" class="max-h-48 rounded-lg shadow-md mx-auto">
                                 </div>
+                                <div id="image-alert" class="mt-4 hidden rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-start gap-3">
+                                    <svg class="w-5 h-5 flex-none text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-12.728 12.728m0-12.728l12.728 12.728" />
+                                    </svg>
+                                    <p id="image-alert-text"></p>
+                                </div>
+                                @if($errors->has('image'))
+                                    <div class="mt-2 text-sm text-red-600">
+                                        {{ $errors->first('image') }}
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -135,8 +191,12 @@
         const imagePreview = document.getElementById('image-preview');
         const previewImage = document.getElementById('preview-image');
 
-        // Click to upload
-        imageUploadArea.addEventListener('click', () => imageInput.click());
+        // Click to upload (only if the click did not already hit the file input)
+        imageUploadArea.addEventListener('click', (event) => {
+            if (event.target !== imageInput) {
+                imageInput.click();
+            }
+        });
 
         // Drag and drop
         imageUploadArea.addEventListener('dragover', (e) => {
@@ -163,47 +223,222 @@
 
         function showImagePreview() {
             if (imageInput.files && imageInput.files[0]) {
+                const file = imageInput.files[0];
+                const allowedTypes = ['image/jpeg', 'image/png'];
+                const maxSize = 2 * 1024 * 1024; // 2MB
+                
+                // Client-side validation
+                if (!allowedTypes.includes(file.type)) {
+                    showImageAlert('{{ __("validation.image_types") }}');
+                    imageInput.value = '';
+                    imagePreview.classList.add('hidden');
+                    return;
+                }
+                
+                if (file.size > maxSize) {
+                    showImageAlert('{{ __("validation.image_size") }}');
+                    imageInput.value = '';
+                    imagePreview.classList.add('hidden');
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     previewImage.src = e.target.result;
                     imagePreview.classList.remove('hidden');
                 };
-                reader.readAsDataURL(imageInput.files[0]);
+                reader.readAsDataURL(file);
             }
+        }
+
+        const imageAlert = document.getElementById('image-alert');
+        const imageAlertText = document.getElementById('image-alert-text');
+        let imageAlertTimeout;
+
+        function showImageAlert(message) {
+            if (!imageAlert || !imageAlertText) return;
+            imageAlertText.textContent = message;
+            imageAlert.classList.remove('hidden');
+            clearTimeout(imageAlertTimeout);
+            imageAlertTimeout = setTimeout(() => {
+                imageAlert.classList.add('hidden');
+            }, 4000);
         }
 
         // District filtering based on city selection
         const citySelect = document.getElementById('city_id');
         const districtSelect = document.getElementById('district_id');
-        const allDistrictOptions = Array.from(districtSelect.options);
+        const quartierSelect = document.getElementById('quartier_id');
+        const allDistrictOptions = districtSelect ? Array.from(districtSelect.options) : [];
+        const allQuartierOptions = quartierSelect ? Array.from(quartierSelect.options) : [];
 
-        citySelect.addEventListener('change', function() {
-            const selectedCityId = this.value;
-            
-            // Reset district select
-            districtSelect.innerHTML = '<option value="">{{ __("-- Select a district --") }}</option>';
-            
-            if (selectedCityId) {
-                // Filter and show districts for the selected city
-                const filteredDistricts = allDistrictOptions.filter(option => 
-                    option.value === '' || option.dataset.city == selectedCityId
-                );
-                
-                if (filteredDistricts.length > 1) {
-                    filteredDistricts.forEach(option => {
-                        if (option.value !== '') {
-                            districtSelect.appendChild(option.cloneNode(true));
-                        }
-                    });
-                    districtSelect.disabled = false;
-                } else {
-                    districtSelect.disabled = true;
-                    districtSelect.innerHTML = '<option value="">{{ __("-- No districts available --") }}</option>';
-                }
+        function resetDistrictSelect() {
+            districtSelect.innerHTML = '<option value="">{{ __('-- Select a city first --') }}</option>';
+            districtSelect.disabled = true;
+        }
+
+        function resetQuartierSelect() {
+            quartierSelect.innerHTML = '<option value="">{{ __('-- Select a district first --') }}</option>';
+            quartierSelect.disabled = true;
+        }
+
+        function populateDistricts(cityId) {
+            districtSelect.innerHTML = '<option value="">{{ __('-- Select a district --') }}</option>';
+            resetQuartierSelect();
+
+            if (!cityId) {
+                resetDistrictSelect();
+                return;
+            }
+
+            const filteredDistricts = allDistrictOptions.filter(option => option.value === '' || option.dataset.city == cityId);
+            const nonEmptyDistricts = filteredDistricts.filter(option => option.value !== '');
+
+            if (nonEmptyDistricts.length > 0) {
+                nonEmptyDistricts.forEach(option => {
+                    districtSelect.appendChild(option.cloneNode(true));
+                });
+                districtSelect.disabled = false;
             } else {
+                districtSelect.innerHTML = '<option value="">{{ __('-- No districts available --') }}</option>';
                 districtSelect.disabled = true;
-                districtSelect.innerHTML = '<option value="">{{ __("-- Select a city first --") }}</option>';
+            }
+        }
+
+        function populateQuartiers(districtId) {
+            quartierSelect.innerHTML = '<option value="">{{ __('-- Select a quartier --') }}</option>';
+
+            if (!districtId) {
+                resetQuartierSelect();
+                return;
+            }
+
+            const filteredQuartiers = allQuartierOptions.filter(option => option.value === '' || option.dataset.district == districtId);
+            const nonEmptyQuartiers = filteredQuartiers.filter(option => option.value !== '');
+
+            if (nonEmptyQuartiers.length > 0) {
+                nonEmptyQuartiers.forEach(option => {
+                    quartierSelect.appendChild(option.cloneNode(true));
+                });
+                quartierSelect.disabled = false;
+            } else {
+                quartierSelect.innerHTML = '<option value="">{{ __('-- No quartiers available --') }}</option>';
+                quartierSelect.disabled = true;
+            }
+        }
+
+        if (citySelect) {
+            citySelect.addEventListener('change', function() {
+                populateDistricts(this.value);
+            });
+        }
+
+        if (districtSelect) {
+            districtSelect.addEventListener('change', function() {
+                populateQuartiers(this.value);
+            });
+        }
+
+        if (citySelect && citySelect.value) {
+            populateDistricts(citySelect.value);
+        } else {
+            resetDistrictSelect();
+            resetQuartierSelect();
+        }
+
+        if (districtSelect && districtSelect.value) {
+            populateQuartiers(districtSelect.value);
+        }
+
+        // Initialize map
+        let map;
+        let marker;
+
+        function initMap() {
+            // Fix Leaflet icon paths for Vite build
+            delete L.Icon.Default.prototype._getIconUrl;
+            L.Icon.Default.mergeOptions({
+                iconRetinaUrl: '/images/marker-icon-2x.png',
+                iconUrl: '/images/marker-icon.png',
+                shadowUrl: '/images/marker-shadow.png',
+            });
+
+            // Default location (Morocco center)
+            const defaultLat = 31.7917;
+            const defaultLng = -7.0926;
+            const zoom = 6;
+
+            // Create map
+            map = L.map('map').setView([defaultLat, defaultLng], zoom);
+
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Add click event to set location
+            map.on('click', function(e) {
+                setLocation(e.latlng.lat, e.latlng.lng);
+            });
+
+            // Set initial location if values exist
+            const latInput = document.getElementById('latitude');
+            const lngInput = document.getElementById('longitude');
+            if (latInput.value && lngInput.value) {
+                setLocation(parseFloat(latInput.value), parseFloat(lngInput.value));
+            }
+        }
+
+        function setLocation(lat, lng) {
+            const latInput = document.getElementById('latitude');
+            const lngInput = document.getElementById('longitude');
+
+            latInput.value = lat.toFixed(6);
+            lngInput.value = lng.toFixed(6);
+
+            // Remove existing marker
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            // Add new marker
+            marker = L.marker([lat, lng]).addTo(map);
+            map.setView([lat, lng], 15);
+        }
+
+        // Use current location
+        document.getElementById('use-location-btn').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                this.disabled = true;
+                this.innerHTML = '<svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>{{ __("Getting location...") }}';
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        setLocation(lat, lng);
+                        document.getElementById('use-location-btn').disabled = false;
+                        document.getElementById('use-location-btn').innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>{{ __("Use My Location") }}';
+                    },
+                    function(error) {
+                        console.error('Geolocation error:', error);
+                        alert('{{ __("Unable to get your location. Please click on the map to set the location manually.") }}');
+                        document.getElementById('use-location-btn').disabled = false;
+                        document.getElementById('use-location-btn').innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>{{ __("Use My Location") }}';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 300000
+                    }
+                );
+            } else {
+                alert('{{ __("Geolocation is not supported by this browser.") }}');
             }
         });
+
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', initMap);
     </script>
 </x-app-layout>

@@ -11,8 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Create quartiers table
+        Schema::create('quartiers', function (Blueprint $table) {
+            $table->id();
+            $table->string('name_fr');
+            $table->string('name_ar')->nullable();
+            $table->string('slug')->unique();
+            $table->foreignId('district_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        // Add quartier_id to reports table
         Schema::table('reports', function (Blueprint $table) {
-            $table->foreignId('quartier_id')->nullable()->constrained('quartiers')->onDelete('cascade')->after('city_id');
+            $table->foreignId('quartier_id')->nullable()->constrained()->onDelete('cascade')->after('district_id');
         });
     }
 
@@ -25,5 +36,7 @@ return new class extends Migration
             $table->dropForeign(['quartier_id']);
             $table->dropColumn('quartier_id');
         });
+
+        Schema::dropIfExists('quartiers');
     }
 };

@@ -324,5 +324,14 @@
     "help.tabs.citizens": "Help for Citizens",
     "help.tabs.conditions": "Conditions of Use",
     "help.tabs.privacy": "Privacy Policy",
-    "help.tabs.contact": "Contact Us"
+    "help.tabs.contact": "Contact Us",
+    "validation.image_required": "The file must be an image.",
+    "validation.image_types": "The image must be a JPG, JPEG, or PNG file.",
+    "validation.image_size": "The image size must not exceed 2MB.",
+    "validation.latitude_required": "The latitude field is required.",
+    "validation.latitude_numeric": "The latitude must be a number.",
+    "validation.latitude_range": "The latitude must be between -90 and 90.",
+    "validation.longitude_required": "The longitude field is required.",
+    "validation.longitude_numeric": "The longitude must be a number.",
+    "validation.longitude_range": "The longitude must be between -180 and 180.",
 }

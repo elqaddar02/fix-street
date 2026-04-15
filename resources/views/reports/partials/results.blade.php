@@ -25,10 +25,14 @@
             </div>
 
             <div class="p-6 flex-grow flex flex-col">
-                <div class="flex items-center gap-3 mb-4">
+                <div class="flex items-center gap-3 mb-4 flex-wrap">
                     <span class="px-2.5 py-1 bg-red-50 rounded-lg text-[9px] font-black text-red-600 uppercase tracking-tighter">{{ $report->category->display_name }}</span>
                     <span class="w-1 h-1 rounded-full bg-slate-200"></span>
                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ $report->city->display_name }}</span>
+                    @if($report->district)
+                        <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ app()->getLocale() === 'ar' ? $report->district->name_ar : $report->district->name_fr }}</span>
+                    @endif
                 </div>
 
                 <h4 class="text-xl font-black text-slate-900 mb-3 group-hover:text-red-600 transition-colors leading-tight">{{ $report->title }}</h4>

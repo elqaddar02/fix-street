@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
 // Public report show route
 Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
 Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/api/quartier/{quartier}/coordinates', [ReportController::class, 'getQuartierCoordinates'])->name('quartier.coordinates');
 
 Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {

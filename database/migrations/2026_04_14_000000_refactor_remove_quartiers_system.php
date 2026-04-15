@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::table('reports', function (Blueprint $table) {
             // Drop the foreign key constraint for quartier_id
-            $table->dropForeign(['quartier_id']);
-            // Drop the quartier_id column
-            $table->dropColumn('quartier_id');
+            
             // Add the district_id foreign key
             $table->foreignId('district_id')->nullable()->constrained()->onDelete('cascade')->after('city_id');
         });
