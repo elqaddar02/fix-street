@@ -49,7 +49,7 @@
                         </div>
 
                         <!-- Category, City and District -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <x-input-label for="category_id" :value="__('Category')" class="text-lg font-semibold" />
                                 <select id="category_id" name="category_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
@@ -82,30 +82,15 @@
 
                             <div>
                                 <x-input-label for="district_id" :value="__('District')" class="text-lg font-semibold" />
-                                <select id="district_id" name="district_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required disabled>
-                                    <option value="">{{ __('-- Select a city first --') }}</option>
+                                <select id="district_id" name="district_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
+                                    <option value="">{{ __('-- Select a district --') }}</option>
                                     @foreach ($districts as $district)
-                                        <option value="{{ $district->id }}" data-city="{{ $district->city_id }}" @selected(old('district_id') == $district->id)>
+                                        <option value="{{ $district->id }}" data-lat="{{ $district->lat ?? 33.5731 }}" data-lng="{{ $district->lng ?? -7.5898 }}" @selected(old('district_id') == $district->id)>
                                             {{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}
                                         </option>
                                     @endforeach
                                 </select>
                                 @error('district_id')
-                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <x-input-label for="quartier_id" :value="__('Quartier')" class="text-lg font-semibold" />
-                                <select id="quartier_id" name="quartier_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required disabled>
-                                    <option value="">{{ __('-- Select a district first --') }}</option>
-                                    @foreach ($quartiers as $quartier)
-                                        <option value="{{ $quartier->id }}" data-district="{{ $quartier->district_id }}" @selected(old('quartier_id') == $quartier->id)>
-                                            {{ app()->getLocale() === 'ar' ? $quartier->name_ar : $quartier->name_fr }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('quartier_id')
                                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -265,89 +250,65 @@
             }, 4000);
         }
 
-        // District filtering based on city selection
+        // District and map logic
         const citySelect = document.getElementById('city_id');
         const districtSelect = document.getElementById('district_id');
-        const quartierSelect = document.getElementById('quartier_id');
-        const allDistrictOptions = districtSelect ? Array.from(districtSelect.options) : [];
-        const allQuartierOptions = quartierSelect ? Array.from(quartierSelect.options) : [];
-
-        function resetDistrictSelect() {
-            districtSelect.innerHTML = '<option value="">{{ __('-- Select a city first --') }}</option>';
-            districtSelect.disabled = true;
-        }
-
-        function resetQuartierSelect() {
-            quartierSelect.innerHTML = '<option value="">{{ __('-- Select a district first --') }}</option>';
-            quartierSelect.disabled = true;
-        }
-
-        function populateDistricts(cityId) {
-            districtSelect.innerHTML = '<option value="">{{ __('-- Select a district --') }}</option>';
-            resetQuartierSelect();
-
-            if (!cityId) {
-                resetDistrictSelect();
-                return;
+        
+        // Geolocation data for districts (stored in data attributes)
+        const districtCoordinates = {};
+        Array.from(districtSelect.options).forEach(option => {
+            if (option.value) {
+                districtCoordinates[option.value] = {
+                    lat: parseFloat(option.dataset.lat) || 33.5731,
+                    lng: parseFloat(option.dataset.lng) || -7.5898,
+                    name: option.textContent
+                };
             }
+        });
 
-            const filteredDistricts = allDistrictOptions.filter(option => option.value === '' || option.dataset.city == cityId);
-            const nonEmptyDistricts = filteredDistricts.filter(option => option.value !== '');
+        // Update map when district changes
+        districtSelect.addEventListener('change', function() {
+            if (this.value && districtCoordinates[this.value]) {
+                const coords = districtCoordinates[this.value];
+                updateMapLocation(coords.lat, coords.lng);
+            }
+        });
 
-            if (nonEmptyDistricts.length > 0) {
-                nonEmptyDistricts.forEach(option => {
-                    districtSelect.appendChild(option.cloneNode(true));
-                });
+        // Update map when city changes
+        citySelect.addEventListener('change', function() {
+            if (this.value) {
+                // Reset district and map to default Salé center
+                districtSelect.value = '';
                 districtSelect.disabled = false;
+                updateMapLocation(33.5731, -7.5898);
             } else {
-                districtSelect.innerHTML = '<option value="">{{ __('-- No districts available --') }}</option>';
                 districtSelect.disabled = true;
+                districtSelect.value = '';
+            }
+        });
+
+        function updateMapLocation(lat, lng) {
+            const latInput = document.getElementById('latitude');
+            const lngInput = document.getElementById('longitude');
+            
+            latInput.value = lat.toFixed(6);
+            lngInput.value = lng.toFixed(6);
+            
+            // Update map if it's initialized
+            if (typeof marker !== 'undefined' && marker) {
+                map.removeLayer(marker);
+            }
+            if (typeof map !== 'undefined') {
+                marker = L.marker([lat, lng]).addTo(map);
+                map.setView([lat, lng], 15);
             }
         }
 
-        function populateQuartiers(districtId) {
-            quartierSelect.innerHTML = '<option value="">{{ __('-- Select a quartier --') }}</option>';
-
-            if (!districtId) {
-                resetQuartierSelect();
-                return;
-            }
-
-            const filteredQuartiers = allQuartierOptions.filter(option => option.value === '' || option.dataset.district == districtId);
-            const nonEmptyQuartiers = filteredQuartiers.filter(option => option.value !== '');
-
-            if (nonEmptyQuartiers.length > 0) {
-                nonEmptyQuartiers.forEach(option => {
-                    quartierSelect.appendChild(option.cloneNode(true));
-                });
-                quartierSelect.disabled = false;
-            } else {
-                quartierSelect.innerHTML = '<option value="">{{ __('-- No quartiers available --') }}</option>';
-                quartierSelect.disabled = true;
-            }
-        }
-
-        if (citySelect) {
-            citySelect.addEventListener('change', function() {
-                populateDistricts(this.value);
-            });
-        }
-
-        if (districtSelect) {
-            districtSelect.addEventListener('change', function() {
-                populateQuartiers(this.value);
-            });
-        }
-
-        if (citySelect && citySelect.value) {
-            populateDistricts(citySelect.value);
-        } else {
-            resetDistrictSelect();
-            resetQuartierSelect();
-        }
-
-        if (districtSelect && districtSelect.value) {
-            populateQuartiers(districtSelect.value);
+        // Initialize on page load if a district was previously selected
+        if (districtSelect.value && districtCoordinates[districtSelect.value]) {
+            const coords = districtCoordinates[districtSelect.value];
+            document.getElementById('latitude').value = coords.lat.toFixed(6);
+            document.getElementById('longitude').value = coords.lng.toFixed(6);
         }
 
         // Initialize map

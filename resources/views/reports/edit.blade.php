@@ -71,10 +71,10 @@
 
                             <div>
                                 <x-input-label for="district_id" :value="__('District')" class="text-lg font-semibold" />
-                                <select id="district_id" name="district_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4">
+                                <select id="district_id" name="district_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
                                     <option value="">{{ __('-- Select a district --') }}</option>
                                     @foreach ($districts as $district)
-                                        <option value="{{ $district->id }}" data-city="{{ $district->city_id }}" @selected(old('district_id', $report->district_id) == $district->id)>
+                                        <option value="{{ $district->id }}" data-lat="{{ $district->lat ?? 33.5731 }}" data-lng="{{ $district->lng ?? -7.5898 }}" @selected(old('district_id', $report->district_id) == $district->id)>
                                             {{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}
                                         </option>
                                     @endforeach
@@ -183,43 +183,42 @@
             }
         }
 
-        // District filtering based on city selection
-        const citySelect = document.getElementById('city_id');
+        // Map and district logic
         const districtSelect = document.getElementById('district_id');
-        const allDistrictOptions = Array.from(districtSelect.options);
-
-        citySelect.addEventListener('change', function() {
-            const selectedCityId = this.value;
-            
-            // Reset district select
-            districtSelect.innerHTML = '<option value="">{{ __("-- Select a district --") }}</option>';
-            
-            if (selectedCityId) {
-                // Filter and show districts for the selected city
-                const filteredDistricts = allDistrictOptions.filter(option => 
-                    option.value === '' || option.dataset.city == selectedCityId
-                );
-                
-                if (filteredDistricts.length > 1) {
-                    filteredDistricts.forEach(option => {
-                        if (option.value !== '') {
-                            districtSelect.appendChild(option.cloneNode(true));
-                        }
-                    });
-                    districtSelect.disabled = false;
-                } else {
-                    districtSelect.disabled = true;
-                    districtSelect.innerHTML = '<option value="">{{ __("-- No districts available --") }}</option>';
-                }
-            } else {
-                districtSelect.disabled = true;
-                districtSelect.innerHTML = '<option value="">{{ __("-- Select a city first --") }}</option>';
+        
+        // Geolocation data for districts (stored in data attributes)
+        const districtCoordinates = {};
+        Array.from(districtSelect.options).forEach(option => {
+            if (option.value) {
+                districtCoordinates[option.value] = {
+                    lat: parseFloat(option.dataset.lat) || 33.5731,
+                    lng: parseFloat(option.dataset.lng) || -7.5898,
+                    name: option.textContent
+                };
             }
         });
 
-        // Trigger city change on page load to show districts for current city
-        if (citySelect.value) {
-            citySelect.dispatchEvent(new Event('change'));
+        // Update map when district changes
+        districtSelect.addEventListener('change', function() {
+            if (this.value && districtCoordinates[this.value]) {
+                const coords = districtCoordinates[this.value];
+                updateMapLocation(coords.lat, coords.lng);
+            }
+        });
+
+        function updateMapLocation(lat, lng) {
+            const latInput = document.getElementById('latitude');
+            const lngInput = document.getElementById('longitude');
+            
+            latInput.value = lat.toFixed(6);
+            lngInput.value = lng.toFixed(6);
+        }
+
+        // Initialize on page load if a district was previously selected
+        if (districtSelect.value && districtCoordinates[districtSelect.value]) {
+            const coords = districtCoordinates[districtSelect.value];
+            document.getElementById('latitude').value = coords.lat.toFixed(6);
+            document.getElementById('longitude').value = coords.lng.toFixed(6);
         }
     </script>
 </x-app-layout>

@@ -61,30 +61,10 @@
 
                                 <div class="group">
                                     <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-red-600 transition">{{ __('District') }}</label>
-                                    <select name="district" id="district-select" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none" @if(!$selectedCity) disabled @endif>
+                                    <select name="district" id="district-select" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none">
                                         <option value="">{{ __('All Districts') }}</option>
-                                        @if($selectedCity)
-                                            @foreach ($districts->where('city_id', $selectedCity) as $district)
-                                                <option value="{{ $district->id }}" @selected($selectedDistrict == $district->id) data-city="{{ $district->city_id }}" data-lat="{{ $district->lat }}" data-lng="{{ $district->lng }}">{{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}</option>
-                                            @endforeach
-                                        @endif
                                         @foreach ($districts as $district)
-                                            <option value="{{ $district->id }}" data-city="{{ $district->city_id }}" data-lat="{{ $district->lat }}" data-lng="{{ $district->lng }}" @selected($selectedDistrict == $district->id) style="display:none;">{{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="group">
-                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-red-600 transition">{{ __('Quartier') }}</label>
-                                    <select name="quartier" id="quartier-select" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none" @if(!$selectedDistrict) disabled @endif>
-                                        <option value="">{{ __('All Quartiers') }}</option>
-                                        @if($selectedDistrict)
-                                            @foreach ($quartiers->where('district_id', $selectedDistrict) as $quartier)
-                                                <option value="{{ $quartier->id }}" @selected($selectedQuartier == $quartier->id) data-district="{{ $quartier->district_id }}" data-lat="{{ $quartier->latitude }}" data-lng="{{ $quartier->longitude }}">{{ app()->getLocale() === 'ar' ? $quartier->name_ar : $quartier->name_fr }}</option>
-                                            @endforeach
-                                        @endif
-                                        @foreach ($quartiers as $quartier)
-                                            <option value="{{ $quartier->id }}" data-district="{{ $quartier->district_id }}" data-lat="{{ $quartier->latitude }}" data-lng="{{ $quartier->longitude }}" @selected($selectedQuartier == $quartier->id) style="display:none;">{{ app()->getLocale() === 'ar' ? $quartier->name_ar : $quartier->name_fr }}</option>
+                                            <option value="{{ $district->id }}" @selected($selectedDistrict == $district->id)>{{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -163,7 +143,7 @@
                     this.bindPagination();
                 },
                 bindFormEvents() {
-                    const form = document.querySelector('form[action="{{ route('reports.index') }}"]');
+                    const form = document.querySelector('form[action="{{ route("reports.index") }}"]');
                     if (!form) return;
 
                     form.addEventListener('submit', e => {
@@ -180,7 +160,7 @@
                     if (sortSelect) {
                         sortSelect.addEventListener('change', () => {
                             this.sortBy = sortSelect.value;
-                            const form = document.querySelector('form[action="{{ route('reports.index') }}"]');
+                            const form = document.querySelector('form[action="{{ route("reports.index") }}"]');
                             this.fetchReports(form);
                         });
                     }
@@ -244,268 +224,7 @@
             }));
         });
 
-        // District and quartier filtering on reports index
-        const citySelect = document.getElementById('city-select');
-        const districtSelect = document.getElementById('district-select');
-        const quartierSelect = document.getElementById('quartier-select');
-        const allDistrictOptions = districtSelect ? Array.from(districtSelect.options) : [];
-        const allQuartierOptions = quartierSelect ? Array.from(quartierSelect.options) : [];
-
-        function resetDistrictSelect() {
-            if (!districtSelect) return;
-            districtSelect.innerHTML = '<option value="">{{ __('All Districts') }}</option>';
-            districtSelect.disabled = true;
-        }
-
-        function resetQuartierSelect() {
-            if (!quartierSelect) return;
-            quartierSelect.innerHTML = '<option value="">{{ __('All Quartiers') }}</option>';
-            quartierSelect.disabled = true;
-        }
-
-        function populateDistricts(cityId) {
-            if (!districtSelect) return;
-            resetQuartierSelect();
-            if (!cityId) {
-                resetDistrictSelect();
-                return;
-            }
-
-            const filteredDistricts = allDistrictOptions.filter(option => option.value === '' || option.dataset.city == cityId);
-            const nonEmptyDistricts = filteredDistricts.filter(option => option.value !== '');
-
-            districtSelect.innerHTML = '<option value="">{{ __('All Districts') }}</option>';
-            if (nonEmptyDistricts.length > 0) {
-                nonEmptyDistricts.forEach(option => districtSelect.appendChild(option.cloneNode(true)));
-                districtSelect.disabled = false;
-            } else {
-                districtSelect.innerHTML = '<option value="">{{ __('-- No districts available --') }}</option>';
-                districtSelect.disabled = true;
-            }
-        }
-
-        function populateQuartiers(districtId) {
-            if (!quartierSelect) return;
-            if (!districtId) {
-                resetQuartierSelect();
-                return;
-            }
-
-            const filteredQuartiers = allQuartierOptions.filter(option => option.value === '' || option.dataset.district == districtId);
-            const nonEmptyQuartiers = filteredQuartiers.filter(option => option.value !== '');
-
-            quartierSelect.innerHTML = '<option value="">{{ __('All Quartiers') }}</option>';
-            if (nonEmptyQuartiers.length > 0) {
-                nonEmptyQuartiers.forEach(option => quartierSelect.appendChild(option.cloneNode(true)));
-                quartierSelect.disabled = false;
-            } else {
-                quartierSelect.innerHTML = '<option value="">{{ __('-- No quartiers available --') }}</option>';
-                quartierSelect.disabled = true;
-            }
-        }
-
-        if (citySelect) {
-            citySelect.addEventListener('change', function() {
-                populateDistricts(this.value);
-            });
-        }
-
-        if (districtSelect) {
-            districtSelect.addEventListener('change', function() {
-                populateQuartiers(this.value);
-            });
-        }
-
-        if (citySelect && citySelect.value) {
-            populateDistricts(citySelect.value);
-        }
-
-        if (districtSelect && districtSelect.value) {
-            populateQuartiers(districtSelect.value);
-        }
-
-        // Initialize map
-        function initReportsMap() {
-            // Fix Leaflet icon paths for Vite build
-            delete L.Icon.Default.prototype._getIconUrl;
-            L.Icon.Default.mergeOptions({
-                iconRetinaUrl: '/images/marker-icon-2x.png',
-                iconUrl: '/images/marker-icon.png',
-                shadowUrl: '/images/marker-shadow.png',
-            });
-
-            // Create map
-            reportsMap = L.map('reports-map').setView([mapCenter.lat, mapCenter.lng], mapCenter.zoom);
-
-            // Add OpenStreetMap tiles
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-                maxZoom: 19
-            }).addTo(reportsMap);
-
-            // Add click event to filter by location
-            reportsMap.on('click', function(e) {
-                setSelectedLocation(e.latlng.lat, e.latlng.lng);
-                filterReportsByLocation(e.latlng.lat, e.latlng.lng);
-            });
-
-            // Load reports markers
-            loadReportsMarkers();
-        }
-
-        function loadReportsMarkers() {
-            // Clear existing markers
-            markers.forEach(marker => reportsMap.removeLayer(marker));
-            markers = [];
-
-            // Get current reports data (you might need to pass this from controller)
-            @if($reports->count() > 0)
-                @foreach($reports as $report)
-                    @if($report->latitude && $report->longitude)
-                        const marker = L.marker([{{ $report->latitude }}, {{ $report->longitude }}], {
-                            icon: L.divIcon({
-                                className: 'custom-marker',
-                                html: `<div class="w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-xs font-bold
-                                    @switch($report->status)
-                                        @case('OPEN') bg-red-500 text-white
-                                        @case('IN_PROGRESS') bg-orange-500 text-white
-                                        @case('RESOLVED') bg-green-500 text-white
-                                        @default bg-gray-500 text-white
-                                    @endswitch">${{ $report->id }}"></div>`,
-                                iconSize: [24, 24],
-                                iconAnchor: [12, 12]
-                            })
-                        }).addTo(reportsMap);
-
-                        marker.bindPopup(`
-                            <div class="p-2">
-                                <h3 class="font-bold text-sm">{{ $report->title }}</h3>
-                                <p class="text-xs text-gray-600 mt-1">{{ Str::limit($report->description, 100) }}</p>
-                                <div class="mt-2 flex items-center gap-2">
-                                    <span class="px-2 py-1 text-xs rounded-full
-                                        @switch($report->status)
-                                            @case('OPEN') bg-red-100 text-red-800
-                                            @case('IN_PROGRESS') bg-orange-100 text-orange-800
-                                            @case('RESOLVED') bg-green-100 text-green-800
-                                            @default bg-gray-100 text-gray-800
-                                        @endswitch">
-                                        {{ $report->status }}
-                                    </span>
-                                    <a href="{{ route('reports.show', $report) }}" class="text-blue-600 text-xs hover:underline">View Details</a>
-                                </div>
-                            </div>
-                        `);
-
-                        markers.push(marker);
-                    @endif
-                @endforeach
-
-                // Fit map to show all markers
-                if (markers.length > 0) {
-                    const group = new L.featureGroup(markers);
-                    reportsMap.fitBounds(group.getBounds().pad(0.1));
-                }
-            @endif
-        }
-
-        function setSelectedLocation(lat, lng) {
-            selectedLocation = { lat, lng };
-
-            // Remove existing selection marker
-            if (window.selectionMarker) {
-                reportsMap.removeLayer(window.selectionMarker);
-            }
-
-            // Add selection marker
-            window.selectionMarker = L.marker([lat, lng], {
-                icon: L.divIcon({
-                    className: 'selection-marker',
-                    html: '<div class="w-8 h-8 bg-blue-600 rounded-full border-4 border-white shadow-xl flex items-center justify-center"><div class="w-2 h-2 bg-white rounded-full"></div></div>',
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16]
-                })
-            }).addTo(reportsMap);
-
-            reportsMap.setView([lat, lng], 13);
-        }
-
-        function filterReportsByLocation(lat, lng) {
-            // Calculate distance and filter reports within radius (e.g., 5km)
-            const radiusKm = 5;
-            const filteredReports = [];
-
-            @if($reports->count() > 0)
-                @foreach($reports as $report)
-                    @if($report->latitude && $report->longitude)
-                        const distance = getDistanceFromLatLonInKm(lat, lng, {{ $report->latitude }}, {{ $report->longitude }});
-                        if (distance <= radiusKm) {
-                            filteredReports.push({{ $report->id }});
-                        }
-                    @endif
-                @endforeach
-            @endif
-
-            // Update list view with filtered reports
-            updateListViewWithFilteredReports(filteredReports);
-        }
-
-        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radius of the earth in km
-            const dLat = deg2rad(lat2 - lat1);
-            const dLon = deg2rad(lon2 - lon1);
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            const d = R * c; // Distance in km
-            return d;
-        }
-
-        function deg2rad(deg) {
-            return deg * (Math.PI/180);
-        }
-
-        function updateListViewWithFilteredReports(reportIds) {
-            // Switch to list view and apply filter
-            toggleView('list');
-
-            // You could add URL parameters or use AJAX to filter the list
-            // For now, we'll just switch to list view
-            // In a full implementation, you'd modify the Alpine component to accept location filters
-        }
-
-        // District filtering based on city selection
-        const citySelect = document.getElementById('city-select');
-        const districtSelect = document.getElementById('district-select');
-        const allDistrictOptions = Array.from(districtSelect.options);
-
-        citySelect.addEventListener('change', function() {
-            const selectedCityId = this.value;
-            
-            // Reset district select
-            districtSelect.innerHTML = '<option value="">{{ __("All Districts") }}</option>';
-            
-            if (selectedCityId) {
-                // Filter and show districts for the selected city
-                const filteredDistricts = allDistrictOptions.filter(option => 
-                    option.value === '' || option.dataset.city == selectedCityId
-                );
-                
-                if (filteredDistricts.length > 1) {
-                    filteredDistricts.forEach(option => {
-                        if (option.value !== '') {
-                            districtSelect.appendChild(option.cloneNode(true));
-                        }
-                    });
-                    districtSelect.disabled = false;
-                } else {
-                    districtSelect.disabled = true;
-                    districtSelect.innerHTML = '<option value="">{{ __("-- No districts available --") }}</option>';
-                }
-            } else {
-                districtSelect.disabled = true;
-                districtSelect.innerHTML = '<option value="">{{ __("All Districts") }}</option>';
-            }
-        });
+        // District filtering on reports index - districts are global, no city-based filtering needed
+        
     </script>
 </x-app-layout>
