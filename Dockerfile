@@ -3,6 +3,8 @@ FROM node:20-alpine AS assets-builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
+# Bust cache to ensure latest code is always copied
+ARG CACHEBUST=1
 COPY . .
 RUN npm run build
 
@@ -31,6 +33,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
+
+# Bust cache to ensure latest code is always copied
+ARG CACHEBUST=1
 
 # Copy application files
 COPY . .

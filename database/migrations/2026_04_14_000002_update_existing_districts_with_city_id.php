@@ -12,10 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Update existing districts with Salé city_id (assuming city_id 6)
-        DB::table('districts')->update([
-            'city_id' => 6  // Salé city ID
-        ]);
+        // Update existing districts with Salé city_id
+        $saleCity = DB::table('cities')->where('name', 'Salé')->first();
+        if ($saleCity) {
+            DB::table('districts')->update([
+                'city_id' => $saleCity->id
+            ]);
+        }
     }
 
     /**
