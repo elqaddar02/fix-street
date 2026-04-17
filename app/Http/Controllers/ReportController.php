@@ -131,7 +131,7 @@ class ReportController extends Controller
             'category_id' => 'required|exists:categories,id',
             'city_id'     => 'required|exists:cities,id',
             'district_id' => 'required|exists:districts,id',
-            'quartier_id' => 'required|exists:quartiers,id',
+            'quartier_id' => 'nullable|exists:quartiers,id',
             'latitude'    => 'required|numeric|between:-90,90',
             'longitude'   => 'required|numeric|between:-180,180',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
