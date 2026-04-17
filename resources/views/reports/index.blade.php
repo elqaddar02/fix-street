@@ -64,7 +64,17 @@
                                     <select name="district" id="district-select" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none">
                                         <option value="">{{ __('All Districts') }}</option>
                                         @foreach ($districts as $district)
-                                            <option value="{{ $district->id }}" @selected($selectedDistrict == $district->id)>{{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}</option>
+                                            <option value="{{ $district->id }}" data-city-id="{{ $district->city_id }}" @selected($selectedDistrict == $district->id)>{{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="group">
+                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-red-600 transition">{{ __('Quartier') }}</label>
+                                    <select name="quartier" id="quartier-select" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none">
+                                        <option value="">{{ __('All Quartiers') }}</option>
+                                        @foreach ($quartiers as $quartier)
+                                            <option value="{{ $quartier->id }}" data-district-id="{{ $quartier->district_id }}" @selected($selectedQuartier == $quartier->id)>{{ app()->getLocale() === 'ar' ? $quartier->name_ar : $quartier->name_fr }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -224,7 +234,59 @@
             }));
         });
 
-        // District filtering on reports index - districts are global, no city-based filtering needed
-        
+        // Dependent dropdowns for index page filters
+        document.addEventListener('DOMContentLoaded', function() {
+            const citySelect = document.getElementById('city-select');
+            const districtSelect = document.getElementById('district-select');
+            const quartierSelect = document.getElementById('quartier-select');
+
+            if (!citySelect || !districtSelect || !quartierSelect) return;
+
+            const allDistrictOptions = Array.from(districtSelect.options);
+            const allQuartierOptions = Array.from(quartierSelect.options);
+
+            function updateDistricts() {
+                const cityId = citySelect.value;
+                const currentDistrictId = districtSelect.value;
+
+                districtSelect.innerHTML = '';
+                allDistrictOptions.forEach(option => {
+                    if (!option.value || !cityId || option.dataset.cityId === cityId) {
+                        districtSelect.appendChild(option.cloneNode(true));
+                    }
+                });
+
+                if (currentDistrictId && Array.from(districtSelect.options).some(o => o.value === currentDistrictId)) {
+                    districtSelect.value = currentDistrictId;
+                } else {
+                    districtSelect.value = '';
+                }
+                updateQuartiers();
+            }
+
+            function updateQuartiers() {
+                const districtId = districtSelect.value;
+                const currentQuartierId = quartierSelect.value;
+
+                quartierSelect.innerHTML = '';
+                allQuartierOptions.forEach(option => {
+                    if (!option.value || !districtId || option.dataset.districtId === districtId) {
+                        quartierSelect.appendChild(option.cloneNode(true));
+                    }
+                });
+
+                if (currentQuartierId && Array.from(quartierSelect.options).some(o => o.value === currentQuartierId)) {
+                    quartierSelect.value = currentQuartierId;
+                } else {
+                    quartierSelect.value = '';
+                }
+            }
+
+            citySelect.addEventListener('change', updateDistricts);
+            districtSelect.addEventListener('change', updateQuartiers);
+
+            // Initialize on load if there are pre-selected values
+            updateDistricts();
+        });
     </script>
 </x-app-layout>

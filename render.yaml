@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: fix-street
+    runtime: docker
+    plan: free
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: LOG_CHANNEL
+        value: errorlog
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - fromDatabase:
+          name: fix-street-db
+          property: host
+        key: DB_HOST
+      - fromDatabase:
+          name: fix-street-db
+          property: port
+        key: DB_PORT
+      - fromDatabase:
+          name: fix-street-db
+          property: database
+        key: DB_DATABASE
+      - fromDatabase:
+          name: fix-street-db
+          property: user
+        key: DB_USERNAME
+      - fromDatabase:
+          name: fix-street-db
+          property: password
+        key: DB_PASSWORD
+
+databases:
+  - name: fix-street-db
+    plan: free
+    databaseName: fix_street
+    user: fix_street_user

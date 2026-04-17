@@ -17,11 +17,11 @@ class QuartierCoordinatesSeeder extends Seeder
     public function run(): void
     {
         $coordinates = [
-            'Bab Lamrissa' => ['latitude' => 34.0519, 'longitude' => -6.7937],
-            'Bettana' => ['latitude' => 34.0495, 'longitude' => -6.8125],
-            'Tabriquet' => ['latitude' => 34.0642, 'longitude' => -6.8098],
-            'Layayda' => ['latitude' => 34.0832, 'longitude' => -6.8247],
-            'Hssaine' => ['latitude' => 34.0405, 'longitude' => -6.8234],
+            'Bab Lamrissa' => ['latitude' => 34.028, 'longitude' => -6.824],
+            'Bettana' => ['latitude' => 34.022, 'longitude' => -6.811],
+            'Tabriquet' => ['latitude' => 34.041, 'longitude' => -6.805],
+            'Layayda' => ['latitude' => 34.062, 'longitude' => -6.791],
+            'Hssaine' => ['latitude' => 34.004, 'longitude' => -6.748],
         ];
 
         foreach ($coordinates as $districtName => $coords) {
@@ -31,9 +31,11 @@ class QuartierCoordinatesSeeder extends Seeder
                 continue;
             }
 
+            // This seeder updates all quartiers in a district to the district's center coordinates
+            // as a fallback if specific quartier coordinates are not set.
             Quartier::where('district_id', $district->id)
+                ->whereNull('latitude')
                 ->update($coords);
         }
     }
 }
-

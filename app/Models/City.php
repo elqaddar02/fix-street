@@ -9,7 +9,7 @@ class City extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'name_ar', 'active'];
+    protected $fillable = ['name', 'name_ar', 'active', 'latitude', 'longitude'];
 
     public function reports()
     {

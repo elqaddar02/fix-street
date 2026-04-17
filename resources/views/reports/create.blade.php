@@ -101,7 +101,7 @@
                                 <select id="city_id" name="city_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
                                     <option value="">{{ __('-- Select a city --') }}</option>
                                     @foreach ($cities as $city)
-                                        <option value="{{ $city->id }}" @selected(old('city_id') == $city->id) @disabled(!$city->active)>
+                                        <option value="{{ $city->id }}" data-lat="{{ $city->latitude }}" data-lng="{{ $city->longitude }}" @selected(old('city_id') == $city->id) @disabled(!$city->active)>
                                             {{ $city->display_name }} @if(!$city->active) (Bientôt disponible) @endif
                                         </option>
                                     @endforeach
@@ -116,7 +116,7 @@
                                 <select id="district_id" name="district_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4" required>
                                     <option value="">{{ __('-- Select a district --') }}</option>
                                     @foreach ($districts as $district)
-                                        <option value="{{ $district->id }}" data-lat="{{ $district->lat ?? 33.5731 }}" data-lng="{{ $district->lng ?? -7.5898 }}" @selected(old('district_id') == $district->id)>
+                                        <option value="{{ $district->id }}" data-city-id="{{ $district->city_id }}" data-lat="{{ $district->lat ?? 33.5731 }}" data-lng="{{ $district->lng ?? -7.5898 }}" @selected(old('district_id') == $district->id)>
                                             {{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}
                                         </option>
                                     @endforeach
@@ -131,7 +131,7 @@
                                 <select id="quartier_id" name="quartier_id" class="mt-2 block w-full border-2 border-gray-400 rounded-lg shadow-sm focus:border-red-500 focus:ring-red-500 py-3 px-4">
                                     <option value="">{{ __('-- Select a quartier --') }}</option>
                                     @foreach ($quartiers as $quartier)
-                                        <option value="{{ $quartier->id }}" data-lat="{{ $quartier->latitude ?? 33.5731 }}" data-lng="{{ $quartier->longitude ?? -7.5898 }}" @selected(old('quartier_id') == $quartier->id)>
+                                        <option value="{{ $quartier->id }}" data-district-id="{{ $quartier->district_id }}" data-lat="{{ $quartier->latitude ?? 33.5731 }}" data-lng="{{ $quartier->longitude ?? -7.5898 }}" @selected(old('quartier_id') == $quartier->id)>
                                             {{ app()->getLocale() === 'ar' ? $quartier->name_ar : $quartier->name_fr }}
                                         </option>
                                     @endforeach
@@ -194,254 +194,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
     <script>
-        // ========== IMAGE UPLOAD HANDLING ==========
-        const imageInput = document.getElementById('image');
-        const imageUploadArea = document.getElementById('image-upload-area');
-        const imagePreview = document.getElementById('image-preview');
-        const previewImage = document.getElementById('preview-image');
-
-        imageUploadArea.addEventListener('click', (event) => {
-            if (event.target !== imageInput) {
-                imageInput.click();
+        window.reportConfig = {
+            translations: {
+                imageTypes: "{{ __('validation.image_types') }}",
+                imageSize: "{{ __('validation.image_size') }}",
+                selectQuartier: "{{ __('-- Select a quartier --') }}",
+                selectDistrict: "{{ __('-- Select a district --') }}",
+                gettingLocation: "{{ __('Getting location...') }}",
+                useMyLocation: "{{ __('Use My Location') }}",
+                geolocationError: "{{ __('Unable to get your location. Please click on the map to set the location manually.') }}",
+                geolocationNotSupported: "{{ __('Geolocation is not supported by this browser.') }}"
             }
-        });
-
-        imageUploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            imageUploadArea.classList.add('border-red-500', 'bg-red-50');
-        });
-
-        imageUploadArea.addEventListener('dragleave', () => {
-            imageUploadArea.classList.remove('border-red-500', 'bg-red-50');
-        });
-
-        imageUploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            imageUploadArea.classList.remove('border-red-500', 'bg-red-50');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                imageInput.files = files;
-                showImagePreview();
-            }
-        });
-
-        imageInput.addEventListener('change', showImagePreview);
-
-        function showImagePreview() {
-            if (imageInput.files && imageInput.files[0]) {
-                const file = imageInput.files[0];
-                const allowedTypes = ['image/jpeg', 'image/png'];
-                const maxSize = 2 * 1024 * 1024;
-                
-                if (!allowedTypes.includes(file.type)) {
-                    showImageAlert('{{ __("validation.image_types") }}');
-                    imageInput.value = '';
-                    imagePreview.classList.add('hidden');
-                    return;
-                }
-                
-                if (file.size > maxSize) {
-                    showImageAlert('{{ __("validation.image_size") }}');
-                    imageInput.value = '';
-                    imagePreview.classList.add('hidden');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewImage.src = e.target.result;
-                    imagePreview.classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        const imageAlert = document.getElementById('image-alert');
-        const imageAlertText = document.getElementById('image-alert-text');
-        let imageAlertTimeout;
-
-        function showImageAlert(message) {
-            if (!imageAlert || !imageAlertText) return;
-            imageAlertText.textContent = message;
-            imageAlert.classList.remove('hidden');
-            clearTimeout(imageAlertTimeout);
-            imageAlertTimeout = setTimeout(() => {
-                imageAlert.classList.add('hidden');
-            }, 4000);
-        }
-
-        // ========== MAP AND LOCATION HANDLING ==========
-        const citySelect = document.getElementById('city_id');
-        const districtSelect = document.getElementById('district_id');
-        const quartierSelect = document.getElementById('quartier_id');
-        
-        // Geolocation data for districts
-        const districtCoordinates = {};
-        Array.from(districtSelect.options).forEach(option => {
-            if (option.value) {
-                districtCoordinates[option.value] = {
-                    lat: parseFloat(option.dataset.lat) || 33.5731,
-                    lng: parseFloat(option.dataset.lng) || -7.5898,
-                    name: option.textContent
-                };
-            }
-        });
-
-        // Geolocation data for quartiers
-        const quartierCoordinates = {};
-        Array.from(quartierSelect.options).forEach(option => {
-            if (option.value) {
-                quartierCoordinates[option.value] = {
-                    lat: parseFloat(option.dataset.lat) || 33.5731,
-                    lng: parseFloat(option.dataset.lng) || -7.5898,
-                    name: option.textContent
-                };
-            }
-        });
-
-        // Update map when quartier changes (HIGHEST PRIORITY)
-        quartierSelect.addEventListener('change', function() {
-            if (this.value && quartierCoordinates[this.value]) {
-                const coords = quartierCoordinates[this.value];
-                updateMapLocation(coords.lat, coords.lng);
-            } else if (districtSelect.value && districtCoordinates[districtSelect.value]) {
-                // Fall back to district if quartier is cleared
-                const coords = districtCoordinates[districtSelect.value];
-                updateMapLocation(coords.lat, coords.lng);
-            }
-        });
-
-        // Update map when district changes
-        districtSelect.addEventListener('change', function() {
-            quartierSelect.value = ''; // Reset quartier when district changes
-            if (this.value && districtCoordinates[this.value]) {
-                const coords = districtCoordinates[this.value];
-                updateMapLocation(coords.lat, coords.lng);
-            }
-        });
-
-        // Update map when city changes
-        citySelect.addEventListener('change', function() {
-            if (this.value) {
-                districtSelect.value = '';
-                quartierSelect.value = '';
-                districtSelect.disabled = false;
-                quartierSelect.disabled = true;
-                updateMapLocation(33.5731, -7.5898); // Salé center
-            } else {
-                districtSelect.disabled = true;
-                quartierSelect.disabled = true;
-                districtSelect.value = '';
-                quartierSelect.value = '';
-            }
-        });
-
-        function updateMapLocation(lat, lng) {
-            const latInput = document.getElementById('latitude');
-            const lngInput = document.getElementById('longitude');
-            
-            latInput.value = lat.toFixed(6);
-            lngInput.value = lng.toFixed(6);
-            
-            if (typeof marker !== 'undefined' && marker) {
-                map.removeLayer(marker);
-            }
-            if (typeof map !== 'undefined') {
-                marker = L.marker([lat, lng]).addTo(map);
-                map.setView([lat, lng], 15);
-            }
-        }
-
-        // Initialize on page load if location was previously selected
-        if (quartierSelect.value && quartierCoordinates[quartierSelect.value]) {
-            const coords = quartierCoordinates[quartierSelect.value];
-            document.getElementById('latitude').value = coords.lat.toFixed(6);
-            document.getElementById('longitude').value = coords.lng.toFixed(6);
-        } else if (districtSelect.value && districtCoordinates[districtSelect.value]) {
-            const coords = districtCoordinates[districtSelect.value];
-            document.getElementById('latitude').value = coords.lat.toFixed(6);
-            document.getElementById('longitude').value = coords.lng.toFixed(6);
-        }
-
-        // Initialize map
-        let map;
-        let marker;
-
-        function initMap() {
-            delete L.Icon.Default.prototype._getIconUrl;
-            L.Icon.Default.mergeOptions({
-                iconRetinaUrl: '/images/marker-icon-2x.png',
-                iconUrl: '/images/marker-icon.png',
-                shadowUrl: '/images/marker-shadow.png',
-            });
-
-            const defaultLat = 31.7917;
-            const defaultLng = -7.0926;
-            const zoom = 6;
-
-            map = L.map('map').setView([defaultLat, defaultLng], zoom);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-                maxZoom: 19
-            }).addTo(map);
-
-            map.on('click', function(e) {
-                setLocation(e.latlng.lat, e.latlng.lng);
-            });
-
-            const latInput = document.getElementById('latitude');
-            const lngInput = document.getElementById('longitude');
-            if (latInput.value && lngInput.value) {
-                setLocation(parseFloat(latInput.value), parseFloat(lngInput.value));
-            }
-        }
-
-        function setLocation(lat, lng) {
-            const latInput = document.getElementById('latitude');
-            const lngInput = document.getElementById('longitude');
-
-            latInput.value = lat.toFixed(6);
-            lngInput.value = lng.toFixed(6);
-
-            if (marker) {
-                map.removeLayer(marker);
-            }
-
-            marker = L.marker([lat, lng]).addTo(map);
-            map.setView([lat, lng], 15);
-        }
-
-        document.getElementById('use-location-btn').addEventListener('click', function() {
-            if (navigator.geolocation) {
-                this.disabled = true;
-                this.innerHTML = '<svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>{{ __("Getting location...") }}';
-
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-                        setLocation(lat, lng);
-                        document.getElementById('use-location-btn').disabled = false;
-                        document.getElementById('use-location-btn').innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>{{ __("Use My Location") }}';
-                    },
-                    function(error) {
-                        console.error('Geolocation error:', error);
-                        alert('{{ __("Unable to get your location. Please click on the map to set the location manually.") }}');
-                        document.getElementById('use-location-btn').disabled = false;
-                        document.getElementById('use-location-btn').innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>{{ __("Use My Location") }}';
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 300000
-                    }
-                );
-            } else {
-                alert('{{ __("Geolocation is not supported by this browser.") }}');
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', initMap);
+        };
     </script>
+    <script src="{{ asset('js/reports/create.js') }}"></script>
 </x-app-layout>
