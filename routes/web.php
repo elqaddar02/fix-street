@@ -52,7 +52,7 @@ Route::get('/login-redirect', function (Request $request) {
     return redirect()->route('login');
 })->name('login.redirect');
 
-Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
    
