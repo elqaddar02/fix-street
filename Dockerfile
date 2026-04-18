@@ -3,8 +3,6 @@ FROM node:20-alpine AS assets-builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
-# Bust cache to ensure latest code is always copied
-ARG CACHEBUST=1
 COPY . .
 RUN npm run build
 
@@ -34,9 +32,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Bust cache to ensure latest code is always copied
-ARG CACHEBUST=1
-
 # Copy application files
 COPY . .
 
@@ -49,20 +44,15 @@ RUN composer install --no-dev --optimize-autoloader
 # Copy Nginx config
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 
+# Copy start script
+COPY docker/start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
 # Setup permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Expose port 80
+# Expose port 80 for Render
 EXPOSE 80
-
-# Start script
-COPY --chmod=755 <<EOF /usr/local/bin/start.sh
-#!/bin/sh
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-nginx && php-fpm
-EOF
 
 CMD ["/usr/local/bin/start.sh"]
