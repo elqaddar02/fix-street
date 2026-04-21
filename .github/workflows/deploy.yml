@@ -37,6 +37,8 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
           # Path on the server where htdocs is located
           server-dir: ./htdocs/ 
           # We exclude these because they are either not needed or handled differently
