@@ -32,26 +32,12 @@ jobs:
           npm run build
 
       - name: 🚀 Sync Files via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          # Path on the server where htdocs is located
-          server-dir: ./htdocs/ 
-          # We exclude these because they are either not needed or handled differently
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/tests/**
-            **/Dockerfile
-            **/render.yaml
-            storage/framework/cache/**
-            storage/framework/sessions/**
-            storage/framework/views/**
-            .env.example
-            phpunit.xml
-            README.md
+        uses: SebastianSchildt/ftp-deploy-action@v2.0.0
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          LOCAL_DIR: ./
+          REMOTE_DIR: /htdocs/
+          # Exclude files to save time and avoid errors
+          ARGS: --exclude .git/ --exclude node_modules/ --exclude tests/
