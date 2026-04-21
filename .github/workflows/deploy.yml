@@ -32,12 +32,11 @@ jobs:
           npm run build
 
       - name: 🚀 Sync Files via FTP
-        uses: SebastianSchildt/ftp-deploy-action@v2.0.0
-        env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-          LOCAL_DIR: ./
-          REMOTE_DIR: /htdocs/
-          # Exclude files to save time and avoid errors
-          ARGS: --exclude .git/ --exclude node_modules/ --exclude tests/
+        uses: ArielMejiaDev/ftp-deploy@v1.2.1
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local_dir: ./
+          remote_dir: /htdocs/
+          delete: false # Set to true if you want to delete files on server that aren't in git
