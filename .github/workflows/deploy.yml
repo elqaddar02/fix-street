@@ -31,12 +31,36 @@ jobs:
           npm install
           npm run build
 
+      - name: 🚀 Prepare for InfinityFree
+        run: |
+          mkdir deploy_temp
+          mkdir deploy_temp/laravel
+          mkdir deploy_temp/htdocs
+          
+          # 1. Copy everything to laravel folder (excluding node_modules and deploy_temp)
+          # We use rsync-like behavior with cp
+          cp -rp ./* deploy_temp/laravel/ 2>/dev/null || true
+          
+          # 2. Move public contents to htdocs
+          cp -rp public/* deploy_temp/htdocs/
+          
+          # 3. Apply deployment index.php
+          if [ -f "public/index.php.deploy" ]; then
+            cp public/index.php.deploy deploy_temp/htdocs/index.php
+          fi
+          
+          # 4. Cleanup laravel folder (remove public and other unnecessary files)
+          rm -rf deploy_temp/laravel/public
+          rm -rf deploy_temp/laravel/deploy_temp
+          rm -rf deploy_temp/laravel/node_modules
+          rm -f deploy_temp/laravel/composer.phar
+
       - name: 🚀 Sync Files via FTP
         uses: ArielMejiaDev/ftp-deploy@v1.2.1
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local_dir: ./
-          remote_dir: /htdocs/
-          delete: false # Set to true if you want to delete files on server that aren't in git
+          local_dir: ./deploy_temp/
+          remote_dir: /
+          delete: false
