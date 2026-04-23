@@ -33,27 +33,31 @@ jobs:
 
       - name: 🚀 Prepare for InfinityFree
         run: |
-          mkdir deploy_temp
-          mkdir deploy_temp/laravel
-          mkdir deploy_temp/htdocs
+          # Create fresh deploy directory
+          mkdir -p deploy_temp/laravel
+          mkdir -p deploy_temp/htdocs
           
-          # 1. Copy everything to laravel folder (excluding node_modules and deploy_temp)
-          # We use rsync-like behavior with cp
-          cp -rp ./* deploy_temp/laravel/ 2>/dev/null || true
+          # 1. Copy core files (everything except public, .git, and deploy_temp)
+          # Use find to avoid copying the destination into itself
+          find . -maxdepth 1 ! -name "deploy_temp" ! -name "public" ! -name ".git" ! -name "." -exec cp -rp {} deploy_temp/laravel/ \;
           
-          # 2. Move public contents to htdocs
+          # 2. Copy public files to htdocs
           cp -rp public/* deploy_temp/htdocs/
           
           # 3. Apply deployment index.php
           if [ -f "public/index.php.deploy" ]; then
             cp public/index.php.deploy deploy_temp/htdocs/index.php
+            echo "✅ Applied index.php.deploy"
           fi
           
-          # 4. Cleanup laravel folder (remove public and other unnecessary files)
-          rm -rf deploy_temp/laravel/public
-          rm -rf deploy_temp/laravel/deploy_temp
+          # 4. Final Cleanup
           rm -rf deploy_temp/laravel/node_modules
-          rm -f deploy_temp/laravel/composer.phar
+          rm -rf deploy_temp/laravel/public
+
+      - name: 🔍 Verify Structure
+        run: |
+          echo "Structure of deploy_temp:"
+          ls -R deploy_temp | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /'
 
       - name: 🚀 Sync Files via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
