@@ -190,22 +190,21 @@ jobs:
           mkdir -p deploy_zip
           mv -f laravel_core.zip deploy_zip/ || { echo "::error::Failed to move zip"; exit 1; }
 
+      # FIXED: Removed 'include', switched protocol to ftp, fixed state-name path
       - name: Upload laravel_core.zip via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          server: ${{ env.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
-          protocol: ftps
+          protocol: ftp
           local-dir: ./deploy_zip/
           server-dir: ${{ env.FTP_WEB_DIR }}
-          state-name: deploy-cache/zip-sync.json
+          state-name: zip-sync.json
           timeout: 120000
           log-level: verbose
           dangerous-clean-slate: false
-          include: |
-            laravel_core.zip
 
       - name: Trigger remote unzip via HTTP
         env:
