@@ -186,7 +186,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
-          protocol: ftp
+          protocol: ftps
           local-dir: ./deploy_temp/
           server-dir: ${{ env.FTP_WEB_DIR }}
           state-name: deploy-cache/web-sync.json
@@ -212,7 +212,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
-          protocol: ftp
+          protocol: ftps
           local-dir: ./deploy_temp/laravel_core/
           server-dir: ${{ env.FTP_CORE_DIR }}
           state-name: deploy-cache/core-sync.json
