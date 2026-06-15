@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: fix-street-web
+    env: php
+    buildpack: https://github.com/heroku/heroku-buildpack-php
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: "composer install --no-dev --optimize-autoloader && cp .env.example .env && php artisan key:generate && npm install && npm run build"
+    startCommand: "vendor/bin/heroku-php-apache2 public/"
+    postDeployCommand: "php artisan migrate --force && php artisan storage:link && php artisan config:cache && php artisan route:cache && php artisan view:cache"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: 'false'
+      - key: APP_URL
+        value: https://Your_Render_URL.onrender.com
+      - key: LOG_CHANNEL
+        value: stack
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: CACHE_DRIVER
+        value: file
+      - key: SESSION_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: local
+
+databases:
+  - name: fix-street-db
+    engine: postgresql
+    plan: free
