@@ -2,69 +2,167 @@ name: Deploy Laravel to InfinityFree
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+
+concurrency:
+  group: deploy-infinityfree
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: 🚚 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 📂 Setup PHP
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, bcmath, fileinfo, tokenizer
           coverage: none
 
-      - name: 🔨 Install PHP Dependencies
-        run: composer install --no-dev --optimize-autoloader
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-      - name: 📂 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
 
-      - name: 🔨 Install & Build Assets (Vite)
+      - name: Build frontend assets (Vite)
         run: |
-          npm install
+          npm ci
           npm run build
 
-      - name: 🚀 Prepare for InfinityFree
+      - name: Generate production .env
         run: |
-          # Create fresh deploy directory
-          mkdir -p deploy_temp/laravel
-          mkdir -p deploy_temp/htdocs
-          
-          # 1. Copy core files (everything except public, .git, and deploy_temp)
-          # Use find to avoid copying the destination into itself
-          find . -maxdepth 1 ! -name "deploy_temp" ! -name "public" ! -name ".git" ! -name "." -exec cp -rp {} deploy_temp/laravel/ \;
-          
-          # 2. Copy public files to htdocs
-          cp -rp public/* deploy_temp/htdocs/
-          
-          # 3. Apply deployment index.php
-          if [ -f "public/index.php.deploy" ]; then
-            cp public/index.php.deploy deploy_temp/htdocs/index.php
-            echo "✅ Applied index.php.deploy"
+          cat > .env << EOF
+          APP_NAME="${{ secrets.APP_NAME }}"
+          APP_ENV=production
+          APP_KEY=${{ secrets.APP_KEY }}
+          APP_DEBUG=false
+          APP_URL=${{ secrets.APP_URL }}
+
+          APP_LOCALE=en
+          APP_FALLBACK_LOCALE=en
+          APP_FAKER_LOCALE=en_US
+
+          APP_MAINTENANCE_DRIVER=file
+          BCRYPT_ROUNDS=12
+
+          LOG_CHANNEL=stack
+          LOG_STACK=single
+          LOG_LEVEL=error
+
+          DB_CONNECTION=mysql
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_DATABASE=${{ secrets.DB_DATABASE }}
+          DB_USERNAME=${{ secrets.DB_USERNAME }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+
+          SESSION_DRIVER=file
+          SESSION_LIFETIME=120
+          SESSION_ENCRYPT=false
+          SESSION_PATH=/
+          SESSION_DOMAIN=null
+
+          BROADCAST_CONNECTION=log
+          FILESYSTEM_DISK=local
+          QUEUE_CONNECTION=sync
+          CACHE_STORE=file
+
+          MAIL_MAILER=log
+          MAIL_FROM_ADDRESS="${{ secrets.MAIL_FROM_ADDRESS }}"
+          MAIL_FROM_NAME="${{ secrets.APP_NAME }}"
+
+          VITE_APP_NAME="${{ secrets.APP_NAME }}"
+          EOF
+
+      - name: Cache Laravel config/routes/views
+        run: |
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+
+      - name: Prepare InfinityFree folder layout
+        run: |
+          set -e
+
+          rm -rf deploy_temp
+          mkdir -p deploy_temp/laravel_core
+
+          # Core Laravel app (everything except public/, dev folders, and git metadata)
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='public' \
+            --exclude='deploy_temp' \
+            --exclude='tests' \
+            --exclude='.env' \
+            --exclude='.env.example' \
+            --exclude='database/database.sqlite' \
+            ./ deploy_temp/laravel_core/
+
+          # Web root = deploy_temp/ (FTP uploads directly into htdocs)
+          rsync -a public/ deploy_temp/
+
+          # Production entry point + rewrite rules
+          cp public/index.php.deploy deploy_temp/index.php
+          cp public/.htaccess.deploy deploy_temp/.htaccess
+
+          # Block web access to laravel_core
+          cp deploy/laravel_core.htaccess deploy_temp/laravel_core/.htaccess
+
+          # Production .env lives outside the web root
+          cp .env deploy_temp/laravel_core/.env
+
+          # Storage symlink workaround: expose public disk files under web root /storage/
+          mkdir -p deploy_temp/storage
+          if [ -d "storage/app/public" ] && [ "$(ls -A storage/app/public 2>/dev/null)" ]; then
+            cp -rp storage/app/public/. deploy_temp/storage/
           fi
-          
-          # 4. Final Cleanup
-          rm -rf deploy_temp/laravel/node_modules
-          rm -rf deploy_temp/laravel/public
 
-      - name: 🔍 Verify Structure
+          # Ensure writable framework directories exist
+          mkdir -p deploy_temp/laravel_core/storage/framework/{cache,sessions,views}
+          mkdir -p deploy_temp/laravel_core/storage/logs
+          mkdir -p deploy_temp/laravel_core/bootstrap/cache
+
+          # Remove dev artifacts from upload bundle
+          rm -rf deploy_temp/laravel_core/node_modules
+
+      - name: Show deploy bundle structure
         run: |
-          echo "Structure of deploy_temp:"
-          ls -R deploy_temp | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /'
+          echo "web root (deploy_temp):"
+          ls -la deploy_temp | head -20
+          echo ""
+          echo "laravel_core:"
+          ls -la deploy_temp/laravel_core | head -20
 
-      - name: 🚀 Sync Files via FTP
+      - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp
           local-dir: ./deploy_temp/
-          server-dir: /
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
           state-name: .ftp-deploy-sync-state.json
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/tests/**
+            **/.DS_Store
+            **/Thumbs.db
+            storage/**
