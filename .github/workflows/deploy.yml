@@ -136,7 +136,8 @@ jobs:
           cp deploy/laravel_core.htaccess deploy_core/.htaccess || echo "Deny from all" > deploy_core/.htaccess
 
           # Production env config
-          cp .env deploy_core/production.env
+          
+          cp .env deploy_core/env-config.txt
 
           # Storage symlink workaround
           mkdir -p deploy_web/storage
