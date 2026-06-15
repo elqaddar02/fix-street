@@ -182,6 +182,58 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
+
+        - name: Create laravel_core.zip
+          run: |
+            set -e
+            # Create a zip of the laravel_core directory to speed up transfer
+            cd deploy_temp
+            if [ -d "laravel_core" ]; then
+              zip -r ../laravel_core.zip laravel_core || { echo "::error::Failed to create zip"; exit 1; }
+            else
+              echo "::error::laravel_core folder not found"; exit 1;
+            fi
+
+        - name: Prepare zip upload folder
+          run: |
+            mkdir -p deploy_zip
+            mv -f laravel_core.zip deploy_zip/ || { echo "::error::Failed to move zip"; exit 1; }
+
+        - name: Upload laravel_core.zip via FTP
+          uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+          with:
+            server: ${{ secrets.FTP_SERVER }}
+            username: ${{ secrets.FTP_USERNAME }}
+            password: ${{ secrets.FTP_PASSWORD }}
+            port: 21
+            protocol: ftps
+            local-dir: ./deploy_zip/
+            server-dir: ${{ env.FTP_WEB_DIR }}
+            state-name: deploy-cache/zip-sync.json
+            timeout: 120000
+            log-level: verbose
+            dangerous-clean-slate: false
+            include: |
+              laravel_core.zip
+
+        - name: Trigger remote unzip via HTTP
+          env:
+            UNZIP_TOKEN: ${{ secrets.UNZIP_TOKEN }}
+            APP_URL: ${{ secrets.APP_URL }}
+          run: |
+            set -e
+            if [ -z "$UNZIP_TOKEN" ]; then
+              echo "::error::UNZIP_TOKEN secret is not set"; exit 1;
+            fi
+            if [ -z "$APP_URL" ]; then
+              echo "::error::APP_URL secret is not set"; exit 1;
+            fi
+            echo "Triggering unzip on remote..."
+            # call the public/unzip.php endpoint with the token
+            curl -v --fail --show-error --max-time 120 "${APP_URL%/}/unzip.php?token=${UNZIP_TOKEN}" || {
+              echo "::error::Remote unzip call failed"; exit 1;
+            }
+
           protocol: ftp
           local-dir: ./deploy_combined/
           server-dir: ${{ env.FTP_WEB_DIR }}
