@@ -217,7 +217,7 @@ jobs:
           local-dir: ./deploy_temp/laravel_core/
           server-dir: ${{ env.FTP_CORE_DIR }}
           state-name: deploy-cache/core-sync.json
-          timeout: 600000
+          timeout: 700000
           log-level: verbose
           dangerous-clean-slate: false
           exclude: |
