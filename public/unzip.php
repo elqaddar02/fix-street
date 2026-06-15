@@ -11,6 +11,14 @@ $EXPECTED_TOKEN = 'REPLACE_WITH_A_STRONG_TOKEN';
 // Path to the zip file (defaults to parent directory)
 $ZIP_PATH = __DIR__ . '/../laravel_core.zip';
 
+// Also allow alternate locations (web root or a deploy_zip folder) — script will pick the first found
+$ZIP_CANDIDATES = [
+    __DIR__ . '/../laravel_core.zip',
+    __DIR__ . '/laravel_core.zip',
+    __DIR__ . '/../deploy_zip/laravel_core.zip',
+    __DIR__ . '/deploy_zip/laravel_core.zip',
+];
+
 // Target directory to extract into (defaults to parent/laravel_core/)
 $TARGET_DIR = __DIR__ . '/../laravel_core/';
 
@@ -56,6 +64,19 @@ function normalize_dir($dir)
 }
 
 $ZIP_PATH = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $ZIP_PATH);
+$found = null;
+foreach ($ZIP_CANDIDATES as $candidate) {
+    $candidate = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $candidate);
+    if (file_exists($candidate)) {
+        $found = $candidate;
+        break;
+    }
+}
+if ($found !== null) {
+    $ZIP_PATH = $found;
+} else {
+    respond(404, "File not found. Checked paths: " . implode(', ', $ZIP_CANDIDATES));
+}
 $TARGET_DIR = normalize_dir($TARGET_DIR);
 
 // Confirm zip file exists
