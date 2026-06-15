@@ -5,8 +5,8 @@
 // -----------------------------
 // CONFIGURATION
 // -----------------------------
-// Replace this token with a strong secret and keep it out of version control
-$EXPECTED_TOKEN = 'REPLACE_WITH_A_STRONG_TOKEN';
+// Your GitHub UNZIP_TOKEN secret value matches this exactly
+$EXPECTED_TOKEN = 'MySuperSecretKey123';
 
 // Path to the zip file (defaults to parent directory)
 $ZIP_PATH = __DIR__ . '/../laravel_core.zip';
@@ -212,17 +212,13 @@ $successMsg = "Extraction completed successfully to: {$TARGET_DIR}";
 
 // Optionally delete this script
 if ($DELETE_SELF_AFTER) {
-    // Try to delete the running script file
     $self = __FILE__;
-    // echo success before deletion (some hosts buffer output)
     echo $successMsg . "\n";
     if (!@unlink($self)) {
         respond(500, "Extraction succeeded but failed to delete self: {$self}");
     }
-    // If we reached here, php will continue running but file is removed from disk
     exit;
 }
 
 respond(200, $successMsg);
-
 ?>
