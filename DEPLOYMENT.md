@@ -263,6 +263,20 @@ This error means GitHub Actions could not complete the FTP **control connection*
 - If **“Test FTP connection”** fails → secrets or hostname are wrong (or InfinityFree blocks GitHub IPs).
 - If test passes but deploy fails → upload too large/slow; split deploy should help.
 
+### `ERR_SSL_TLSV1_ALERT_DECODE_ERROR` (TLS / SSL data socket)
+
+InfinityFree **free tier uses plain FTP on port 21**, not FTPS/TLS.
+
+**Fix:**
+- In `deploy.yml`, both deploy steps must use `protocol: ftp` (NOT `ftps` or `ftps-legacy`)
+- In GitHub secret `FTP_SERVER`, use hostname only: `ftpupload.net`  
+  **Do NOT** prefix with `ftps://` or `ftp://`
+- Port must be `21`, not `990`
+
+FileZilla: use **FTP** (plain), not "FTP over explicit TLS".
+
+---
+
 ### `553 Can't open that file: Permission denied`
 
 This means FTP connected but **could not write** a file or folder.
