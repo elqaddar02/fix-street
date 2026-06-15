@@ -17,7 +17,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # FIX 1: Restore file modification times so FTP can compare timestamps correctly
       - name: Set git file modification times
         uses: chetan/git-restore-mtime-action@v2
 
@@ -96,7 +95,6 @@ jobs:
           php artisan route:cache
           php artisan view:cache
 
-      # FIX 2: Create a local state folder and persist it between workflow runs
       - name: Cache FTP Sync State
         uses: actions/cache@v4
         with:
@@ -105,7 +103,6 @@ jobs:
           restore-keys: |
             ftp-cache-
 
-      # FIX 3: Keep web root and laravel_core completely separate locally
       - name: Prepare InfinityFree folder layout
         run: |
           set -e
@@ -135,7 +132,7 @@ jobs:
           cp public/.htaccess.deploy deploy_web/.htaccess
 
           # Block web access to laravel_core (uploaded separately, but protected just in case)
-          mkdir -p deploy_core/.htaccess
+          # FIXED: Removed the invalid mkdir line that threw the error
           cp deploy/laravel_core.htaccess deploy_core/.htaccess || echo "Deny from all" > deploy_core/.htaccess
 
           # Production env config
@@ -193,7 +190,6 @@ jobs:
               exit 1
             }
 
-      # FIX 4: Simplified Deploy pointing to completely distinct local directories
       - name: Deploy web root via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
