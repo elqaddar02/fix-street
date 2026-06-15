@@ -122,8 +122,8 @@ jobs:
           # Block web access to laravel_core
           cp deploy/laravel_core.htaccess deploy_temp/laravel_core/.htaccess
 
-          # Production .env lives outside the web root
-          cp .env deploy_temp/laravel_core/.env
+          # Production env (InfinityFree often blocks uploading ".env" via FTP)
+          cp .env deploy_temp/laravel_core/production.env
 
           # Storage symlink workaround: expose public disk files under web root /storage/
           mkdir -p deploy_temp/storage
@@ -154,6 +154,16 @@ jobs:
           echo "laravel_core/vendor size:"
           du -sh deploy_temp/laravel_core/vendor || true
 
+      - name: Prepare FTP directories
+        run: |
+          BASE="${{ secrets.FTP_SERVER_DIR }}"
+          BASE="${BASE:-/}"
+          BASE="${BASE%/}/"
+          echo "FTP_WEB_DIR=${BASE}" >> $GITHUB_ENV
+          echo "FTP_CORE_DIR=${BASE}laravel_core/" >> $GITHUB_ENV
+          echo "Using FTP web dir: ${BASE}"
+          echo "Using FTP core dir: ${BASE}laravel_core/"
+
       - name: Test FTP connection
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
@@ -178,8 +188,8 @@ jobs:
           port: 21
           protocol: ftp
           local-dir: ./deploy_temp/
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          state-name: .ftp-deploy-sync-state-web.json
+          server-dir: ${{ env.FTP_WEB_DIR }}
+          state-name: deploy-cache/web-sync.json
           timeout: 300000
           log-level: verbose
           dangerous-clean-slate: false
@@ -190,6 +200,8 @@ jobs:
             **/tests/**
             **/.DS_Store
             **/Thumbs.db
+            **/.env
+            **/.env.*
             storage/**
             laravel_core/**
 
@@ -202,8 +214,8 @@ jobs:
           port: 21
           protocol: ftp
           local-dir: ./deploy_temp/laravel_core/
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}laravel_core/
-          state-name: .ftp-deploy-sync-state-core.json
+          server-dir: ${{ env.FTP_CORE_DIR }}
+          state-name: deploy-cache/core-sync.json
           timeout: 600000
           log-level: verbose
           dangerous-clean-slate: false
@@ -213,6 +225,8 @@ jobs:
             **/tests/**
             **/.DS_Store
             **/Thumbs.db
+            **/.env
+            **/.env.*
             storage/logs/**
             storage/framework/cache/data/**
             storage/framework/sessions/**

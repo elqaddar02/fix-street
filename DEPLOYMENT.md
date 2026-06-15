@@ -263,6 +263,25 @@ This error means GitHub Actions could not complete the FTP **control connection*
 - If **“Test FTP connection”** fails → secrets or hostname are wrong (or InfinityFree blocks GitHub IPs).
 - If test passes but deploy fails → upload too large/slow; split deploy should help.
 
+### `553 Can't open that file: Permission denied`
+
+This means FTP connected but **could not write** a file or folder.
+
+1. **`FTP_SERVER_DIR` must point inside writable `htdocs`**
+   - In FileZilla, after login, note your path when you see `index.html` / site files.
+   - If PWD is `/` and that is your site root → `FTP_SERVER_DIR=/`
+   - If PWD is `/` but site files are in `htdocs/` subfolder → `FTP_SERVER_DIR=/htdocs/`
+   - **Never upload to paths above `htdocs`** — InfinityFree returns 553.
+
+2. **Dotfiles blocked** — InfinityFree often rejects FTP uploads of `.env` and hidden sync files.
+   - This repo uploads `laravel_core/production.env` instead of `.env`
+   - `index.php.deploy` copies it to `.env` on the server at runtime
+   - Deploy state files use `deploy-cache/*.json` (no leading dot)
+
+3. **Delete broken remote folders** (via FileZilla) if a previous failed deploy left partial `laravel_core/` or `htdocs/htdocs/` nesting, then re-run the workflow.
+
+4. **Ensure `laravel_core` is a folder** on the server, not a stray file.
+
 ---
 
 ## 9) Common InfinityFree issues

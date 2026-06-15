@@ -8,6 +8,13 @@ define('LARAVEL_START', microtime(true));
 // InfinityFree layout: htdocs/index.php + htdocs/laravel_core/
 $corePath = __DIR__.'/laravel_core';
 
+// InfinityFree FTP may block uploading ".env" — we upload production.env instead.
+$envFile = $corePath.'/.env';
+$envSource = $corePath.'/production.env';
+if (file_exists($envSource) && (! file_exists($envFile) || filemtime($envSource) >= filemtime($envFile))) {
+    @copy($envSource, $envFile);
+}
+
 if (file_exists($maintenance = $corePath.'/storage/framework/maintenance.php')) {
     require $maintenance;
 }
