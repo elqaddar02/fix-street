@@ -140,6 +140,10 @@ jobs:
           # Remove dev artifacts from upload bundle
           rm -rf deploy_temp/laravel_core/node_modules
 
+          # FTP-Deploy-Action state files (must exist locally before deploy)
+          mkdir -p deploy_temp/deploy-cache
+          mkdir -p deploy_temp/laravel_core/deploy-cache
+
       - name: Show deploy bundle structure
         run: |
           echo "web root (deploy_temp):"
@@ -211,6 +215,7 @@ jobs:
             **/.env.*
             storage/**
             laravel_core/**
+            deploy-cache/**
 
       - name: Deploy Laravel core via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -237,3 +242,4 @@ jobs:
             storage/logs/**
             storage/framework/cache/data/**
             storage/framework/sessions/**
+            deploy-cache/**
