@@ -17,6 +17,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # FIX 1: Restore file modification times so FTP can compare timestamps correctly
+      - name: Set git file modification times
+        uses: chetan/git-restore-mtime-action@v2
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -92,72 +96,76 @@ jobs:
           php artisan route:cache
           php artisan view:cache
 
+      # FIX 2: Create a local state folder and persist it between workflow runs
+      - name: Cache FTP Sync State
+        uses: actions/cache@v4
+        with:
+          path: .ftp_cache
+          key: ftp-cache-${{ github.sha }}
+          restore-keys: |
+            ftp-cache-
+
+      # FIX 3: Keep web root and laravel_core completely separate locally
       - name: Prepare InfinityFree folder layout
         run: |
           set -e
 
-          rm -rf deploy_temp
-          mkdir -p deploy_temp/laravel_core
-          mkdir -p deploy_temp/deploy-cache
+          rm -rf deploy_web deploy_core
+          mkdir -p deploy_web
+          mkdir -p deploy_core
+          mkdir -p .ftp_cache
 
-          # Core Laravel app (everything except public/, dev folders, and git metadata)
+          # Core Laravel app goes into deploy_core
           rsync -a \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='node_modules' \
             --exclude='public' \
-            --exclude='deploy_temp' \
             --exclude='tests' \
             --exclude='.env' \
             --exclude='.env.example' \
             --exclude='database/database.sqlite' \
-            ./ deploy_temp/laravel_core/
+            ./ deploy_core/
 
-          # Web root = deploy_temp/ (FTP uploads directly into htdocs)
-          rsync -a public/ deploy_temp/
+          # Web root goes into deploy_web
+          rsync -a public/ deploy_web/
 
           # Production entry point + rewrite rules
-          cp public/index.php.deploy deploy_temp/index.php
-          cp public/.htaccess.deploy deploy_temp/.htaccess
+          cp public/index.php.deploy deploy_web/index.php
+          cp public/.htaccess.deploy deploy_web/.htaccess
 
-          # Block web access to laravel_core
-          cp deploy/laravel_core.htaccess deploy_temp/laravel_core/.htaccess
+          # Block web access to laravel_core (uploaded separately, but protected just in case)
+          mkdir -p deploy_core/.htaccess
+          cp deploy/laravel_core.htaccess deploy_core/.htaccess || echo "Deny from all" > deploy_core/.htaccess
 
-          # Production env (InfinityFree often blocks uploading ".env" via FTP)
-          cp .env deploy_temp/laravel_core/production.env
+          # Production env config
+          cp .env deploy_core/production.env
 
-          # Storage symlink workaround: expose public disk files under web root /storage/
-          mkdir -p deploy_temp/storage
+          # Storage symlink workaround
+          mkdir -p deploy_web/storage
           if [ -d "storage/app/public" ] && [ "$(ls -A storage/app/public 2>/dev/null)" ]; then
-            cp -rp storage/app/public/. deploy_temp/storage/
+            cp -rp storage/app/public/. deploy_web/storage/
           fi
 
           # Ensure writable framework directories exist
-          mkdir -p deploy_temp/laravel_core/storage/framework/{cache,sessions,views}
-          mkdir -p deploy_temp/laravel_core/storage/logs
-          mkdir -p deploy_temp/laravel_core/bootstrap/cache
-
-          # Remove dev artifacts from upload bundle
-          rm -rf deploy_temp/laravel_core/node_modules
-
-          # FTP-Deploy-Action state files (must exist locally before deploy)
-          mkdir -p deploy_temp/deploy-cache
-          mkdir -p deploy_temp/laravel_core/deploy-cache
+          mkdir -p deploy_core/storage/framework/{cache,sessions,views}
+          mkdir -p deploy_core/storage/logs
+          mkdir -p deploy_core/bootstrap/cache
 
       - name: Show deploy bundle structure
         run: |
-          echo "web root (deploy_temp):"
-          ls -la deploy_temp | head -20
+          echo "web root (deploy_web):"
+          ls -la deploy_web | head -20
           echo ""
-          echo "laravel_core:"
-          ls -la deploy_temp/laravel_core | head -20
+          echo "laravel_core (deploy_core):"
+          ls -la deploy_core | head -20
 
       - name: Show deploy bundle size
         run: |
-          echo "Total deploy bundle size:"
-          du -sh deploy_temp
-          echo "laravel_core/vendor size:"
-          du -sh deploy_temp/laravel_core/vendor || true
+          echo "Web root bundle size:"
+          du -sh deploy_web
+          echo "Laravel Core bundle size:"
+          du -sh deploy_core
 
       - name: Prepare FTP directories
         run: |
@@ -172,24 +180,20 @@ jobs:
           BASE="${BASE%/}/"
           echo "FTP_WEB_DIR=${BASE}" >> $GITHUB_ENV
           echo "FTP_CORE_DIR=${BASE}laravel_core/" >> $GITHUB_ENV
-          echo "Using FTP host: ${HOST}"
-          echo "Using FTP web dir: ${BASE}"
-          echo "Using FTP core dir: ${BASE}laravel_core/"
 
       - name: Test FTP connection
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          echo "Testing plain FTP login to: $FTP_HOST"
           curl -v --ftp-pasv --connect-timeout 60 --max-time 120 \
             -u "$FTP_USERNAME:$FTP_PASSWORD" \
             "ftp://${FTP_HOST}/" || {
-              echo "::error::FTP connection failed. Check FTP_HOST, FTP_USERNAME, FTP_PASSWORD secrets."
-              echo "InfinityFree: use plain FTP (port 21), NOT ftps:// in FTP_SERVER secret."
+              echo "::error::FTP connection failed."
               exit 1
             }
 
+      # FIX 4: Simplified Deploy pointing to completely distinct local directories
       - name: Deploy web root via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -198,24 +202,15 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           protocol: ftp
-          local-dir: ./deploy_temp/
+          local-dir: ./deploy_web/
           server-dir: ${{ env.FTP_WEB_DIR }}
-          state-name: deploy-cache/web-sync.json
+          state-name: ../.ftp_cache/web-sync.json
           timeout: 300000
-          log-level: verbose
           dangerous-clean-slate: false
           exclude: |
             **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/tests/**
             **/.DS_Store
             **/Thumbs.db
-            **/.env
-            **/.env.*
-            storage/**
-            laravel_core/**
-            deploy-cache/**
 
       - name: Deploy Laravel core via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -225,21 +220,15 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           protocol: ftp
-          local-dir: ./deploy_temp/laravel_core/
+          local-dir: ./deploy_core/
           server-dir: ${{ env.FTP_CORE_DIR }}
-          state-name: deploy-cache/core-sync.json
+          state-name: ../.ftp_cache/core-sync.json
           timeout: 600000
-          log-level: verbose
           dangerous-clean-slate: false
           exclude: |
             **/.git*
-            **/node_modules/**
-            **/tests/**
             **/.DS_Store
             **/Thumbs.db
-            **/.env
-            **/.env.*
             storage/logs/**
             storage/framework/cache/data/**
             storage/framework/sessions/**
-            deploy-cache/**
