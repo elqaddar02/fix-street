@@ -188,7 +188,7 @@ jobs:
       - name: Prepare zip upload folder
         run: |
           mkdir -p deploy_zip
-          mv -f ../laravel_core.zip deploy_zip/ || { echo "::error::Failed to move zip"; exit 1; }
+          mv -f laravel_core.zip deploy_zip/ || { echo "::error::Failed to move zip"; exit 1; }
 
       - name: Upload laravel_core.zip via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
