@@ -107,12 +107,11 @@ jobs:
         run: |
           set -e
 
-          rm -rf deploy_web deploy_core
-          mkdir -p deploy_web
-          mkdir -p deploy_core
+          rm -rf deploy_combined
+          mkdir -p deploy_combined/laravel_core
           mkdir -p .ftp_cache
 
-          # Core Laravel app goes into deploy_core
+          # 1. Core Laravel app goes into deploy_combined/laravel_core
           rsync -a \
             --exclude='.git' \
             --exclude='.github' \
@@ -122,48 +121,34 @@ jobs:
             --exclude='.env' \
             --exclude='.env.example' \
             --exclude='database/database.sqlite' \
-            ./ deploy_core/
+            ./ deploy_combined/laravel_core/
 
-          # Web root goes into deploy_web
-          rsync -a public/ deploy_web/
+          # 2. Web root public items go into the base of deploy_combined
+          rsync -a public/ deploy_combined/
 
-          # Production entry point + rewrite rules
-          cp public/index.php.deploy deploy_web/index.php
-          cp public/.htaccess.deploy deploy_web/.htaccess
+          # 3. Production entry points + rewrite rules
+          cp public/index.php.deploy deploy_combined/index.php
+          cp public/.htaccess.deploy deploy_combined/.htaccess
 
-          # Block web access to laravel_core (uploaded separately, but protected just in case)
-          # FIXED: Removed the invalid mkdir line that threw the error
-          cp deploy/laravel_core.htaccess deploy_core/.htaccess || echo "Deny from all" > deploy_core/.htaccess
+          # 4. Block web access to laravel_core
+          cp deploy/laravel_core.htaccess deploy_combined/laravel_core/.htaccess || echo "Deny from all" > deploy_combined/laravel_core/.htaccess
 
-          # Production env config
-          
-          cp .env deploy_core/env-config.txt
+          # 5. Production safe env config file
+          cp .env deploy_combined/laravel_core/env-config.txt
 
-          # Storage symlink workaround
-          mkdir -p deploy_web/storage
+          # 6. Storage symlink workaround
+          mkdir -p deploy_combined/storage
           if [ -d "storage/app/public" ] && [ "$(ls -A storage/app/public 2>/dev/null)" ]; then
-            cp -rp storage/app/public/. deploy_web/storage/
+            cp -rp storage/app/public/. deploy_combined/storage/
           fi
 
-          # Ensure writable framework directories exist
-          mkdir -p deploy_core/storage/framework/{cache,sessions,views}
-          mkdir -p deploy_core/storage/logs
-          mkdir -p deploy_core/bootstrap/cache
+          # 7. Ensure framework write directories exist locally
+          mkdir -p deploy_combined/laravel_core/storage/framework/{cache,sessions,views}
+          mkdir -p deploy_combined/laravel_core/storage/logs
+          mkdir -p deploy_combined/laravel_core/bootstrap/cache
 
-      - name: Show deploy bundle structure
-        run: |
-          echo "web root (deploy_web):"
-          ls -la deploy_web | head -20
-          echo ""
-          echo "laravel_core (deploy_core):"
-          ls -la deploy_core | head -20
-
-      - name: Show deploy bundle size
-        run: |
-          echo "Web root bundle size:"
-          du -sh deploy_web
-          echo "Laravel Core bundle size:"
-          du -sh deploy_core
+          # 8. Restore the cached tracking state to the bundle root
+          cp .ftp_cache/combined-sync.json deploy_combined/combined-sync.json || echo "{}" > deploy_combined/combined-sync.json
 
       - name: Prepare FTP directories
         run: |
@@ -177,7 +162,6 @@ jobs:
           BASE="${BASE:-/}"
           BASE="${BASE%/}/"
           echo "FTP_WEB_DIR=${BASE}" >> $GITHUB_ENV
-          echo "FTP_CORE_DIR=${BASE}laravel_core/" >> $GITHUB_ENV
 
       - name: Test FTP connection
         env:
@@ -191,7 +175,7 @@ jobs:
               exit 1
             }
 
-      - name: Deploy web root via FTP
+      - name: Deploy Everything via Single Pass FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ env.FTP_HOST }}
@@ -199,33 +183,20 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           protocol: ftp
-          local-dir: ./deploy_web/
+          local-dir: ./deploy_combined/
           server-dir: ${{ env.FTP_WEB_DIR }}
-          state-name: ../.ftp_cache/web-sync.json
-          timeout: 300000
+          state-name: combined-sync.json
+          timeout: 900000
           dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.DS_Store
             **/Thumbs.db
+            laravel_core/storage/logs/**
+            laravel_core/storage/framework/cache/data/**
+            laravel_core/storage/framework/sessions/**
 
-      - name: Deploy Laravel core via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ env.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          protocol: ftp
-          local-dir: ./deploy_core/
-          server-dir: ${{ env.FTP_CORE_DIR }}
-          state-name: ../.ftp_cache/core-sync.json
-          timeout: 600000
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.DS_Store
-            **/Thumbs.db
-            storage/logs/**
-            storage/framework/cache/data/**
-            storage/framework/sessions/**
+      - name: Save sync state to cache
+        if: always()
+        run: |
+          cp deploy_combined/combined-sync.json .ftp_cache/combined-sync.json || true
