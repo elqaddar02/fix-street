@@ -98,6 +98,7 @@ jobs:
 
           rm -rf deploy_temp
           mkdir -p deploy_temp/laravel_core
+          mkdir -p deploy_temp/deploy-cache
 
           # Core Laravel app (everything except public/, dev folders, and git metadata)
           rsync -a \
