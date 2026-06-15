@@ -132,7 +132,7 @@ Go to **GitHub repo → Settings → Secrets and variables → Actions → New r
 | `FTP_SERVER` | Yes | `ftpupload.net` |
 | `FTP_USERNAME` | Yes | `if0_41234567` |
 | `FTP_PASSWORD` | Yes | FTP password from panel |
-| `FTP_SERVER_DIR` | Yes | `/` if FTP opens inside `htdocs`; `/htdocs/` if FTP opens above it |
+| `FTP_SERVER_DIR` | Yes | Must end with `/` — use `/` if FTP opens inside `htdocs`; `/htdocs/` if one level above |
 | `FTP_PORT` | No | `21` (default) |
 | `APP_NAME` | Yes | `Madinova` |
 | `APP_KEY` | Yes | `base64:xxxx...` from `php artisan key:generate --show` |
@@ -228,7 +228,44 @@ Enable logs: after a request, download `laravel_core/storage/logs/laravel.log` v
 
 ---
 
-## 8) Common InfinityFree issues
+## 8) Troubleshooting: `Timeout (control socket)`
+
+This error means GitHub Actions could not complete the FTP **control connection** (often before any files upload).
+
+### Fix checklist (in order)
+
+1. **`FTP_SERVER` must be the InfinityFree hostname** from Control Panel → FTP Details  
+   - Good: `ftpupload.net` or `ftp.yoursite.infinityfreeapp.com`  
+   - Bad: `localhost`, `127.0.0.1`, your website URL (`https://...`)
+
+2. **`FTP_USERNAME`** is your hosting username (e.g. `if0_41234567`), not your email.
+
+3. **`FTP_PASSWORD`** is the FTP password from the panel (reset it if unsure).
+
+4. **`FTP_SERVER_DIR` must end with `/`**  
+   - FileZilla opens inside `htdocs` → use `/`  
+   - FileZilla opens above `htdocs` → use `/htdocs/`
+
+5. **Test FTP locally with FileZilla** using the same host/user/pass. Use **Passive mode**.
+
+6. **Re-run the workflow** — the updated pipeline includes:
+   - `timeout: 300000` (web root) / `600000` (laravel_core)
+   - FTP connection test step before upload
+   - Split upload (web files first, then `laravel_core/`)
+
+7. **InfinityFree + cloud CI limitation** — free hosting sometimes blocks or throttles FTP from datacenter IPs (GitHub runners). If FileZilla works from your PC but GitHub always times out:
+   - Try the account-specific FTP host instead of `ftpupload.net`
+   - Retry at a different time
+   - As fallback: run `npm run build` + `composer install --no-dev` locally and upload via FileZilla manually
+
+### Read the logs
+
+- If **“Test FTP connection”** fails → secrets or hostname are wrong (or InfinityFree blocks GitHub IPs).
+- If test passes but deploy fails → upload too large/slow; split deploy should help.
+
+---
+
+## 9) Common InfinityFree issues
 
 | Problem | Cause | Fix |
 |---------|-------|-----|
@@ -247,7 +284,7 @@ Enable logs: after a request, download `laravel_core/storage/logs/laravel.log` v
 
 ---
 
-## 9) Subfolder deployment (optional)
+## 10) Subfolder deployment (optional)
 
 If your site is `https://domain.com/subfolder/` instead of domain root, edit `public/.htaccess.deploy`:
 
@@ -263,7 +300,7 @@ APP_URL=https://domain.com/subfolder
 
 ---
 
-## 10) Files in this repo for deployment
+## 11) Files in this repo for deployment
 
 | File | Purpose |
 |------|---------|
@@ -275,7 +312,7 @@ APP_URL=https://domain.com/subfolder
 
 ---
 
-## Your placeholders (fill in)
+## 12) Your placeholders (fill in)
 
 - **GitHub repo:** `your-username/madinova` (or your repo URL)
 - **InfinityFree domain:** `https://yourname.infinityfreeapp.com`

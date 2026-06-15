@@ -11,6 +11,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - name: Checkout code
@@ -146,7 +147,29 @@ jobs:
           echo "laravel_core:"
           ls -la deploy_temp/laravel_core | head -20
 
-      - name: Deploy via FTP
+      - name: Show deploy bundle size
+        run: |
+          echo "Total deploy bundle size:"
+          du -sh deploy_temp
+          echo "laravel_core/vendor size:"
+          du -sh deploy_temp/laravel_core/vendor || true
+
+      - name: Test FTP connection
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          echo "Testing FTP login to: $FTP_SERVER"
+          curl -v --ftp-pasv --connect-timeout 60 --max-time 120 \
+            -u "$FTP_USERNAME:$FTP_PASSWORD" \
+            "ftp://${FTP_SERVER}/" || {
+              echo "::error::FTP connection failed. Check FTP_SERVER, FTP_USERNAME, FTP_PASSWORD secrets."
+              echo "InfinityFree: use the hostname from Control Panel → FTP Details (not localhost)."
+              exit 1
+            }
+
+      - name: Deploy web root via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -156,7 +179,9 @@ jobs:
           protocol: ftp
           local-dir: ./deploy_temp/
           server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          state-name: .ftp-deploy-sync-state.json
+          state-name: .ftp-deploy-sync-state-web.json
+          timeout: 300000
+          log-level: verbose
           dangerous-clean-slate: false
           exclude: |
             **/.git*
@@ -166,3 +191,28 @@ jobs:
             **/.DS_Store
             **/Thumbs.db
             storage/**
+            laravel_core/**
+
+      - name: Deploy Laravel core via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 21
+          protocol: ftp
+          local-dir: ./deploy_temp/laravel_core/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}laravel_core/
+          state-name: .ftp-deploy-sync-state-core.json
+          timeout: 600000
+          log-level: verbose
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            **/tests/**
+            **/.DS_Store
+            **/Thumbs.db
+            storage/logs/**
+            storage/framework/cache/data/**
+            storage/framework/sessions/**
