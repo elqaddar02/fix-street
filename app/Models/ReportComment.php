@@ -13,6 +13,7 @@ class ReportComment extends Model
         'report_id',
         'user_id',
         'comment',
+        'approved',
     ];
 
     public function report()

@@ -44,6 +44,15 @@ class CityController extends Controller
         return redirect()->route('admin.cities.index')->with('success', 'Ville mise à jour.');
     }
 
+    public function updateStatus(Request $request, City $city)
+    {
+        $request->validate(['active' => 'required|boolean']);
+
+        $city->update(['active' => $request->active]);
+
+        return back()->with('success', 'Statut de la ville mis à jour.');
+    }
+
     public function destroy(City $city)
     {
         $city->delete();

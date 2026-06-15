@@ -1,0 +1,70 @@
+name: Deploy Laravel to InfinityFree
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚚 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📂 Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql
+          coverage: none
+
+      - name: 🔨 Install PHP Dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: 📂 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🔨 Install & Build Assets (Vite)
+        run: |
+          npm install
+          npm run build
+
+      - name: 🚀 Prepare for InfinityFree
+        run: |
+          # Create fresh deploy directory
+          mkdir -p deploy_temp/laravel
+          mkdir -p deploy_temp/htdocs
+          
+          # 1. Copy core files (everything except public, .git, and deploy_temp)
+          # Use find to avoid copying the destination into itself
+          find . -maxdepth 1 ! -name "deploy_temp" ! -name "public" ! -name ".git" ! -name "." -exec cp -rp {} deploy_temp/laravel/ \;
+          
+          # 2. Copy public files to htdocs
+          cp -rp public/* deploy_temp/htdocs/
+          
+          # 3. Apply deployment index.php
+          if [ -f "public/index.php.deploy" ]; then
+            cp public/index.php.deploy deploy_temp/htdocs/index.php
+            echo "✅ Applied index.php.deploy"
+          fi
+          
+          # 4. Final Cleanup
+          rm -rf deploy_temp/laravel/node_modules
+          rm -rf deploy_temp/laravel/public
+
+      - name: 🔍 Verify Structure
+        run: |
+          echo "Structure of deploy_temp:"
+          ls -R deploy_temp | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/   /'
+
+      - name: 🚀 Sync Files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./deploy_temp/
+          server-dir: /
+          state-name: .ftp-deploy-sync-state.json

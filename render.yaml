@@ -1,35 +1,46 @@
 services:
   - type: web
-    name: fix-street-web
-    env: php
-    buildpack: https://github.com/heroku/heroku-buildpack-php
-    region: oregon
+    name: fix-street
+    runtime: docker
     plan: free
-    branch: main
-    buildCommand: "composer install --no-dev --optimize-autoloader && cp .env.example .env && php artisan key:generate && npm install && npm run build"
-    startCommand: "vendor/bin/heroku-php-apache2 public/"
-    postDeployCommand: "php artisan migrate --force && php artisan storage:link && php artisan config:cache && php artisan route:cache && php artisan view:cache"
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: 'false'
-      - key: APP_URL
-        value: https://Your_Render_URL.onrender.com
+        value: false
       - key: LOG_CHANNEL
-        value: stack
+        value: errorlog
       - key: DB_CONNECTION
         value: pgsql
-      - key: CACHE_DRIVER
-        value: file
       - key: SESSION_DRIVER
-        value: file
+        value: database
+      - key: CACHE_STORE
+        value: database
       - key: QUEUE_CONNECTION
-        value: sync
-      - key: FILESYSTEM_DISK
-        value: local
+        value: database
+      - fromDatabase:
+          name: fix-street-db
+          property: host
+        key: DB_HOST
+      - fromDatabase:
+          name: fix-street-db
+          property: port
+        key: DB_PORT
+      - fromDatabase:
+          name: fix-street-db
+          property: database
+        key: DB_DATABASE
+      - fromDatabase:
+          name: fix-street-db
+          property: user
+        key: DB_USERNAME
+      - fromDatabase:
+          name: fix-street-db
+          property: password
+        key: DB_PASSWORD
 
 databases:
   - name: fix-street-db
-    engine: postgresql
     plan: free
+    databaseName: fix_street
+    user: fix_street_user

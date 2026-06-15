@@ -9,11 +9,18 @@ class Quartier extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'city_id', 'active'];
+    protected $fillable = [
+        'name_fr',
+        'name_ar',
+        'slug',
+        'district_id',
+        'latitude',
+        'longitude',
+    ];
 
-    public function city()
+    public function district()
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(District::class);
     }
 
     public function reports()

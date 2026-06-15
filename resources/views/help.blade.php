@@ -15,23 +15,23 @@
                             <ul class="space-y-2">
                                 <li>
                                     <button @click="activeTab = 'help-citizens'" :class="{ 'bg-yellow-400 font-bold border-l-4 border-red-600': activeTab === 'help-citizens' }" class="w-full text-left px-4 py-2 rounded-lg hover:bg-yellow-100 transition">
-                                        Help for citizens
+                                        {{ __('help.tabs.citizens') }}
                                     </button>
                                 </li>
                                
                                 <li>
                                     <button @click="activeTab = 'conditions'" :class="{ 'bg-yellow-400 font-bold border-l-4 border-red-600': activeTab === 'conditions' }" class="w-full text-left px-4 py-2 rounded-lg hover:bg-yellow-100 transition">
-                                        Conditions of Use
+                                        {{ __('help.tabs.conditions') }}
                                     </button>
                                 </li>
                                 <li>
                                     <button @click="activeTab = 'privacy'" :class="{ 'bg-yellow-400 font-bold border-l-4 border-red-600': activeTab === 'privacy' }" class="w-full text-left px-4 py-2 rounded-lg hover:bg-yellow-100 transition">
-                                        Privacy
+                                        {{ __('help.tabs.privacy') }}
                                     </button>
                                 </li>
                                 <li>
                                     <button @click="activeTab = 'contact'" :class="{ 'bg-yellow-400 font-bold border-l-4 border-red-600': activeTab === 'contact' }" class="w-full text-left px-4 py-2 rounded-lg hover:bg-yellow-100 transition">
-                                        Contact
+                                        {{ __('help.tabs.contact') }}
                                     </button>
                                 </li>
                             </ul>

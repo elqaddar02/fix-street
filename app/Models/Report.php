@@ -13,13 +13,14 @@ class Report extends Model
         'title',
         'description',
         'image',
-        'latitude',
-        'longitude',
         'status',
         'user_id',
         'category_id',
         'city_id',
+        'district_id',
         'quartier_id',
+        'latitude',
+        'longitude',
     ];
 
     public function user()
@@ -37,6 +38,11 @@ class Report extends Model
         return $this->belongsTo(City::class);
     }
 
+    public function district()
+    {
+        return $this->belongsTo(District::class);
+    }
+
     public function quartier()
     {
         return $this->belongsTo(Quartier::class);
@@ -45,5 +51,16 @@ class Report extends Model
     public function comments()
     {
         return $this->hasMany(ReportComment::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(ReportLike::class);
+    }
+
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'report_likes', 'report_id', 'user_id')
+                    ->withTimestamps();
     }
 }

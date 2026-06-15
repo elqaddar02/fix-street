@@ -28,19 +28,24 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Check if there's an intended URL (like from trying to like a report)
+        if ($request->session()->has('url.intended')) {
+            return redirect()->intended();
+        }
+
         if (Auth::user()->is_admin) {
             if (\Illuminate\Support\Facades\Route::has('admin.dashboard')) {
-                return redirect()->intended(route('admin.dashboard'));
+                return redirect()->route('admin.dashboard');
             }
 
-            return redirect()->intended(url('/admin/dashboard'));
+            return redirect()->to(url('/admin/dashboard'));
         }
 
         if (\Illuminate\Support\Facades\Route::has('dashboard')) {
-            return redirect()->intended(route('dashboard', absolute: false));
+            return redirect()->route('dashboard');
         }
 
-        return redirect()->intended(url('/dashboard'));
+        return redirect()->to(url('/dashboard'));
     }
 
     /**
