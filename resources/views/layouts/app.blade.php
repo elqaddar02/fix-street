@@ -40,7 +40,7 @@
             @endisset
 
             <!-- Page Content - Flex Grow -->
-            <main class="flex-grow">
+            <main class="flex-grow pt-20">
                 {{ $slot }}
             </main>
 
