@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             DistrictSeeder::class,
             QuartierSeeder::class,
             QuartierCoordinatesSeeder::class,
+            AdPlacementSeeder::class,
         ]);
     }
 }
