@@ -7,12 +7,16 @@ use App\Models\City;
 use App\Models\District;
 use App\Models\Quartier;
 use App\Models\Report;
+use App\Services\PublicUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
 {
+    public function __construct(private readonly PublicUploadService $uploads)
+    {
+    }
+
     public function index(Request $request)
     {
         $categories = Category::all();
@@ -148,15 +152,7 @@ class ReportController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('reports', 'public');
-            
-            // Copy to public/storage for Windows compatibility
-            $source = storage_path('app/public/' . $validated['image']);
-            $destination = public_path('storage/' . $validated['image']);
-            if (!file_exists(dirname($destination))) {
-                mkdir(dirname($destination), 0755, true);
-            }
-            copy($source, $destination);
+            $validated['image'] = $this->uploads->store($request->file('image'), 'reports');
         }
 
         if (auth()->check() && auth()->user()->is_admin) {
@@ -212,24 +208,8 @@ class ReportController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($report->image) {
-                Storage::disk('public')->delete($report->image);
-                $oldPath = public_path('storage/' . $report->image);
-                if (file_exists($oldPath)) {
-                    unlink($oldPath);
-                }
-            }
-
-            $validated['image'] = $request->file('image')->store('reports', 'public');
-            
-            // Copy to public/storage for Windows compatibility
-            $source = storage_path('app/public/' . $validated['image']);
-            $destination = public_path('storage/' . $validated['image']);
-            if (!file_exists(dirname($destination))) {
-                mkdir(dirname($destination), 0755, true);
-            }
-            copy($source, $destination);
+            $this->uploads->delete($report->image);
+            $validated['image'] = $this->uploads->store($request->file('image'), 'reports');
         }
 
         $report->update($validated);
@@ -244,14 +224,7 @@ class ReportController extends Controller
             abort(403);
         }
 
-        // Delete image if exists
-        if ($report->image) {
-            Storage::disk('public')->delete($report->image);
-            $path = public_path('storage/' . $report->image);
-            if (file_exists($path)) {
-                unlink($path);
-            }
-        }
+        $this->uploads->delete($report->image);
 
         $report->delete();
 
