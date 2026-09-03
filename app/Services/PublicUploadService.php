@@ -29,6 +29,14 @@ class PublicUploadService
         $source = storage_path('app/public/' . $path);
         $destination = public_path('storage/' . $path);
 
+        // If public/storage is a real symlink (e.g. storage:link succeeded,
+        // which it does on some local setups), $source and $destination are
+        // already the same file — skip the copy instead of relying on
+        // copy() to fail safely when asked to copy a file onto itself.
+        if (realpath($source) === realpath($destination)) {
+            return $path;
+        }
+
         if (!file_exists(dirname($destination))) {
             mkdir(dirname($destination), 0755, true);
         }
