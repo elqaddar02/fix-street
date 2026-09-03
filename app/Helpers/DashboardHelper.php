@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Ad;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
@@ -20,6 +21,29 @@ function reportStatusClass($status)
     ];
 
     return $statusClasses[$status] ?? 'bg-gray-100 text-gray-800';
+}
+
+/**
+ * Get the display label and CSS classes for an ad's current status badge
+ *
+ * @param Ad $ad
+ * @return array{label: string, class: string}
+ */
+function adStatusBadge(Ad $ad)
+{
+    if (!$ad->is_active) {
+        return ['label' => 'Inactive', 'class' => 'bg-gray-100 text-gray-800'];
+    }
+
+    if ($ad->starts_at && $ad->starts_at->isFuture()) {
+        return ['label' => 'Scheduled', 'class' => 'bg-blue-100 text-blue-800'];
+    }
+
+    if ($ad->ends_at && $ad->ends_at->isPast()) {
+        return ['label' => 'Expired', 'class' => 'bg-red-100 text-red-800'];
+    }
+
+    return ['label' => 'Active', 'class' => 'bg-green-100 text-green-800'];
 }
 
 /**

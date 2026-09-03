@@ -112,6 +112,15 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
     Route::patch('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'update'])->name('cities.update');
     Route::patch('/cities/{city}/status', [\App\Http\Controllers\Admin\CityController::class, 'updateStatus'])->name('cities.updateStatus');
     Route::delete('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'destroy'])->name('cities.destroy');
+
+    // Ads
+    Route::get('/ads', [\App\Http\Controllers\Admin\AdController::class, 'index'])->name('ads.index');
+    Route::get('/ads/create', [\App\Http\Controllers\Admin\AdController::class, 'create'])->name('ads.create');
+    Route::post('/ads', [\App\Http\Controllers\Admin\AdController::class, 'store'])->name('ads.store');
+    Route::get('/ads/{ad}/edit', [\App\Http\Controllers\Admin\AdController::class, 'edit'])->name('ads.edit');
+    Route::patch('/ads/{ad}', [\App\Http\Controllers\Admin\AdController::class, 'update'])->name('ads.update');
+    Route::patch('/ads/{ad}/status', [\App\Http\Controllers\Admin\AdController::class, 'updateStatus'])->name('ads.updateStatus');
+    Route::delete('/ads/{ad}', [\App\Http\Controllers\Admin\AdController::class, 'destroy'])->name('ads.destroy');
 });
 
 // Language switcher
