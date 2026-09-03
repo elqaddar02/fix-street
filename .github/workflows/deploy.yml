@@ -104,6 +104,8 @@ jobs:
             ftp-cache-
 
       - name: Prepare InfinityFree folder layout
+        env:
+          UNZIP_TOKEN: ${{ secrets.UNZIP_TOKEN }}
         run: |
           set -e
 
@@ -125,6 +127,12 @@ jobs:
 
           # 2. Web root public items go into the base of deploy_combined
           rsync -a public/ deploy_combined/
+
+          # 2b. Inject the real unzip token so the secret never lives in git history
+          if [ -z "${UNZIP_TOKEN:-}" ]; then
+            echo "::error::UNZIP_TOKEN secret is not set"; exit 1
+          fi
+          sed -i "s/CHANGE_ME_BEFORE_USE/${UNZIP_TOKEN}/" deploy_combined/unzip.php
 
           # 3. Production entry points + rewrite rules
           cp public/index.php.deploy deploy_combined/index.php
