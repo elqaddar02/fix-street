@@ -134,7 +134,7 @@ class ReportController extends Controller
             'category_id' => 'required|exists:categories,id',
             'latitude'    => 'required|numeric|between:-90,90',
             'longitude'   => 'required|numeric|between:-180,180',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:6144',
         ], [
             'image.image' => __('validation.image_required'),
             'image.mimes' => __('validation.image_types'),
@@ -215,7 +215,7 @@ class ReportController extends Controller
             'category_id' => 'required|exists:categories,id',
             'city_id'     => 'required|exists:cities,id',
             'district_id' => 'nullable|exists:districts,id',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:6144',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
         ]);
