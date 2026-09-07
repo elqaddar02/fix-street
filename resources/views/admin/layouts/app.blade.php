@@ -35,6 +35,7 @@
                 <a href="{{ route('admin.reports.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.reports.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Reports</a>
                 <a href="{{ route('admin.comments.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.comments.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Comments</a>
                 <a href="{{ route('admin.cities.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.cities.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Cities</a>
+                <a href="{{ route('admin.ads.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.ads.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Ads</a>
             </nav>
 
             <!-- Bottom Actions -->

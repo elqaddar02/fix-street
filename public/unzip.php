@@ -5,8 +5,9 @@
 // -----------------------------
 // CONFIGURATION
 // -----------------------------
-// Your GitHub UNZIP_TOKEN secret value matches this exactly
-$EXPECTED_TOKEN = 'MySuperSecretKey123';
+// Real value is injected by CI from the UNZIP_TOKEN GitHub secret at deploy
+// time (see .github/workflows/deploy.yml) — never commit the real token here.
+$EXPECTED_TOKEN = getenv('UNZIP_TOKEN') ?: 'CHANGE_ME_BEFORE_USE';
 
 // Path to the zip file (defaults to parent directory)
 $ZIP_PATH = __DIR__ . '/../laravel_core.zip';
