@@ -9,13 +9,23 @@ use App\Models\Quartier;
 /**
  * Resolves a City/District/Quartier from a map lat/lng.
  *
- * District/Quartier coverage in this app is sparse (only seeded for one
- * city today), so those two are always "best effort": a match is only
- * returned when the nearest known row is within a plausible distance for
- * that tier. City is only matched among active cities (the set already
- * offered elsewhere in the app), and is expected to always resolve since
- * every active city has coordinates — but callers should still treat a
- * null return as "no confident match" rather than assume one always exists.
+ * Bottom-up by design: find the nearest quartier (or, failing that, the
+ * nearest district) and walk its real Eloquent relations up to get its
+ * district and city, rather than matching each tier independently. Two
+ * independently-nearest tiers can disagree — e.g. a pin can be closer to
+ * Rabat's city centroid while actually sitting inside a Salé quartier,
+ * since Rabat and Salé sit on opposite banks of the same river a few km
+ * apart. Walking up from the quartier avoids that: whatever quartier is
+ * closest, its own district and city are what gets returned, always
+ * consistent with what's already in the database.
+ *
+ * District/Quartier coverage is sparse (only seeded for one city today),
+ * so those two are always "best effort" — only returned when the nearest
+ * known row is within a plausible distance for that tier, and only when
+ * its parent city is active. City on its own always resolves to the
+ * nearest active city with coordinates as a last resort; callers should
+ * still treat a null return as "no confident match" rather than assume
+ * one always exists.
  */
 class LocationResolver
 {
@@ -27,6 +37,38 @@ class LocationResolver
      */
     public function resolve(float $lat, float $lng): array
     {
+        $quartier = $this->nearestWithin(
+            Quartier::with('district.city')->whereNotNull('latitude')->whereNotNull('longitude')->get(),
+            $lat,
+            $lng,
+            fn ($q) => [$q->latitude, $q->longitude],
+            self::MAX_QUARTIER_KM
+        );
+
+        if ($quartier && $quartier->district && $quartier->district->city?->active) {
+            return [
+                'city_id' => $quartier->district->city->id,
+                'district_id' => $quartier->district->id,
+                'quartier_id' => $quartier->id,
+            ];
+        }
+
+        $district = $this->nearestWithin(
+            District::with('city')->whereNotNull('lat')->whereNotNull('lng')->get(),
+            $lat,
+            $lng,
+            fn ($d) => [$d->lat, $d->lng],
+            self::MAX_DISTRICT_KM
+        );
+
+        if ($district && $district->city?->active) {
+            return [
+                'city_id' => $district->city->id,
+                'district_id' => $district->id,
+                'quartier_id' => null,
+            ];
+        }
+
         $city = $this->nearest(
             City::where('active', true)->whereNotNull('latitude')->whereNotNull('longitude')->get(),
             $lat,
@@ -34,32 +76,10 @@ class LocationResolver
             fn ($c) => [$c->latitude, $c->longitude]
         );
 
-        $district = null;
-        if ($city) {
-            $district = $this->nearestWithin(
-                District::where('city_id', $city->id)->whereNotNull('lat')->whereNotNull('lng')->get(),
-                $lat,
-                $lng,
-                fn ($d) => [$d->lat, $d->lng],
-                self::MAX_DISTRICT_KM
-            );
-        }
-
-        $quartier = null;
-        if ($district) {
-            $quartier = $this->nearestWithin(
-                Quartier::where('district_id', $district->id)->whereNotNull('latitude')->whereNotNull('longitude')->get(),
-                $lat,
-                $lng,
-                fn ($q) => [$q->latitude, $q->longitude],
-                self::MAX_QUARTIER_KM
-            );
-        }
-
         return [
             'city_id' => $city?->id,
-            'district_id' => $district?->id,
-            'quartier_id' => $quartier?->id,
+            'district_id' => null,
+            'quartier_id' => null,
         ];
     }
 
