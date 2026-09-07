@@ -7,14 +7,17 @@ use App\Models\City;
 use App\Models\District;
 use App\Models\Quartier;
 use App\Models\Report;
+use App\Services\LocationResolver;
 use App\Services\PublicUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
-    public function __construct(private readonly PublicUploadService $uploads)
-    {
+    public function __construct(
+        private readonly PublicUploadService $uploads,
+        private readonly LocationResolver $locationResolver,
+    ) {
     }
 
     public function index(Request $request)
@@ -120,22 +123,15 @@ class ReportController extends Controller
         // }
 
         $categories = Category::all();
-        $cities = City::where('active', true)->get();
-        $districts = District::all();
-        $quartiers = Quartier::all();
 
-        return view('reports.create', compact('categories', 'cities', 'districts', 'quartiers'));
+        return view('reports.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
-            'city_id'     => 'required|exists:cities,id',
-            'district_id' => 'required|exists:districts,id',
-            'quartier_id' => 'nullable|exists:quartiers,id',
             'latitude'    => 'required|numeric|between:-90,90',
             'longitude'   => 'required|numeric|between:-180,180',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -158,6 +154,23 @@ class ReportController extends Controller
         if (auth()->check() && auth()->user()->is_admin) {
             abort(403, 'Admins cannot store reports.');
         }
+
+        // The form only asks for one piece of text; mirror it into
+        // description too since reports.show/index and the admin panel
+        // still render both.
+        $validated['description'] = $validated['title'];
+
+        // City/District/Quartier are no longer picked manually — resolve
+        // them from the map pin instead. District/Quartier stay null when
+        // no known one is close enough (coverage is sparse outside seeded
+        // areas); City is expected to resolve since every active city has
+        // coordinates, but is left null rather than raising here on the
+        // rare chance none do — the reports.city_id column would reject a
+        // null insert on its own if that ever happens.
+        $validated = array_merge(
+            $validated,
+            $this->locationResolver->resolve((float) $validated['latitude'], (float) $validated['longitude'])
+        );
 
         $validated['status'] = 'OPEN';
         $validated['user_id'] = Auth::id();
