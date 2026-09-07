@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
 Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 Route::get('/api/quartier/{quartier}/coordinates', [ReportController::class, 'getQuartierCoordinates'])->name('quartier.coordinates');
+Route::get('/api/resolve-location', [ReportController::class, 'resolveLocation'])->name('location.resolve');
 
 Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
