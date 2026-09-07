@@ -103,7 +103,7 @@ class AdController extends Controller
             'provider' => 'required|in:' . Ad::PROVIDER_HOUSE . ',' . Ad::PROVIDER_ADSENSE,
             'target_url' => 'required_if:provider,' . Ad::PROVIDER_HOUSE . '|nullable|url|max:2048',
             'external_slot_id' => 'required_if:provider,' . Ad::PROVIDER_ADSENSE . '|nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:6144',
             'starts_at' => 'nullable|date',
             'ends_at' => 'nullable|date|after_or_equal:starts_at',
             'weight' => 'nullable|integer|min:1|max:100',
