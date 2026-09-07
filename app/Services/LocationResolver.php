@@ -32,11 +32,32 @@ class LocationResolver
     private const MAX_DISTRICT_KM = 25;
     private const MAX_QUARTIER_KM = 15;
 
+    // Generous bounding box around Morocco (not a distance-to-nearest-city
+    // cutoff — the largest real gap between two seeded cities is ~200km
+    // around Agadir, so a distance cutoff would falsely reject legitimate
+    // photos in real coverage gaps). This only rejects coordinates that are
+    // clearly not Morocco at all: another continent, the ocean, (0,0)
+    // "null island" from a corrupted EXIF tag, etc.
+    private const MIN_LAT = 20.0;
+    private const MAX_LAT = 36.0;
+    private const MIN_LNG = -18.0;
+    private const MAX_LNG = -1.0;
+
+    public function isWithinSupportedArea(float $lat, float $lng): bool
+    {
+        return $lat >= self::MIN_LAT && $lat <= self::MAX_LAT
+            && $lng >= self::MIN_LNG && $lng <= self::MAX_LNG;
+    }
+
     /**
      * @return array{city_id: int|null, district_id: int|null, quartier_id: int|null}
      */
     public function resolve(float $lat, float $lng): array
     {
+        if (!$this->isWithinSupportedArea($lat, $lng)) {
+            return ['city_id' => null, 'district_id' => null, 'quartier_id' => null];
+        }
+
         $quartier = $this->nearestWithin(
             Quartier::with('district.city')->whereNotNull('latitude')->whereNotNull('longitude')->get(),
             $lat,

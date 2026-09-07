@@ -70,6 +70,15 @@
     "-- Select a category --": "-- Select a category --",
     "City": "City",
     "-- Select a city --": "-- Select a city --",
+    "District / Arrondissement": "District / Arrondissement",
+    "-- Select a district --": "-- Select a district --",
+    "-- Select a quartier --": "-- Select a quartier --",
+    "Modifier la localisation": "Change location",
+    "Location": "Location",
+    "If your photo has GPS data we'll detect the area automatically. Otherwise, pick it below.": "If your photo has GPS data we'll detect the area automatically. Otherwise, pick it below.",
+    "This location is outside our coverage area. Please set it manually.": "This location is outside our coverage area. Please set it manually.",
+    "Not available": "Not available",
+    "Pin corrected. Location updated.": "Pin corrected. Location updated.",
     "Quartier": "Quartier",
     "-- Select a city first --": "-- Select a city first --",
     "Latitude (optional)": "Latitude (optional)",
@@ -333,5 +342,7 @@
     "validation.latitude_range": "The latitude must be between -90 and 90.",
     "validation.longitude_required": "The longitude field is required.",
     "validation.longitude_numeric": "The longitude must be a number.",
-    "validation.longitude_range": "The longitude must be between -180 and 180."
+    "validation.longitude_range": "The longitude must be between -180 and 180.",
+    "validation.district_city_mismatch": "The selected district does not belong to the selected city.",
+    "validation.quartier_district_mismatch": "The selected quartier does not belong to the selected district."
 }

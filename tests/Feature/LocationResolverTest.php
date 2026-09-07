@@ -65,6 +65,27 @@ class LocationResolverTest extends TestCase
         $this->assertNull($resolved['quartier_id']);
     }
 
+    public function test_coordinates_outside_morocco_resolve_to_nothing(): void
+    {
+        $this->seed();
+
+        $resolver = app(LocationResolver::class);
+
+        // (0,0) "null island" — what a corrupted/default EXIF GPS tag often is
+        $nullIsland = $resolver->resolve(0.0, 0.0);
+        $this->assertNull($nullIsland['city_id']);
+        $this->assertNull($nullIsland['district_id']);
+        $this->assertNull($nullIsland['quartier_id']);
+
+        // Paris — a real place, just not one this platform covers
+        $paris = $resolver->resolve(48.8566, 2.3522);
+        $this->assertNull($paris['city_id']);
+
+        $this->assertFalse($resolver->isWithinSupportedArea(0.0, 0.0));
+        $this->assertFalse($resolver->isWithinSupportedArea(48.8566, 2.3522));
+        $this->assertTrue($resolver->isWithinSupportedArea(34.025, -6.822)); // Salé
+    }
+
     public function test_district_and_quartier_are_never_returned_without_their_parent(): void
     {
         $this->seed();
