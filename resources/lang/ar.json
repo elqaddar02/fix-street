@@ -88,6 +88,15 @@
 
     "City": "المدينة",
     "-- Select a city --": "-- اختر مدينة --",
+    "District / Arrondissement": "المقاطعة / العمالة",
+    "-- Select a district --": "-- اختر مقاطعة --",
+    "-- Select a quartier --": "-- اختر حياً --",
+    "Modifier la localisation": "تغيير الموقع",
+    "Location": "الموقع",
+    "If your photo has GPS data we'll detect the area automatically. Otherwise, pick it below.": "إذا كانت صورتك تحتوي على بيانات GPS، سيتم تحديد المنطقة تلقائياً. وإلا، يرجى اختيارها أدناه.",
+    "This location is outside our coverage area. Please set it manually.": "هذا الموقع خارج منطقة تغطيتنا. يرجى تحديده يدوياً.",
+    "Not available": "غير متوفر",
+    "Pin corrected. Location updated.": "تم تصحيح الموقع. تم تحديث الموقع.",
 
     "Quartier": "الحي",
     "-- Select a city first --": "-- اختر المدينة أولاً --",
@@ -340,5 +349,7 @@
     "validation.latitude_range": "يجب أن يكون خط العرض بين -90 و 90.",
     "validation.longitude_required": "حقل خط الطول مطلوب.",
     "validation.longitude_numeric": "يجب أن يكون خط الطول رقماً.",
-    "validation.longitude_range": "يجب أن يكون خط الطول بين -180 و 180."
+    "validation.longitude_range": "يجب أن يكون خط الطول بين -180 و 180.",
+    "validation.district_city_mismatch": "المقاطعة المختارة لا تنتمي إلى المدينة المختارة.",
+    "validation.quartier_district_mismatch": "الحي المختار لا ينتمي إلى المقاطعة المختارة."
 }

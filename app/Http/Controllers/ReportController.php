@@ -11,6 +11,7 @@ use App\Services\LocationResolver;
 use App\Services\PublicUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class ReportController extends Controller
 {
@@ -123,8 +124,11 @@ class ReportController extends Controller
         // }
 
         $categories = Category::all();
+        $cities = City::where('active', true)->get();
+        $districts = District::all();
+        $quartiers = Quartier::all();
 
-        return view('reports.create', compact('categories'));
+        return view('reports.create', compact('categories', 'cities', 'districts', 'quartiers'));
     }
 
     public function store(Request $request)
@@ -132,6 +136,9 @@ class ReportController extends Controller
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
+            'city_id'     => 'required|exists:cities,id',
+            'district_id' => ['nullable', Rule::exists('districts', 'id')->where('city_id', $request->input('city_id'))],
+            'quartier_id' => ['nullable', Rule::exists('quartiers', 'id')->where('district_id', $request->input('district_id'))],
             'latitude'    => 'required|numeric|between:-90,90',
             'longitude'   => 'required|numeric|between:-180,180',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:6144',
@@ -145,6 +152,8 @@ class ReportController extends Controller
             'longitude.required' => __('validation.longitude_required'),
             'longitude.numeric' => __('validation.longitude_numeric'),
             'longitude.between' => __('validation.longitude_range'),
+            'district_id.exists' => __('validation.district_city_mismatch'),
+            'quartier_id.exists' => __('validation.quartier_district_mismatch'),
         ]);
 
         if ($request->hasFile('image')) {
@@ -160,17 +169,13 @@ class ReportController extends Controller
         // still render both.
         $validated['description'] = $validated['title'];
 
-        // City/District/Quartier are no longer picked manually — resolve
-        // them from the map pin instead. District/Quartier stay null when
-        // no known one is close enough (coverage is sparse outside seeded
-        // areas); City is expected to resolve since every active city has
-        // coordinates, but is left null rather than raising here on the
-        // rare chance none do — the reports.city_id column would reject a
-        // null insert on its own if that ever happens.
-        $validated = array_merge(
-            $validated,
-            $this->locationResolver->resolve((float) $validated['latitude'], (float) $validated['longitude'])
-        );
+        // city_id/district_id/quartier_id arrive directly from the form:
+        // either the auto-locked panel's hidden inputs (populated
+        // client-side from /api/resolve-location against the same map
+        // pin) or the manual cascade selects. Validation above already
+        // guarantees the three are internally consistent with each other
+        // (district belongs to the submitted city, quartier belongs to
+        // the submitted district) regardless of which path produced them.
 
         $validated['status'] = 'OPEN';
         $validated['user_id'] = Auth::id();
@@ -267,7 +272,19 @@ class ReportController extends Controller
             'lng' => 'required|numeric|between:-180,180',
         ]);
 
-        $resolved = $this->locationResolver->resolve((float) $validated['lat'], (float) $validated['lng']);
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+
+        if (!$this->locationResolver->isWithinSupportedArea($lat, $lng)) {
+            return response()->json([
+                'outside_area' => true,
+                'city_id' => null, 'city' => null,
+                'district_id' => null, 'district' => null,
+                'quartier_id' => null, 'quartier' => null,
+            ]);
+        }
+
+        $resolved = $this->locationResolver->resolve($lat, $lng);
 
         $city = $resolved['city_id'] ? City::find($resolved['city_id']) : null;
         $district = $resolved['district_id'] ? District::find($resolved['district_id']) : null;
@@ -276,8 +293,12 @@ class ReportController extends Controller
         $isArabic = app()->getLocale() === 'ar';
 
         return response()->json([
+            'outside_area' => false,
+            'city_id' => $city?->id,
             'city' => $city?->display_name,
+            'district_id' => $district?->id,
             'district' => $district ? ($isArabic ? $district->name_ar : $district->name_fr) : null,
+            'quartier_id' => $quartier?->id,
             'quartier' => $quartier ? ($isArabic ? $quartier->name_ar : $quartier->name_fr) : null,
         ]);
     }

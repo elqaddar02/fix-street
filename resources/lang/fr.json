@@ -70,6 +70,15 @@
     "-- Select a category --": "-- Sélectionner une catégorie --",
     "City": "Ville",
     "-- Select a city --": "-- Sélectionner une ville --",
+    "District / Arrondissement": "District / Arrondissement",
+    "-- Select a district --": "-- Sélectionner un arrondissement --",
+    "-- Select a quartier --": "-- Sélectionner un quartier --",
+    "Modifier la localisation": "Modifier la localisation",
+    "Location": "Localisation",
+    "If your photo has GPS data we'll detect the area automatically. Otherwise, pick it below.": "Si votre photo contient des données GPS, la zone sera détectée automatiquement. Sinon, sélectionnez-la ci-dessous.",
+    "This location is outside our coverage area. Please set it manually.": "Cet emplacement est en dehors de notre zone de couverture. Veuillez le définir manuellement.",
+    "Not available": "Non disponible",
+    "Pin corrected. Location updated.": "Position corrigée. Localisation mise à jour.",
     "Quartier": "Quartier",
     "-- Select a city first --": "-- Sélectionner d'abord une ville --",
     "Latitude (optional)": "Latitude (facultatif)",
@@ -333,5 +342,7 @@
     "validation.latitude_range": "La latitude doit être comprise entre -90 et 90.",
     "validation.longitude_required": "Le champ longitude est obligatoire.",
     "validation.longitude_numeric": "La longitude doit être un nombre.",
-    "validation.longitude_range": "La longitude doit être comprise entre -180 et 180."
+    "validation.longitude_range": "La longitude doit être comprise entre -180 et 180.",
+    "validation.district_city_mismatch": "L'arrondissement sélectionné n'appartient pas à la ville sélectionnée.",
+    "validation.quartier_district_mismatch": "Le quartier sélectionné n'appartient pas à l'arrondissement sélectionné."
 }
