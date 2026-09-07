@@ -254,6 +254,34 @@ class ReportController extends Controller
         ]);
     }
 
+    /**
+     * Reverse-lookup the admin area for a map pin, so the create form can show
+     * the user which city/district/quartier their report will be filed under
+     * before they submit. Uses the same resolver store() does, so the preview
+     * can't drift from what actually gets saved.
+     */
+    public function resolveLocation(Request $request)
+    {
+        $validated = $request->validate([
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
+        ]);
+
+        $resolved = $this->locationResolver->resolve((float) $validated['lat'], (float) $validated['lng']);
+
+        $city = $resolved['city_id'] ? City::find($resolved['city_id']) : null;
+        $district = $resolved['district_id'] ? District::find($resolved['district_id']) : null;
+        $quartier = $resolved['quartier_id'] ? Quartier::find($resolved['quartier_id']) : null;
+
+        $isArabic = app()->getLocale() === 'ar';
+
+        return response()->json([
+            'city' => $city?->display_name,
+            'district' => $district ? ($isArabic ? $district->name_ar : $district->name_fr) : null,
+            'quartier' => $quartier ? ($isArabic ? $quartier->name_ar : $quartier->name_fr) : null,
+        ]);
+    }
+
     public function storeComment(Request $request, Report $report)
     {
         $request->validate([

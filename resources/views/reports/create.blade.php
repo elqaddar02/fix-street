@@ -51,13 +51,6 @@
                                     </svg>
                                     <p id="image-alert-text"></p>
                                 </div>
-                                <div id="exif-location-notice" class="mt-3 hidden rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 flex items-start gap-3">
-                                    <svg class="w-5 h-5 flex-none text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    <p>{{ __('Location found in the photo — pin placed automatically. Drag it to fine-tune.') }}</p>
-                                </div>
                                 @if($errors->has('image'))
                                     <div class="mt-2 text-sm text-red-600">
                                         {{ $errors->first('image') }}
@@ -96,6 +89,13 @@
                         <div>
                             <x-input-label :value="__('Location on Map')" class="text-lg font-semibold" />
                             <p class="text-sm text-gray-500 mt-1">{{ __('City, district and neighborhood are detected automatically from this pin — no need to pick them yourself.') }}</p>
+
+                            <!-- Always-visible location status: which source placed the pin, and where it resolves to -->
+                            <div id="location-status" class="mt-3 hidden rounded-2xl border px-4 py-3 text-sm flex items-start gap-3">
+                                <p id="location-status-text"></p>
+                            </div>
+                            <p id="location-area" class="mt-2 hidden text-sm font-semibold text-gray-700"></p>
+
                             <div class="mt-2">
                                 <div id="map" class="w-full h-96 rounded-lg border-2 border-gray-300 shadow-sm"></div>
                                 <div class="mt-3 flex flex-col sm:flex-row gap-3">
@@ -148,13 +148,25 @@
 
     <script>
         window.reportConfig = {
+            resolveUrl: "{{ route('location.resolve') }}",
             translations: {
                 imageTypes: "{{ __('validation.image_types') }}",
                 imageSize: "{{ __('validation.image_size') }}",
                 gettingLocation: "{{ __('Getting location...') }}",
                 useMyLocation: "{{ __('Use My Location') }}",
                 geolocationError: "{{ __('Unable to get your location. Please click on the map to set the location manually.') }}",
-                geolocationNotSupported: "{{ __('Geolocation is not supported by this browser.') }}"
+                geolocationDenied: "{{ __('Location access is blocked. Allow it in your browser, or tap the map to place the pin yourself.') }}",
+                geolocationNotSupported: "{{ __('Geolocation is not supported by this browser.') }}",
+                locatedFromPhoto: "{{ __('Location read from the photo. Drag the pin to fine-tune.') }}",
+                locatedFromDevice: "{{ __('Using your current location. Drag the pin to fine-tune.') }}",
+                pinnedManually: "{{ __('Pin placed manually.') }}",
+                photoNoGps: "{{ __('This photo has no GPS data (common for shared or screenshot images).') }}",
+                photoNoGpsPng: "{{ __('PNG images cannot carry GPS data.') }}",
+                tryingDevice: "{{ __('Trying your device location instead...') }}",
+                keepingCurrentPin: "{{ __('Keeping the pin already set.') }}",
+                checkingArea: "{{ __('Checking area...') }}",
+                areaUnknown: "{{ __('Area could not be determined — drag the pin closer to the street.') }}",
+                cityLevelOnly: "{{ __('city level only, no district data for this area yet') }}"
             }
         };
     </script>
