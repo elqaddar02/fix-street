@@ -88,6 +88,15 @@
 
     "City": "المدينة",
     "-- Select a city --": "-- اختر مدينة --",
+    "District / Arrondissement": "المقاطعة / العمالة",
+    "-- Select a district --": "-- اختر مقاطعة --",
+    "-- Select a quartier --": "-- اختر حياً --",
+    "Modifier la localisation": "تغيير الموقع",
+    "Location": "الموقع",
+    "If your photo has GPS data we'll detect the area automatically. Otherwise, pick it below.": "إذا كانت صورتك تحتوي على بيانات GPS، سيتم تحديد المنطقة تلقائياً. وإلا، يرجى اختيارها أدناه.",
+    "This location is outside our coverage area. Please set it manually.": "هذا الموقع خارج منطقة تغطيتنا. يرجى تحديده يدوياً.",
+    "Not available": "غير متوفر",
+    "Pin corrected. Location updated.": "تم تصحيح الموقع. تم تحديث الموقع.",
 
     "Quartier": "الحي",
     "-- Select a city first --": "-- اختر المدينة أولاً --",
@@ -99,7 +108,7 @@
 
     "Upload Photo (optional but recommended)": "إرفاق صورة (اختياري ولكن يُنصح به)",
     "Click to upload or drag and drop": "انقر للرفع أو اسحب الملف وأفلته هنا",
-    "PNG, JPG, GIF up to 2MB": "PNG، JPG، GIF بحجم يصل إلى 2MB",
+    "PNG, JPG, GIF up to 2MB": "PNG، JPG، GIF بحجم يصل إلى 6MB",
 
     "Back": "رجوع",
     "Submit Report": "إرسال الإبلاغ",
@@ -334,21 +343,13 @@
     "help.tabs.contact": "اتصل بنا",
     "validation.image_required": "يجب أن يكون الملف صورة.",
     "validation.image_types": "يجب أن تكون الصورة من نوع JPG أو JPEG أو PNG.",
-    "validation.image_size": "لا يجب أن يتجاوز حجم الصورة 2 ميجابايت.",
+    "validation.image_size": "لا يجب أن يتجاوز حجم الصورة 6 ميجابايت.",
     "validation.latitude_required": "حقل خط العرض مطلوب.",
     "validation.latitude_numeric": "يجب أن يكون خط العرض رقماً.",
     "validation.latitude_range": "يجب أن يكون خط العرض بين -90 و 90.",
     "validation.longitude_required": "حقل خط الطول مطلوب.",
     "validation.longitude_numeric": "يجب أن يكون خط الطول رقماً.",
     "validation.longitude_range": "يجب أن يكون خط الطول بين -180 و 180.",
-    "validation.required": "الحقل :attribute مطلوب.",
-    "validation.string": "يجب أن يكون :attribute نصاً.",
-    "validation.max.string": "lا يجب أن يتجاوز :attribute :max حرفاً.",
-    "auth.failed": "بيانات الاعتماد المقدمة لا تتطابق مع سجلاتنا.",
-    "auth.throttle": "محاولات تسجيل دخول كثيرة جداً. يرجى المحاولة مرة أخرى في :minutes دقيقة.",
-    "auth.password.required": "كلمة المرور مطلوبة.",
-    "auth.email.required": "عنوان البريد الإلكتروني مطلوب.",
-    "auth.email.invalid": "يرجى إدخال عنوان بريد إلكتروني صحيح.",
-    "auth.confirmation_mismatch": "تأكيد كلمة المرور لا يتطابق.",
-    "auth.email_unique": "عنوان البريد الإلكتروني هذا مسجل بالفعل. يرجى تسجيل الدخول بدلاً من ذلك."
+    "validation.district_city_mismatch": "المقاطعة المختارة لا تنتمي إلى المدينة المختارة.",
+    "validation.quartier_district_mismatch": "الحي المختار لا ينتمي إلى المقاطعة المختارة."
 }

@@ -1,10 +1,4 @@
-<nav
-    x-data="{ open: false, scrolled: false }"
-    x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 20)"
-    :class="scrolled 
-        ? 'bg-white/85 backdrop-blur-xl shadow-md h-20' 
-        : 'bg-white h-24'"
-    class="fixed top-0 left-0 w-full z-50 border-b border-gray-200 transition-all duration-300">
+<nav class="fixed top-0 left-0 right-0 z-50 border-b border-gray-200 bg-white h-20 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-6 lg:px-8 h-full">
         <div class="flex justify-between items-center h-full">
 
@@ -12,9 +6,7 @@
             <div class="flex items-center">
                 <a href="{{ url('/') }}" class="flex items-center">
 
-                    <div
-                        x-bind:class="scrolled ? 'h-14 scale-105' : 'h-24 scale-110'"
-                        class="flex items-center transition-all duration-300 origin-left">
+                    <div class="h-16 flex items-center transition-all duration-300 origin-left">
                         <x-application-logo class="w-auto h-full" />
                     </div>
 

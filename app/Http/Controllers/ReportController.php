@@ -7,12 +7,20 @@ use App\Models\City;
 use App\Models\District;
 use App\Models\Quartier;
 use App\Models\Report;
+use App\Services\LocationResolver;
+use App\Services\PublicUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ReportController extends Controller
 {
+    public function __construct(
+        private readonly PublicUploadService $uploads,
+        private readonly LocationResolver $locationResolver,
+    ) {
+    }
+
     public function index(Request $request)
     {
         $categories = Category::active()->get();
@@ -127,14 +135,13 @@ class ReportController extends Controller
     {
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'description' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'city_id'     => 'required|exists:cities,id',
-            'district_id' => 'required|exists:districts,id',
-            'quartier_id' => 'nullable|exists:quartiers,id',
+            'district_id' => ['nullable', Rule::exists('districts', 'id')->where('city_id', $request->input('city_id'))],
+            'quartier_id' => ['nullable', Rule::exists('quartiers', 'id')->where('district_id', $request->input('district_id'))],
             'latitude'    => 'required|numeric|between:-90,90',
             'longitude'   => 'required|numeric|between:-180,180',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:6144',
         ], [
             'image.image' => __('validation.image_required'),
             'image.mimes' => __('validation.image_types'),
@@ -145,23 +152,30 @@ class ReportController extends Controller
             'longitude.required' => __('validation.longitude_required'),
             'longitude.numeric' => __('validation.longitude_numeric'),
             'longitude.between' => __('validation.longitude_range'),
+            'district_id.exists' => __('validation.district_city_mismatch'),
+            'quartier_id.exists' => __('validation.quartier_district_mismatch'),
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('reports', 'public');
-            
-            // Copy to public/storage for Windows compatibility
-            $source = storage_path('app/public/' . $validated['image']);
-            $destination = public_path('storage/' . $validated['image']);
-            if (!file_exists(dirname($destination))) {
-                mkdir(dirname($destination), 0755, true);
-            }
-            copy($source, $destination);
+            $validated['image'] = $this->uploads->store($request->file('image'), 'reports');
         }
 
         if (auth()->check() && auth()->user()->is_admin) {
             abort(403, 'Admins cannot store reports.');
         }
+
+        // The form only asks for one piece of text; mirror it into
+        // description too since reports.show/index and the admin panel
+        // still render both.
+        $validated['description'] = $validated['title'];
+
+        // city_id/district_id/quartier_id arrive directly from the form:
+        // either the auto-locked panel's hidden inputs (populated
+        // client-side from /api/resolve-location against the same map
+        // pin) or the manual cascade selects. Validation above already
+        // guarantees the three are internally consistent with each other
+        // (district belongs to the submitted city, quartier belongs to
+        // the submitted district) regardless of which path produced them.
 
         $validated['status'] = 'OPEN';
         $validated['user_id'] = Auth::id();
@@ -206,30 +220,14 @@ class ReportController extends Controller
             'category_id' => 'required|exists:categories,id',
             'city_id'     => 'required|exists:cities,id',
             'district_id' => 'nullable|exists:districts,id',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:6144',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($report->image) {
-                Storage::disk('public')->delete($report->image);
-                $oldPath = public_path('storage/' . $report->image);
-                if (file_exists($oldPath)) {
-                    unlink($oldPath);
-                }
-            }
-
-            $validated['image'] = $request->file('image')->store('reports', 'public');
-            
-            // Copy to public/storage for Windows compatibility
-            $source = storage_path('app/public/' . $validated['image']);
-            $destination = public_path('storage/' . $validated['image']);
-            if (!file_exists(dirname($destination))) {
-                mkdir(dirname($destination), 0755, true);
-            }
-            copy($source, $destination);
+            $this->uploads->delete($report->image);
+            $validated['image'] = $this->uploads->store($request->file('image'), 'reports');
         }
 
         $report->update($validated);
@@ -244,14 +242,7 @@ class ReportController extends Controller
             abort(403);
         }
 
-        // Delete image if exists
-        if ($report->image) {
-            Storage::disk('public')->delete($report->image);
-            $path = public_path('storage/' . $report->image);
-            if (file_exists($path)) {
-                unlink($path);
-            }
-        }
+        $this->uploads->delete($report->image);
 
         $report->delete();
 
@@ -265,6 +256,50 @@ class ReportController extends Controller
             'longitude' => $quartier->longitude,
             'name_fr' => $quartier->name_fr,
             'name_ar' => $quartier->name_ar,
+        ]);
+    }
+
+    /**
+     * Reverse-lookup the admin area for a map pin, so the create form can show
+     * the user which city/district/quartier their report will be filed under
+     * before they submit. Uses the same resolver store() does, so the preview
+     * can't drift from what actually gets saved.
+     */
+    public function resolveLocation(Request $request)
+    {
+        $validated = $request->validate([
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
+        ]);
+
+        $lat = (float) $validated['lat'];
+        $lng = (float) $validated['lng'];
+
+        if (!$this->locationResolver->isWithinSupportedArea($lat, $lng)) {
+            return response()->json([
+                'outside_area' => true,
+                'city_id' => null, 'city' => null,
+                'district_id' => null, 'district' => null,
+                'quartier_id' => null, 'quartier' => null,
+            ]);
+        }
+
+        $resolved = $this->locationResolver->resolve($lat, $lng);
+
+        $city = $resolved['city_id'] ? City::find($resolved['city_id']) : null;
+        $district = $resolved['district_id'] ? District::find($resolved['district_id']) : null;
+        $quartier = $resolved['quartier_id'] ? Quartier::find($resolved['quartier_id']) : null;
+
+        $isArabic = app()->getLocale() === 'ar';
+
+        return response()->json([
+            'outside_area' => false,
+            'city_id' => $city?->id,
+            'city' => $city?->display_name,
+            'district_id' => $district?->id,
+            'district' => $district ? ($isArabic ? $district->name_ar : $district->name_fr) : null,
+            'quartier_id' => $quartier?->id,
+            'quartier' => $quartier ? ($isArabic ? $quartier->name_ar : $quartier->name_fr) : null,
         ]);
     }
 

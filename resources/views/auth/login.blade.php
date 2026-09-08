@@ -3,8 +3,8 @@
     <x-auth-session-status class="mb-6" :status="session('status')" />
 
     <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-        <p class="text-gray-600">Sign in to your account to continue</p>
+        <h2 class="text-2xl font-bold text-gray-900">{{ __('Login to your account') }}</h2>
+        <p class="text-gray-600 mt-2">{{ __('Welcome back! Please sign in to continue.') }}</p>
     </div>
 
     <form method="POST" action="{{ route('login') }}" class="space-y-5">
@@ -12,63 +12,44 @@
 
         <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email Address')" class="text-sm font-medium text-gray-700" />
-            <x-text-input 
-                id="email" 
-                class="block mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" 
-                type="email" 
-                name="email" 
-                :value="old('email')" 
-                required 
-                autofocus 
-                autocomplete="username"
-                placeholder="you@example.com" 
-            />
+            <x-input-label for="email" :value="__('Email')" />
+            <x-text-input id="email" class="block mt-1.5 w-full rounded-xl border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 py-2.5 px-4" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
         <div>
-            <x-input-label for="password" :value="__('Password')" class="text-sm font-medium text-gray-700" />
-            <x-text-input 
-                id="password" 
-                class="block mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-                type="password"
-                name="password"
-                required 
-                autocomplete="current-password"
-                placeholder="••••••••" 
-            />
+            <x-input-label for="password" :value="__('Password')" />
+            <x-text-input id="password" class="block mt-1.5 w-full rounded-xl border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 py-2.5 px-4"
+                            type="password"
+                            name="password"
+                            required autocomplete="current-password" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <!-- Remember Me -->
         <div class="flex items-center justify-between">
-            <label for="remember_me" class="flex items-center">
-                <input id="remember_me" type="checkbox" class="w-4 h-4 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 cursor-pointer" name="remember">
-                <span class="ms-2 text-sm text-gray-600">Remember me</span>
+            <label for="remember_me" class="flex items-center gap-2 cursor-pointer">
+                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-red-600 shadow-sm focus:ring-red-500" name="remember">
+                <span class="text-sm text-gray-600">{{ __('Remember me') }}</span>
             </label>
-            
+
             @if (Route::has('password.request'))
-                <a class="text-sm text-indigo-600 hover:text-indigo-900 font-medium" href="{{ route('password.request') }}">
-                    Forgot password?
+                <a class="text-sm font-medium text-red-600 hover:text-red-700" href="{{ route('password.request') }}">
+                    {{ __('Forgot your password?') }}
                 </a>
             @endif
         </div>
 
-        <!-- Login Button -->
-        <div class="pt-2">
-            <x-primary-button class="w-full justify-center py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition">
-                {{ __('Sign In') }}
-            </x-primary-button>
-        </div>
+        <x-primary-button class="w-full justify-center rounded-xl bg-red-600 hover:bg-red-700 focus:ring-red-500 active:bg-red-800 py-3 text-sm">
+            {{ __('Log in') }}
+        </x-primary-button>
 
-        <!-- Register Link -->
-        <div class="text-center pt-2">
+        <div class="text-center">
             <p class="text-sm text-gray-600">
-                Don't have an account?
-                <a href="{{ route('register') }}" class="text-indigo-600 hover:text-indigo-900 font-semibold">
-                    Create one now
+                {{ __("Don't have an account?") }}
+                <a href="{{ route('register') }}" class="text-red-600 hover:text-red-700 font-semibold">
+                    {{ __('Register here') }}
                 </a>
             </p>
         </div>
