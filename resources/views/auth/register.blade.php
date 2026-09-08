@@ -1,4 +1,7 @@
 <x-guest-layout>
+    <!-- Error (e.g. expired session) -->
+    <x-auth-error-banner />
+
     <div class="text-center mb-8">
         <h2 class="text-2xl font-bold text-gray-900">{{ __('Create your account') }}</h2>
         <p class="text-gray-600 mt-2">{{ __('Join Madinova and start reporting street issues.') }}</p>

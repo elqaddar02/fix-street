@@ -2,6 +2,9 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-6" :status="session('status')" />
 
+    <!-- Error (e.g. expired session) -->
+    <x-auth-error-banner />
+
     <div class="text-center mb-8">
         <h2 class="text-2xl font-bold text-gray-900">{{ __('Login to your account') }}</h2>
         <p class="text-gray-600 mt-2">{{ __('Welcome back! Please sign in to continue.') }}</p>
