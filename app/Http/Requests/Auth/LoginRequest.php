@@ -34,6 +34,22 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => trans('auth.email.required'),
+            'email.email' => trans('auth.email.invalid'),
+            'email.string' => trans('validation.string', ['attribute' => 'email']),
+            'password.required' => trans('auth.password.required'),
+            'password.string' => trans('validation.string', ['attribute' => 'password']),
+        ];
+    }
+
+    /**
      * Attempt to authenticate the request's credentials.
      *
      * @throws ValidationException
@@ -70,7 +86,6 @@ class LoginRequest extends FormRequest
 
         throw ValidationException::withMessages([
             'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
         ]);

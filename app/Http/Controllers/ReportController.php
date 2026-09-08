@@ -15,7 +15,7 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = Category::all();
+        $categories = Category::active()->get();
         $cities = City::where('active', true)->get();
         $districts = District::all();
         $quartiers = Quartier::all();
@@ -111,13 +111,13 @@ class ReportController extends Controller
 
     public function create()
     {
-        // if (auth()->check() && auth()->user()->is_admin) {
+        // cmd (auth()->check() && auth()->user()->is_admin) {
         //     abort(403, 'Admins are not allowed to create reports.');
         // }
 
-        $categories = Category::all();
+        $categories = Category::active()->get();
         $cities = City::where('active', true)->get();
-        $districts = District::all();
+        $districts = District::all(); 
         $quartiers = Quartier::all();
 
         return view('reports.create', compact('categories', 'cities', 'districts', 'quartiers'));
@@ -186,7 +186,7 @@ class ReportController extends Controller
             abort(403);
         }
 
-        $categories = Category::all();
+        $categories = Category::active()->get();
         $cities = City::where('active', true)->get();
         $districts = District::all();
 

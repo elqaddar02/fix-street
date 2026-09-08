@@ -34,6 +34,17 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'name.required' => trans('validation.required', ['attribute' => 'name']),
+            'name.string' => trans('validation.string', ['attribute' => 'name']),
+            'name.max' => trans('validation.max.string', ['attribute' => 'name', 'max' => 255]),
+            'email.required' => trans('auth.email.required'),
+            'email.string' => trans('validation.string', ['attribute' => 'email']),
+            'email.email' => trans('auth.email.invalid'),
+            'email.unique' => trans('auth.email_unique'),
+            'email.max' => trans('validation.max.string', ['attribute' => 'email', 'max' => 255]),
+            'password.required' => trans('auth.password.required'),
+            'password.confirmed' => trans('auth.confirmation_mismatch'),
         ]);
 
         $user = User::create([

@@ -9,11 +9,16 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'name_ar'];
+    protected $fillable = ['name', 'name_ar', 'active'];
 
     public function reports()
     {
         return $this->hasMany(Report::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('active', true);
     }
 
     public function getDisplayNameAttribute()

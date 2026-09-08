@@ -340,5 +340,15 @@
     "validation.latitude_range": "يجب أن يكون خط العرض بين -90 و 90.",
     "validation.longitude_required": "حقل خط الطول مطلوب.",
     "validation.longitude_numeric": "يجب أن يكون خط الطول رقماً.",
-    "validation.longitude_range": "يجب أن يكون خط الطول بين -180 و 180."
+    "validation.longitude_range": "يجب أن يكون خط الطول بين -180 و 180.",
+    "validation.required": "الحقل :attribute مطلوب.",
+    "validation.string": "يجب أن يكون :attribute نصاً.",
+    "validation.max.string": "lا يجب أن يتجاوز :attribute :max حرفاً.",
+    "auth.failed": "بيانات الاعتماد المقدمة لا تتطابق مع سجلاتنا.",
+    "auth.throttle": "محاولات تسجيل دخول كثيرة جداً. يرجى المحاولة مرة أخرى في :minutes دقيقة.",
+    "auth.password.required": "كلمة المرور مطلوبة.",
+    "auth.email.required": "عنوان البريد الإلكتروني مطلوب.",
+    "auth.email.invalid": "يرجى إدخال عنوان بريد إلكتروني صحيح.",
+    "auth.confirmation_mismatch": "تأكيد كلمة المرور لا يتطابق.",
+    "auth.email_unique": "عنوان البريد الإلكتروني هذا مسجل بالفعل. يرجى تسجيل الدخول بدلاً من ذلك."
 }

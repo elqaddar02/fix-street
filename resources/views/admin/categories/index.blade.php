@@ -24,6 +24,7 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Nom</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Nom AR</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Statut</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Signalements</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Date création</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">Actions</th>
@@ -39,8 +40,23 @@
                                 <span class="text-sm text-gray-600">{{ $category->name_ar ?? '-' }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                <form action="{{ route('admin.categories.updateStatus', $category) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <div class="status-field inline-flex items-center gap-3">
+                                        <span class="status-badge inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold {{ $category->active ? 'text-emerald-800 bg-emerald-100 border-emerald-300' : 'text-slate-700 bg-slate-100 border-slate-300' }}">
+                                            {{ $category->active ? 'Actif' : 'Inactif' }}
+                                        </span>
+                                        <select name="active" data-current="{{ $category->active ? 1 : 0 }}" data-confirm-change="true" data-confirm-message="Changer le statut de la catégorie ?" class="status-select rounded-xl border-2 px-3 py-2 {{ $category->active ? 'border-emerald-400 bg-emerald-50 text-emerald-900' : 'border-slate-400 bg-slate-50 text-slate-900' }} text-sm font-medium shadow-sm focus:outline-none focus:ring-2 transition-colors">
+                                            <option value="1" {{ $category->active ? 'selected' : '' }}>Actif</option>
+                                            <option value="0" {{ !$category->active ? 'selected' : '' }}>Inactif</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ $category->reports->count() }}
+                                    {{ $category->reports_count }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -67,7 +83,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
                                 <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                 </svg>

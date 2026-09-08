@@ -334,4 +334,14 @@
     "validation.longitude_required": "The longitude field is required.",
     "validation.longitude_numeric": "The longitude must be a number.",
     "validation.longitude_range": "The longitude must be between -180 and 180.",
+    "validation.required": "The :attribute field is required.",
+    "validation.string": "The :attribute must be a string.",
+    "validation.max.string": "The :attribute may not be greater than :max characters.",
+    "auth.failed": "The provided credentials do not match our records.",
+    "auth.throttle": "Too many login attempts. Please try again in :minutes minutes.",
+    "auth.password.required": "Password is required.",
+    "auth.email.required": "Email address is required.",
+    "auth.email.invalid": "Please enter a valid email address.",
+    "auth.confirmation_mismatch": "Password confirmation does not match.",
+    "auth.email_unique": "This email address is already registered. Please log in instead."
 }

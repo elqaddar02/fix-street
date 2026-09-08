@@ -140,42 +140,7 @@
                 </x-dashboard.stat-card>
             </div>
 
-            <!-- Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Status Chart -->
-                <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                    <div class="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                        <h3 class="text-xl font-bold text-gray-900 flex items-center">
-                            <svg class="w-6 h-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
-                            </svg>
-                            {{ __('dashboard.charts.status.title') }}
-                        </h3>
-                    </div>
-                    <div class="p-8">
-                        <canvas id="statusChart" width="400" height="300"></canvas>
-                    </div>
-                </div>
-
-                <!-- Category Chart -->
-                <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-                    <div class="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                        <h3 class="text-xl font-bold text-gray-900 flex items-center">
-                            <svg class="w-6 h-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
-                            </svg>
-                            {{ __('dashboard.charts.category.title') }}
-                        </h3>
-                    </div>
-                    <div class="p-8">
-                        <canvas id="categoryChart" width="400" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reports Table -->
+               <!-- Reports Table -->
             <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                 <div class="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                     <div class="flex items-center justify-between">
@@ -233,6 +198,43 @@
                     </div>
                 @endif
             </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Status Chart -->
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+                    <div class="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                        <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                            <svg class="w-6 h-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+                            </svg>
+                            {{ __('dashboard.charts.status.title') }}
+                        </h3>
+                    </div>
+                    <div class="p-8">
+                        <canvas id="statusChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Category Chart -->
+                <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+                    <div class="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                        <h3 class="text-xl font-bold text-gray-900 flex items-center">
+                            <svg class="w-6 h-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                            </svg>
+                            {{ __('dashboard.charts.category.title') }}
+                        </h3>
+                    </div>
+                    <div class="p-8">
+                        <canvas id="categoryChart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+
+         
         </div>
     </div>
 

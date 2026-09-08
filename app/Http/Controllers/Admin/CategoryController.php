@@ -24,6 +24,7 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|unique:categories|max:255',
             'name_ar' => 'nullable|string|max:255',
+            'active' => 'required|boolean',
         ]);
 
         $category = Category::create($validated);
@@ -42,6 +43,7 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
             'name_ar' => 'nullable|string|max:255',
+            'active' => 'required|boolean',
         ]);
 
         $oldName = $category->name;
@@ -49,6 +51,15 @@ class CategoryController extends Controller
         logAdminAction('Update', 'Category', $category->id, "Updated category from '{$oldName}' to '{$category->name}'");
 
         return redirect()->route('admin.categories.index')->with('success', 'Catégorie mise à jour.');
+    }
+
+    public function updateStatus(Request $request, Category $category)
+    {
+        $request->validate(['active' => 'required|boolean']);
+
+        $category->update(['active' => $request->active]);
+
+        return back()->with('success', 'Statut de la catégorie mis à jour.');
     }
 
     public function destroy(Category $category)
