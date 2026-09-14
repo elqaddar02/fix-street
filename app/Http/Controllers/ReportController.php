@@ -225,7 +225,10 @@ class ReportController extends Controller
             'longitude'   => 'nullable|numeric|between:-180,180',
         ]);
 
-        if ($request->hasFile('image')) {
+        // A report that is part of a case is evidence: its photo and location can no longer change.
+        if ($report->dossier_id) {
+            unset($validated['image'], $validated['latitude'], $validated['longitude'], $validated['city_id'], $validated['district_id']);
+        } elseif ($request->hasFile('image')) {
             $this->uploads->delete($report->image);
             $validated['image'] = $this->uploads->store($request->file('image'), 'reports');
         }
@@ -240,6 +243,10 @@ class ReportController extends Controller
         // Ensure user owns the report
         if ($report->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        if ($report->dossier_id) {
+            abort(403, 'This report is part of a case and can no longer be deleted.');
         }
 
         $this->uploads->delete($report->image);
