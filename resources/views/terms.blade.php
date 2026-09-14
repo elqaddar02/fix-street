@@ -1,4 +1,4 @@
-@php($title = 'Terms of Service - Madinova')
+@php($title = 'Terms of Service - Madinup')
 
 <x-app-layout>
     <x-slot name="header">

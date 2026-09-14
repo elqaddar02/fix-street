@@ -6,7 +6,7 @@
                 <div class="flex items-center gap-3">
                     <x-application-logo class="h-10 w-auto fill-current text-indigo-500" />
                     <span class="text-xl font-bold tracking-tight text-white">
-                        {{ config('app.name', 'Madinova') }}
+                        {{ config('app.name', 'Madinup') }}
                     </span>
                 </div>
                 <p class="text-sm text-slate-400 leading-relaxed">
@@ -19,11 +19,11 @@
 
         <div class="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
             <p class="text-xs text-slate-500 tracking-wide">
-                &copy; 2026 Madinova. {{ __('footer.all_rights_reserved') }}
+                &copy; 2026 Madinup. {{ __('footer.all_rights_reserved') }}
             </p>
             <div class="h-1.5 w-1.5 rounded-full bg-indigo-500/50 hidden sm:block"></div>
             <p class="text-xs text-slate-500 font-medium">
-                {{ __('footer.tagline') }}
+                {{ __('footer.independent') }}
             </p>
         </div>
     </div>

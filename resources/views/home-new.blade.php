@@ -1,4 +1,4 @@
-@php($title = __('Madinova - Official City Street Maintenance Portal'))
+@php($title = __('Madinup - Independent Citizen Platform for Street Problems'))
 
 <x-app-layout>
     @include('home.styles')

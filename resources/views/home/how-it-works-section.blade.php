@@ -21,8 +21,8 @@
                 </div>
                 <div class="text-center flex flex-col items-center justify-center">
                     <div class="w-20 h-20 bg-green-600 text-white rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-lg">3</div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">{{ __('Get Fixed') }}</h3>
-                    <p class="text-gray-600">{{ __('City team reviews and schedules maintenance action.') }}</p>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">{{ __('Follow Up') }}</h3>
+                    <p class="text-gray-600">{{ __('Neighbors can support the report and everyone can follow its status until it is fixed.') }}</p>
                 </div>
             </div>
         </div>

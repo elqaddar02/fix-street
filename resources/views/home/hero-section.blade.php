@@ -18,7 +18,7 @@
                     <span id="line2" data-text="{{ __('Get Them Fixed') }}" class="text-yellow-300 inline-block"></span>
                 </h1>
                 <p class="text-lg text-gray-100 mb-10 leading-relaxed max-w-xl">
-                    {{ __('Help us maintain safe, clean streets. Report potholes, broken lights, damaged infrastructure, and more. Your reports empower city officials to act fast.') }}
+                    {{ __('Report potholes, broken lights and damaged infrastructure, rally your neighbors, and follow each problem until it is fixed. Madinup is an independent citizen initiative.') }}
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4">
                     <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="inline-flex items-center justify-center px-8 py-4 bg-white text-red-600 font-bold rounded-xl hover:bg-yellow-100 transition-all shadow-xl hover:shadow-2xl hover:scale-105">
@@ -55,8 +55,8 @@
             $totalReports = \App\Models\Report::count();
             $resolvedCount = \App\Models\Report::where('status', 'RESOLVED')->count();
             $resolvedPercentage = $totalReports > 0 ? ($resolvedCount / $totalReports) * 100 : 0;
-            $resolvedPercentage = min($resolvedPercentage + 20, 100); // Add 20% but max 100%
-            $citiesCount = \App\Models\City::count();
+            // Only cities where reports can actually be filed (a district is required).
+            $citiesCount = \App\Models\City::where('active', true)->whereHas('districts')->count();
         @endphp
         <div class="grid grid-cols-3 gap-6 mt-16 pt-8 border-t border-white/20">
             <!-- Total Reports Stat -->
@@ -85,7 +85,7 @@
             
             <!-- Cities Covered Stat -->
             <div class="text-center">
-                <div class="stat-counter text-4xl font-black text-yellow-300 mb-3" data-target="{{ $citiesCount }}+">0</div>
+                <div class="stat-counter text-4xl font-black text-yellow-300 mb-3" data-target="{{ $citiesCount }}">0</div>
                 <p class="text-sm text-white/80 font-semibold uppercase tracking-wider">{{ __('Cities Covered') }}</p>
             </div>
         </div>

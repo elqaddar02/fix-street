@@ -1,4 +1,4 @@
-@php($title = __('Privacy Policy') . ' - Madinova')
+@php($title = __('Privacy Policy') . ' - Madinup')
 
 <x-app-layout>
     <x-slot name="header">
@@ -12,13 +12,13 @@
             <div class="bg-white border border-red-200 shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-800 space-y-5 leading-relaxed">
                     <p>
-                        {{ __('We collect account data (such as name and email), report details, and optional uploaded images to operate the Madinova platform and improve maintenance response quality.') }}
+                        {{ __('We collect account data (such as name and email), report details, and optional uploaded images to operate the Madinup platform and improve maintenance response quality.') }}
                     </p>
                     <p>
                         {{ __('We use this information to authenticate users, display reports, prevent abuse, and support issue moderation. We do not sell personal information.') }}
                     </p>
                     <p>
-                        {{ __('Madinova may use cookies and similar technologies for session management, security, and analytics. If Google AdSense is enabled, Google may use cookies to serve personalized or non-personalized ads based on your browsing context.') }}
+                        {{ __('Madinup may use cookies and similar technologies for session management, security, and analytics. If Google AdSense is enabled, Google may use cookies to serve personalized or non-personalized ads based on your browsing context.') }}
                     </p>
                     <p>
                         {{ __('Third-party vendors, including Google, may use cookies to show ads. Users can manage ad personalization settings through Google\'s Ads Settings and browser cookie controls.') }}

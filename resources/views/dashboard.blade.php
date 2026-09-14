@@ -1,5 +1,5 @@
 @php
-    $title = __('Dashboard') . ' - Madinova';
+    $title = __('Dashboard') . ' - Madinup';
 @endphp
 
 <x-app-layout>

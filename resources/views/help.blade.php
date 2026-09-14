@@ -1,4 +1,4 @@
-@php($title = 'Help - Madinova')
+@php($title = 'Help - Madinup')
 
 <x-app-layout>
     <x-slot name="header">
