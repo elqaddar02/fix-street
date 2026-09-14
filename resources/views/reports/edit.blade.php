@@ -187,7 +187,7 @@
             try {
                 const compressed = await window.madinupImage.compress(file);
                 const replaced = window.madinupImage.replaceInputFile(imageInput, compressed);
-                if (!replaced && file.size > window.madinupImage.MAX_BYTES) {
+                if (!replaced && file.size > window.madinupImage.UPLOAD_LIMIT_BYTES) {
                     throw new Error('too-large');
                 }
                 previewImage.src = URL.createObjectURL(replaced ? compressed : file);

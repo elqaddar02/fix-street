@@ -1,8 +1,11 @@
-// Shrinks photos in the browser before upload so phone pictures fit the server's 2 MB limit.
-// Re-encoding to JPEG also drops EXIF metadata, such as the GPS position where the photo was taken.
+// Shrinks photos in the browser before upload so phone pictures stay small on slow connections
+// and well under common PHP upload limits. Re-encoding to JPEG also drops EXIF metadata, such as
+// the GPS position where the photo was taken, so read any GPS data from the original file first.
 window.madinupImage = (function () {
     const MAX_DIMENSION = 1920;
     const MAX_BYTES = 1.9 * 1024 * 1024;
+    // Server-side limit (ReportController validates image max:6144 KB).
+    const UPLOAD_LIMIT_BYTES = 6 * 1024 * 1024;
 
     function loadImage(file) {
         return new Promise((resolve, reject) => {
@@ -61,5 +64,5 @@ window.madinupImage = (function () {
         }
     }
 
-    return { compress, replaceInputFile, MAX_BYTES };
+    return { compress, replaceInputFile, MAX_BYTES, UPLOAD_LIMIT_BYTES };
 })();
