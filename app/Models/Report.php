@@ -53,6 +53,11 @@ class Report extends Model
         return $this->hasMany(ReportComment::class);
     }
 
+    public function visibleComments()
+    {
+        return $this->hasMany(ReportComment::class)->visible();
+    }
+
     public function likes()
     {
         return $this->hasMany(ReportLike::class);

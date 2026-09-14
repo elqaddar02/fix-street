@@ -35,36 +35,54 @@ if (imageInput) {
     imageInput.addEventListener('change', showImagePreview);
 }
 
-function showImagePreview() {
-    if (imageInput.files && imageInput.files[0]) {
-        const file = imageInput.files[0];
-        const allowedTypes = ['image/jpeg', 'image/png'];
-        const maxSize = 6 * 1024 * 1024;
+const imageProcessingText = document.getElementById('image-processing');
+let imageProcessing = false;
 
-        if (!allowedTypes.includes(file.type)) {
-            showImageAlert(window.reportConfig.translations.imageTypes);
-            imageInput.value = '';
-            imagePreview.classList.add('hidden');
+// Resize/compress the chosen photo in the browser, then preview the version that will be uploaded.
+// GPS is read from the original file, because re-encoding the photo drops its EXIF data.
+async function showImagePreview() {
+    if (!imageInput.files || !imageInput.files[0]) return;
+
+    const file = imageInput.files[0];
+    const allowedTypes = ['image/jpeg', 'image/png'];
+
+    if (!allowedTypes.includes(file.type)) {
+        rejectImage(window.reportConfig.translations.imageTypes);
+        return;
+    }
+
+    readExifLocation(file);
+
+    imageProcessing = true;
+    imageProcessingText?.classList.remove('hidden');
+
+    try {
+        const compressed = await window.madinupImage.compress(file);
+        const replaced = window.madinupImage.replaceInputFile(imageInput, compressed);
+        if (!replaced && file.size > window.madinupImage.UPLOAD_LIMIT_BYTES) {
+            rejectImage(window.reportConfig.translations.imageSize);
             return;
         }
-
-        if (file.size > maxSize) {
-            showImageAlert(window.reportConfig.translations.imageSize);
-            imageInput.value = '';
-            imagePreview.classList.add('hidden');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            previewImage.src = e.target.result;
-            imagePreview.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-
-        readExifLocation(file);
+        previewImage.src = URL.createObjectURL(replaced ? compressed : file);
+        imagePreview.classList.remove('hidden');
+    } catch (error) {
+        rejectImage(window.reportConfig.translations.imageUnreadable);
+    } finally {
+        imageProcessing = false;
+        imageProcessingText?.classList.add('hidden');
     }
 }
+
+function rejectImage(message) {
+    showImageAlert(message);
+    imageInput.value = '';
+    imagePreview.classList.add('hidden');
+}
+
+// Don't submit while the photo is still being prepared, or the original file would be sent.
+imageInput?.form?.addEventListener('submit', (event) => {
+    if (imageProcessing) event.preventDefault();
+});
 
 const imageAlert = document.getElementById('image-alert');
 const imageAlertText = document.getElementById('image-alert-text');

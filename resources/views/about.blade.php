@@ -1,9 +1,9 @@
-@php($title = __('About Fix Street'))
+@php($title = __('About Madinup'))
 
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('About Fix Street') }}
+            {{ __('About Madinup') }}
         </h2>
     </x-slot>
 
@@ -12,13 +12,13 @@
             <div class="bg-white border border-red-200 shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-800 space-y-5 leading-relaxed">
                     <p>
-                        {{ __('Madinova is a civic reporting platform that helps residents notify local authorities about damaged roads, broken streetlights, waste issues, and other public infrastructure problems.') }}
+                        {{ __('Madinup is an independent citizen platform that helps residents make street problems visible (damaged roads, broken streetlights, waste and other public infrastructure issues) and follow them until they are resolved.') }}
                     </p>
                     <p>
-                        {{ __('Our mission is simple: make city maintenance more transparent and faster by connecting citizens, community feedback, and municipal follow-up in one place.') }}
+                        {{ __('Our mission is to make street problems visible, bring neighbors together around them, and keep a clear public record of what happens next.') }}
                     </p>
                     <p>
-                        {{ __('Every report includes category and location context so maintenance teams can prioritize urgent issues and update status as work progresses.') }}
+                        {{ __('Madinup is not a government service and is not affiliated with any public authority. Publishing a report here is not an official complaint.') }}
                     </p>
                 </div>
             </div>

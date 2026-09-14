@@ -120,9 +120,10 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
                                         <p class="text-gray-700 font-semibold">{{ __('Click to upload or drag and drop') }}</p>
-                                        <p class="text-sm text-gray-500">{{ __('PNG, JPG, GIF up to 6MB') }}</p>
+                                        <p class="text-sm text-gray-500">{{ __('Photos from your phone are resized automatically.') }}</p>
                                     </div>
                                 </div>
+                                <p id="image-processing" class="mt-2 hidden text-sm text-gray-600">{{ __('Preparing photo...') }}</p>
                                 <div id="image-preview" class="mt-4 hidden">
                                     <img id="preview-image" src="" alt="Preview" class="max-h-48 rounded-lg shadow-md mx-auto">
                                 </div>
@@ -140,11 +141,14 @@
         </div>
     </div>
 
+    <script src="{{ asset('js/reports/image-compress.js') }}"></script>
     <script>
         const imageInput = document.getElementById('image');
         const imageUploadArea = document.getElementById('image-upload-area');
         const imagePreview = document.getElementById('image-preview');
         const previewImage = document.getElementById('preview-image');
+        const imageProcessingText = document.getElementById('image-processing');
+        let imageProcessing = false;
 
         // Click to upload
         imageUploadArea.addEventListener('click', () => imageInput.click());
@@ -172,16 +176,36 @@
         // Show preview when file is selected
         imageInput.addEventListener('change', showImagePreview);
 
-        function showImagePreview() {
-            if (imageInput.files && imageInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    previewImage.src = e.target.result;
-                    imagePreview.classList.remove('hidden');
-                };
-                reader.readAsDataURL(imageInput.files[0]);
+        // Resize/compress the chosen photo in the browser, then preview the version that will be uploaded.
+        async function showImagePreview() {
+            if (!imageInput.files || !imageInput.files[0]) return;
+
+            const file = imageInput.files[0];
+            imageProcessing = true;
+            imageProcessingText.classList.remove('hidden');
+
+            try {
+                const compressed = await window.madinupImage.compress(file);
+                const replaced = window.madinupImage.replaceInputFile(imageInput, compressed);
+                if (!replaced && file.size > window.madinupImage.UPLOAD_LIMIT_BYTES) {
+                    throw new Error('too-large');
+                }
+                previewImage.src = URL.createObjectURL(replaced ? compressed : file);
+                imagePreview.classList.remove('hidden');
+            } catch (error) {
+                alert(error.message === 'too-large' ? @json(__('validation.image_size')) : @json(__('validation.image_unreadable')));
+                imageInput.value = '';
+                imagePreview.classList.add('hidden');
+            } finally {
+                imageProcessing = false;
+                imageProcessingText.classList.add('hidden');
             }
         }
+
+        // Don't submit while the photo is still being prepared, or the original file would be sent.
+        imageInput.form.addEventListener('submit', (event) => {
+            if (imageProcessing) event.preventDefault();
+        });
 
         // Map and district logic
         const districtSelect = document.getElementById('district_id');

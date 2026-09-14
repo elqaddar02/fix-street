@@ -122,7 +122,7 @@
                                     <h3 class="text-lg font-semibold text-gray-700 mb-3">Comments</h3>
 
                                     <div id="comments-list" class="space-y-3 mb-4">
-                                        @forelse($report->comments as $comment)
+                                        @forelse($report->visibleComments as $comment)
                                             <div class="border border-red-100 p-3 rounded">
                                                 <p class="text-sm font-semibold text-gray-800">{{ $comment->user->name ?? 'Guest' }} <span class="text-gray-500">({{ $comment->created_at->diffForHumans() }})</span></p>
                                                 <p class="text-gray-700">{{ $comment->comment }}</p>
@@ -250,10 +250,21 @@
                         // Create new comment element
                         const commentDiv = document.createElement('div');
                         commentDiv.className = 'border border-red-100 p-3 rounded';
-                        commentDiv.innerHTML = `
-                            <p class="text-sm font-semibold text-gray-800">${data.comment.user} <span class="text-gray-500">(${data.comment.created_at})</span></p>
-                            <p class="text-gray-700">${data.comment.text}</p>
-                        `;
+
+                        // Build with textContent so user-written text is never interpreted as HTML.
+                        const meta = document.createElement('p');
+                        meta.className = 'text-sm font-semibold text-gray-800';
+                        meta.textContent = data.comment.user + ' ';
+                        const time = document.createElement('span');
+                        time.className = 'text-gray-500';
+                        time.textContent = `(${data.comment.created_at})`;
+                        meta.appendChild(time);
+
+                        const text = document.createElement('p');
+                        text.className = 'text-gray-700';
+                        text.textContent = data.comment.text;
+
+                        commentDiv.append(meta, text);
 
                         // Add to comments list
                         document.getElementById('comments-list').appendChild(commentDiv);

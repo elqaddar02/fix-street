@@ -39,9 +39,10 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
                                         <p class="text-gray-700 font-semibold">{{ __('Click to upload or drag and drop') }}</p>
-                                        <p class="text-sm text-gray-500">{{ __('JPG, JPEG, PNG up to 6MB') }}</p>
+                                        <p class="text-sm text-gray-500">{{ __('Photos from your phone are resized automatically.') }}</p>
                                     </div>
                                 </div>
+                                <p id="image-processing" class="mt-2 hidden text-sm text-gray-600">{{ __('Preparing photo...') }}</p>
                                 <div id="image-preview" class="mt-4 hidden">
                                     <img id="preview-image" src="" alt="Preview" class="max-h-48 rounded-lg shadow-md mx-auto">
                                 </div>
@@ -233,8 +234,9 @@
         window.reportConfig = {
             resolveUrl: "{{ route('location.resolve') }}",
             translations: {
-                imageTypes: "{{ __('validation.image_types') }}",
-                imageSize: "{{ __('validation.image_size') }}",
+                imageTypes: @json(__('validation.image_types')),
+                imageSize: @json(__('validation.image_size')),
+                imageUnreadable: @json(__('validation.image_unreadable')),
                 gettingLocation: "{{ __('Getting location...') }}",
                 useMyLocation: "{{ __('Use My Location') }}",
                 geolocationError: "{{ __('Unable to get your location. Please click on the map to set the location manually.') }}",

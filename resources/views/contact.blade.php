@@ -1,4 +1,4 @@
-@php($title = __('Contact') . ' - Madinova')
+@php($title = __('Contact') . ' - Madinup')
 
 <x-app-layout>
     <x-slot name="header">

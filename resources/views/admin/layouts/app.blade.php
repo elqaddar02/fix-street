@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Admin Dashboard') - Madinova</title>
+    <title>@yield('title', 'Admin Dashboard') - Madinup</title>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -25,7 +25,7 @@
             <div class="px-6 py-5 border-b border-red-800">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
                     <x-application-logo class="h-8 w-8 text-white" />
-                    <span class="font-bold text-lg">Madinova Admin</span>
+                    <span class="font-bold text-lg">Madinup Admin</span>
                 </a>
             </div>
 

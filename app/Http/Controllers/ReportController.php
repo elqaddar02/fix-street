@@ -45,7 +45,7 @@ class ReportController extends Controller
         $selectedDate = $request->query('date');
         $sortBy = $request->query('sort', 'latest'); // 'latest', 'mostLiked', 'oldest'
 
-        $reportsQuery = Report::with(['user', 'category', 'city', 'district', 'comments.user', 'likes'])
+        $reportsQuery = Report::with(['user', 'category', 'city', 'district', 'visibleComments.user', 'likes'])
             ->withCount('likes');
 
         if ($selectedCategory) {
@@ -187,7 +187,7 @@ class ReportController extends Controller
 
     public function show(Report $report)
     {
-        $report->load(['comments.user', 'category', 'city', 'user', 'likes']);
+        $report->load(['visibleComments.user', 'category', 'city', 'user', 'likes']);
         $report->loadCount('likes');
 
         return view('reports.show', compact('report'));

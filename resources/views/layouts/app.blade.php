@@ -4,9 +4,9 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="description" content="Report street problems and help improve your city with Madinova.">
+        <meta name="description" content="Report street problems and help improve your city with Madinup.">
 
-        <title>{{ $title ?? config('app.name', 'Madinova') }}</title>
+        <title>{{ $title ?? config('app.name', 'Madinup') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

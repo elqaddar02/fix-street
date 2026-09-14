@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $latestReports = Report::with(['category', 'city', 'user', 'comments.user'])
+    $latestReports = Report::with(['category', 'city', 'user', 'visibleComments.user'])
         ->latest()
         ->take(6)
         ->get();
@@ -25,7 +25,7 @@ Route::get('/', function () {
             'status' => $report->status,
             'user' => optional($report->user)->name ?? 'Anonymous',
             'created_at' => $report->created_at->format('M j, Y'),
-            'comments' => $report->comments->map(function ($comment) {
+            'comments' => $report->visibleComments->map(function ($comment) {
                 return [
                     'user' => optional($comment->user)->name ?? 'Anonymous',
                     'comment' => $comment->comment,
@@ -58,9 +58,9 @@ Route::middleware('auth')->group(function () {
    
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     
-    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
-    Route::post('/reports/{report}/comments', [ReportController::class, 'storeComment'])->name('reports.comments.store');
-    Route::post('/reports/{report}/likes/toggle', [\App\Http\Controllers\ReportLikeController::class, 'toggle'])->name('reports.likes.toggle');
+    Route::post('/reports', [ReportController::class, 'store'])->middleware('throttle:10,1')->name('reports.store');
+    Route::post('/reports/{report}/comments', [ReportController::class, 'storeComment'])->middleware('throttle:10,1')->name('reports.comments.store');
+    Route::post('/reports/{report}/likes/toggle', [\App\Http\Controllers\ReportLikeController::class, 'toggle'])->middleware('throttle:60,1')->name('reports.likes.toggle');
 
     Route::get('/reports/{report}/edit', [ReportController::class, 'edit'])->name('reports.edit');
     Route::patch('/reports/{report}', [ReportController::class, 'update'])->name('reports.update');

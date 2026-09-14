@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Request;
 /**
  * Get the CSS classes for a report status badge
  * 
- * @param string $status Report status (OPEN, IN_PROGRESS, RESOLVED, CLOSED)
+ * @param string $status Report status (OPEN, IN_PROGRESS, RESOLVED, REJECTED)
  * @return string Tailwind CSS classes
  */
 function reportStatusClass($status)
@@ -17,7 +17,7 @@ function reportStatusClass($status)
         'OPEN' => 'bg-yellow-100 text-yellow-800',
         'IN_PROGRESS' => 'bg-orange-100 text-orange-800',
         'RESOLVED' => 'bg-green-100 text-green-800',
-        'CLOSED' => 'bg-gray-100 text-gray-800',
+        'REJECTED' => 'bg-rose-100 text-rose-800',
     ];
 
     return $statusClasses[$status] ?? 'bg-gray-100 text-gray-800';

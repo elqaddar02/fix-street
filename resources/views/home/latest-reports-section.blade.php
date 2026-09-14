@@ -77,7 +77,7 @@
                                             </div>
                                             <div class="flex items-center gap-1 text-gray-500">
                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10a2 2 0 104 0 2 2 0 00-4 0zM14 10a2 2 0 104 0 2 2 0 00-4 0z"/></svg>
-                                                <span class="text-xs font-semibold">{{ $report->comments->count() }}</span>
+                                                <span class="text-xs font-semibold">{{ $report->visibleComments->count() }}</span>
                                             </div>
                                         </div>
                                     </div>
