@@ -16,6 +16,23 @@ class ReportComment extends Model
         'approved',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'approved' => 'boolean',
+        ];
+    }
+
+    /**
+     * Comments shown publicly: everything except comments a moderator rejected.
+     */
+    public function scopeVisible($query)
+    {
+        return $query->where(function ($query) {
+            $query->whereNull('approved')->orWhere('approved', true);
+        });
+    }
+
     public function report()
     {
         return $this->belongsTo(Report::class);

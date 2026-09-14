@@ -43,14 +43,14 @@
                 'OPEN' => ['bg' => 'bg-gradient-to-r from-yellow-400 to-yellow-500', 'text' => 'text-yellow-900', 'icon' => 'clock'],
                 'IN_PROGRESS' => ['bg' => 'bg-gradient-to-r from-orange-400 to-orange-500', 'text' => 'text-orange-900', 'icon' => 'bolt'],
                 'RESOLVED' => ['bg' => 'bg-gradient-to-r from-green-400 to-green-500', 'text' => 'text-green-900', 'icon' => 'check-circle'],
-                'CLOSED' => ['bg' => 'bg-gradient-to-r from-gray-400 to-gray-500', 'text' => 'text-gray-900', 'icon' => 'x-circle'],
+                'REJECTED' => ['bg' => 'bg-gradient-to-r from-rose-400 to-rose-500', 'text' => 'text-rose-900', 'icon' => 'x-circle'],
             ];
             $config = $statusConfig[$report->status] ?? $statusConfig['OPEN'];
             $statusLabel = [
                 'OPEN' => __('dashboard.status.open'),
                 'IN_PROGRESS' => __('dashboard.status.in_progress'),
                 'RESOLVED' => __('dashboard.status.resolved'),
-                'CLOSED' => __('dashboard.status.closed'),
+                'REJECTED' => __('dashboard.status.rejected'),
             ][$report->status] ?? __('dashboard.status.open');
         @endphp
         <span class="inline-flex items-center px-3 py-1.5 text-xs font-bold rounded-full {{ $config['bg'] }} {{ $config['text'] }} shadow-sm">

@@ -245,7 +245,7 @@
                 'open' => $openReports,
                 'inProgress' => $inProgressReports,
                 'resolved' => $resolvedReports,
-                'closed' => $closedReports,
+                'rejected' => $rejectedReports,
             ],
             'categories' => [
                 'labels' => array_keys($reportsByCategory),
@@ -261,7 +261,7 @@
             'status_open' => __('dashboard.status.open'),
             'status_in_progress' => __('dashboard.status.in_progress'),
             'status_resolved' => __('dashboard.status.resolved'),
-            'status_closed' => __('dashboard.status.closed'),
+            'status_rejected' => __('dashboard.status.rejected'),
             'category_dataset' => __('dashboard.charts.category.dataset'),
         ]); ?>;
     </script>
@@ -285,20 +285,20 @@
                         window.dashboardTranslations.status_open,
                         window.dashboardTranslations.status_in_progress,
                         window.dashboardTranslations.status_resolved,
-                        window.dashboardTranslations.status_closed,
+                        window.dashboardTranslations.status_rejected,
                     ],
                     datasets: [{
                         data: [
                             window.chartData.stats.open,
                             window.chartData.stats.inProgress,
                             window.chartData.stats.resolved,
-                            window.chartData.stats.closed,
+                            window.chartData.stats.rejected,
                         ],
                         backgroundColor: [
                             '#fbbf24', // yellow
                             '#fb923c', // orange
                             '#22c55e', // green
-                            '#6b7280'  // gray
+                            '#f43f5e'  // rose
                         ],
                         borderWidth: 0
                     }]

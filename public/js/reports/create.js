@@ -35,34 +35,49 @@ if (imageInput) {
     imageInput.addEventListener('change', showImagePreview);
 }
 
-function showImagePreview() {
-    if (imageInput.files && imageInput.files[0]) {
-        const file = imageInput.files[0];
-        const allowedTypes = ['image/jpeg', 'image/png'];
-        const maxSize = 2 * 1024 * 1024;
-        
-        if (!allowedTypes.includes(file.type)) {
-            showImageAlert(window.reportConfig.translations.imageTypes);
-            imageInput.value = '';
-            imagePreview.classList.add('hidden');
+const imageProcessingText = document.getElementById('image-processing');
+let imageProcessing = false;
+
+// Resize/compress the chosen photo in the browser, then preview the version that will be uploaded.
+async function showImagePreview() {
+    if (!imageInput.files || !imageInput.files[0]) return;
+
+    const file = imageInput.files[0];
+    if (!file.type.startsWith('image/')) {
+        rejectImage(window.reportConfig.translations.imageTypes);
+        return;
+    }
+
+    imageProcessing = true;
+    imageProcessingText?.classList.remove('hidden');
+
+    try {
+        const compressed = await window.madinupImage.compress(file);
+        const replaced = window.madinupImage.replaceInputFile(imageInput, compressed);
+        if (!replaced && file.size > window.madinupImage.MAX_BYTES) {
+            rejectImage(window.reportConfig.translations.imageSize);
             return;
         }
-        
-        if (file.size > maxSize) {
-            showImageAlert(window.reportConfig.translations.imageSize);
-            imageInput.value = '';
-            imagePreview.classList.add('hidden');
-            return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            previewImage.src = e.target.result;
-            imagePreview.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
+        previewImage.src = URL.createObjectURL(replaced ? compressed : file);
+        imagePreview.classList.remove('hidden');
+    } catch (error) {
+        rejectImage(window.reportConfig.translations.imageUnreadable);
+    } finally {
+        imageProcessing = false;
+        imageProcessingText?.classList.add('hidden');
     }
 }
+
+function rejectImage(message) {
+    showImageAlert(message);
+    imageInput.value = '';
+    imagePreview.classList.add('hidden');
+}
+
+// Don't submit while the photo is still being prepared, or the original file would be sent.
+imageInput?.form?.addEventListener('submit', (event) => {
+    if (imageProcessing) event.preventDefault();
+});
 
 const imageAlert = document.getElementById('image-alert');
 const imageAlertText = document.getElementById('image-alert-text');

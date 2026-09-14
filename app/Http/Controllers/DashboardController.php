@@ -23,7 +23,7 @@ class DashboardController extends Controller
         $openReports = $reports->where('status', 'OPEN')->count();
         $inProgressReports = $reports->where('status', 'IN_PROGRESS')->count();
         $resolvedReports = $reports->where('status', 'RESOLVED')->count();
-        $closedReports = $reports->where('status', 'CLOSED')->count();
+        $rejectedReports = $reports->where('status', 'REJECTED')->count();
 
         // Reports by category
         $categoryGroups = $reports->groupBy('category.name');
@@ -37,7 +37,7 @@ class DashboardController extends Controller
             'Open' => $openReports,
             'In Progress' => $inProgressReports,
             'Resolved' => $resolvedReports,
-            'Closed' => $closedReports,
+            'Rejected' => $rejectedReports,
         ];
 
         // Recent reports (last 5)
@@ -49,7 +49,7 @@ class DashboardController extends Controller
             'openReports',
             'inProgressReports',
             'resolvedReports',
-            'closedReports',
+            'rejectedReports',
             'reportsByCategory',
             'reportsByStatus',
             'recentReports'

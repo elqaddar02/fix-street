@@ -99,6 +99,8 @@
 
     "Upload Photo (optional but recommended)": "إرفاق صورة (اختياري ولكن يُنصح به)",
     "Click to upload or drag and drop": "انقر للرفع أو اسحب الملف وأفلته هنا",
+    "Photos from your phone are resized automatically.": "يتم تصغير صور هاتفك تلقائياً.",
+    "Preparing photo...": "جارٍ تجهيز الصورة...",
     "PNG, JPG, GIF up to 2MB": "PNG، JPG، GIF بحجم يصل إلى 2MB",
 
     "Back": "رجوع",
@@ -192,7 +194,7 @@
     "dashboard.status.open": "مفتوح",
     "dashboard.status.in_progress": "قيد التنفيذ",
     "dashboard.status.resolved": "تم الحل",
-    "dashboard.status.closed": "مغلق",
+    "dashboard.status.rejected": "مرفوض",
     "dashboard.empty.title": "لا توجد تقارير بعد",
     "dashboard.empty.message": "ابدأ بإنشاء تقريرك الأول.",
     "dashboard.empty.action": "إنشاء تقرير",
@@ -339,6 +341,7 @@
     "validation.image_required": "يجب أن يكون الملف صورة.",
     "validation.image_types": "يجب أن تكون الصورة من نوع JPG أو JPEG أو PNG.",
     "validation.image_size": "لا يجب أن يتجاوز حجم الصورة 2 ميجابايت.",
+    "validation.image_unreadable": "تعذّرت قراءة هذه الصورة. يرجى اختيار صورة بصيغة JPG أو PNG.",
     "validation.latitude_required": "حقل خط العرض مطلوب.",
     "validation.latitude_numeric": "يجب أن يكون خط العرض رقماً.",
     "validation.latitude_range": "يجب أن يكون خط العرض بين -90 و 90.",

@@ -33,15 +33,16 @@
                             <x-input-label for="image" :value="__('Upload Photo')" class="text-lg font-semibold" />
                             <div class="mt-2">
                                 <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-6 transition hover:border-red-500 hover:bg-red-50 cursor-pointer" id="image-upload-area">
-                                    <input id="image" name="image" type="file" accept=".jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                                    <input id="image" name="image" type="file" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                                     <div class="text-center">
                                         <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
                                         <p class="text-gray-700 font-semibold">{{ __('Click to upload or drag and drop') }}</p>
-                                        <p class="text-sm text-gray-500">{{ __('JPG, JPEG, PNG up to 2MB') }}</p>
+                                        <p class="text-sm text-gray-500">{{ __('Photos from your phone are resized automatically.') }}</p>
                                     </div>
                                 </div>
+                                <p id="image-processing" class="mt-2 hidden text-sm text-gray-600">{{ __('Preparing photo...') }}</p>
                                 <div id="image-preview" class="mt-4 hidden">
                                     <img id="preview-image" src="" alt="Preview" class="max-h-48 rounded-lg shadow-md mx-auto">
                                 </div>
@@ -196,8 +197,9 @@
     <script>
         window.reportConfig = {
             translations: {
-                imageTypes: "{{ __('validation.image_types') }}",
-                imageSize: "{{ __('validation.image_size') }}",
+                imageTypes: @json(__('validation.image_types')),
+                imageSize: @json(__('validation.image_size')),
+                imageUnreadable: @json(__('validation.image_unreadable')),
                 selectQuartier: "{{ __('-- Select a quartier --') }}",
                 selectDistrict: "{{ __('-- Select a district --') }}",
                 gettingLocation: "{{ __('Getting location...') }}",
@@ -207,5 +209,6 @@
             }
         };
     </script>
+    <script src="{{ asset('js/reports/image-compress.js') }}"></script>
     <script src="{{ asset('js/reports/create.js') }}"></script>
 </x-app-layout>
