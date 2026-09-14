@@ -5,14 +5,15 @@
  *
  * 1. Deploy your site first via GitHub Actions.
  * 2. Upload this file to htdocs/migrate-once.php (or copy via FTP).
- * 3. Set MIGRATE_TOKEN below to match secret MIGRATE_TOKEN in GitHub (or a strong random string).
+ * 3. Set the MIGRATE_TOKEN environment variable, or paste a random string of at least 32 characters below.
  * 4. Visit: https://yourdomain.infinityfreeapp.com/migrate-once.php?token=YOUR_TOKEN
  * 5. DELETE this file immediately after migrations succeed.
  */
 
-$expectedToken = getenv('MIGRATE_TOKEN') ?: 'CHANGE_ME_BEFORE_USE';
+$expectedToken = getenv('MIGRATE_TOKEN') ?: '';
 
-if (($_GET['token'] ?? '') !== $expectedToken) {
+// Refuse to run without a real token: a known default would let anyone trigger migrations.
+if (strlen($expectedToken) < 32 || ! hash_equals($expectedToken, (string) ($_GET['token'] ?? ''))) {
     http_response_code(403);
     exit('Forbidden');
 }

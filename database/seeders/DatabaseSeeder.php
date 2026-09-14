@@ -18,15 +18,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::firstOrCreate(
-            ['email' => 'test@example.com'],
-            ['name' => 'Test User', 'password' => bcrypt('password')]
-        );
+        // Demo accounts with a known password must never exist in production.
+        if (app()->environment(['local', 'testing'])) {
+            User::firstOrCreate(
+                ['email' => 'test@example.com'],
+                ['name' => 'Test User', 'password' => bcrypt('password')]
+            );
 
-        User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            ['name' => 'Admin User', 'is_admin' => true, 'password' => bcrypt('password')]
-        );
+            User::firstOrCreate(
+                ['email' => 'admin@example.com'],
+                ['name' => 'Admin User', 'is_admin' => true, 'password' => bcrypt('password')]
+            );
+        }
 
         $this->call([
             CategorySeeder::class,

@@ -1,8 +1,12 @@
 name: Deploy Laravel to InfinityFree
 
+# Automatic deploys are paused until a new host is chosen.
+# The previous flow uploaded laravel_core.zip (which contained the production .env)
+# to the public web root and relied on public/unzip.php to extract it; both were removed.
+# Running this manually only uploads web-root files: the Laravel core upload
+# must be redesigned for the new host before this workflow is used again.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: deploy-infinityfree
@@ -174,47 +178,6 @@ jobs:
               echo "::error::FTP connection failed."
               exit 1
             }
-
-      - name: Create laravel_core.zip
-        run: |
-          set -e
-          cd deploy_combined
-          if [ -d "laravel_core" ]; then
-            zip -r ../laravel_core.zip laravel_core || { echo "::error::Failed to create zip"; exit 1; }
-          else
-            echo "::error::laravel_core folder not found"; exit 1;
-          fi
-
-      - name: Prepare zip upload folder
-        run: |
-          mkdir -p deploy_zip
-          mv -f laravel_core.zip deploy_zip/ || { echo "::error::Failed to move zip"; exit 1; }
-
-      # FIXED: Removed 'include', switched protocol to ftp, fixed state-name path
-      - name: Upload laravel_core.zip via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ env.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          protocol: ftp
-          local-dir: ./deploy_zip/
-          server-dir: ${{ env.FTP_WEB_DIR }}
-          state-name: zip-sync.json
-          timeout: 120000
-          log-level: verbose
-          dangerous-clean-slate: false
-
-      - name: Trigger remote unzip via HTTP
-        env:
-          UNZIP_TOKEN: ${{ secrets.UNZIP_TOKEN }}
-          APP_URL: ${{ secrets.APP_URL }}
-        run: |
-          set -e
-          echo "Pinging unzip script on remote host..."
-          # The '|| true' ensures the workflow finishes green even if the hosting firewall drops curl
-          curl -v --max-time 15 "${APP_URL%/}/unzip.php?token=${UNZIP_TOKEN}" || true
 
       - name: Deploy web root files via FTP (exclude laravel_core)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
