@@ -48,6 +48,12 @@ class Report extends Model
         return $this->belongsTo(Quartier::class);
     }
 
+    // dossier_id is deliberately not fillable: reports are attached to a case by admins only.
+    public function dossier()
+    {
+        return $this->belongsTo(Dossier::class);
+    }
+
     public function comments()
     {
         return $this->hasMany(ReportComment::class);
