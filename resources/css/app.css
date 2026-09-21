@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Alpine hides these until it has initialised; without the rule the mobile
+   menu flashes open on every page load. */
+[x-cloak] {
+    display: none !important;
+}
