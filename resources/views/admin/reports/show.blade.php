@@ -51,22 +51,26 @@
         </div>
 
         <div class="mt-6">
-            <form action="{{ route('admin.reports.updateStatus', $report) }}" method="POST" class="flex flex-col gap-3 sm:flex-row sm:items-center" onsubmit="return confirm('Changer le statut du signalement ?');">
-                @csrf
-                @method('PATCH')
-                <div class="status-field flex items-center gap-3">
-                    <span class="status-badge inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold {{ $report->status === 'OPEN' ? 'text-amber-800 bg-amber-100 border-amber-300' : ($report->status === 'IN_PROGRESS' ? 'text-sky-800 bg-sky-100 border-sky-300' : ($report->status === 'RESOLVED' ? 'text-emerald-800 bg-emerald-100 border-emerald-300' : 'text-rose-800 bg-rose-100 border-rose-300')) }}">
-                        {{ $report->status === 'OPEN' ? 'Ouvert' : ($report->status === 'IN_PROGRESS' ? 'En cours' : ($report->status === 'RESOLVED' ? 'Résolu' : 'Rejeté')) }}
-                    </span>
-                    <select name="status" class="status-select rounded-xl border-2 px-3 py-2 {{ $report->status === 'OPEN' ? 'border-amber-400 bg-amber-50 text-amber-900' : ($report->status === 'IN_PROGRESS' ? 'border-sky-400 bg-sky-50 text-sky-900' : ($report->status === 'RESOLVED' ? 'border-emerald-400 bg-emerald-50 text-emerald-900' : 'border-rose-400 bg-rose-50 text-rose-900')) }} text-sm font-medium shadow-sm focus:outline-none focus:ring-2 transition-colors">
-                        <option value="OPEN" {{ $report->status === 'OPEN' ? 'selected' : '' }}>Ouvert</option>
-                        <option value="IN_PROGRESS" {{ $report->status === 'IN_PROGRESS' ? 'selected' : '' }}>En cours</option>
-                        <option value="RESOLVED" {{ $report->status === 'RESOLVED' ? 'selected' : '' }}>Résolu</option>
-                        <option value="REJECTED" {{ $report->status === 'REJECTED' ? 'selected' : '' }}>Rejeté</option>
-                    </select>
-                </div>
-                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">Mettre à jour</button>
-            </form>
+            {{-- Same inline-save behaviour as the list: change it, it saves, the toast offers an undo. --}}
+            <div class="flex items-center gap-3">
+                <label for="report-status" class="text-sm font-medium text-slate-600">Statut</label>
+                <select id="report-status"
+                        name="status"
+                        data-status-select
+                        data-action="{{ route('admin.reports.updateStatus', $report) }}"
+                        @class([
+                            'rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus:ring-1 disabled:opacity-50',
+                            'border-amber-200 bg-amber-50 text-amber-800 focus:border-amber-500 focus:ring-amber-500' => $report->status === 'OPEN',
+                            'border-sky-200 bg-sky-50 text-sky-800 focus:border-sky-500 focus:ring-sky-500' => $report->status === 'IN_PROGRESS',
+                            'border-emerald-200 bg-emerald-50 text-emerald-800 focus:border-emerald-500 focus:ring-emerald-500' => $report->status === 'RESOLVED',
+                            'border-rose-200 bg-rose-50 text-rose-800 focus:border-rose-500 focus:ring-rose-500' => $report->status === 'REJECTED',
+                        ])>
+                    <option value="OPEN" @selected($report->status === 'OPEN')>Ouvert</option>
+                    <option value="IN_PROGRESS" @selected($report->status === 'IN_PROGRESS')>En cours</option>
+                    <option value="RESOLVED" @selected($report->status === 'RESOLVED')>Résolu</option>
+                    <option value="REJECTED" @selected($report->status === 'REJECTED')>Rejeté</option>
+                </select>
+            </div>
         </div>
 
         <div class="mt-4">

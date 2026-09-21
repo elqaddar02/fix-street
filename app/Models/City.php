@@ -11,6 +11,13 @@ class City extends Model
 
     protected $fillable = ['name', 'name_ar', 'active', 'latitude', 'longitude'];
 
+    protected function casts(): array
+    {
+        return [
+            'active' => 'boolean',
+        ];
+    }
+
     public function reports()
     {
         return $this->hasMany(Report::class);

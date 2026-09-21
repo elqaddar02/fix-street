@@ -3,120 +3,121 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Admin Dashboard') - Madinup</title>
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Figtree', 'sans-serif'],
-                    },
-                },
-            },
-        }
-    </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Admin') · Madinup</title>
+
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet">
+
+    @vite(['resources/css/app.css', 'resources/js/admin.js'])
 </head>
-<body class="bg-gray-100 text-gray-900">
-    <div class="flex min-h-screen">
-        <aside class="w-64 bg-red-900 text-white sticky top-0 h-screen shadow-lg flex flex-col">
-            <div class="px-6 py-5 border-b border-red-800">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-                    <x-application-logo class="h-8 w-8 text-white" />
-                    <span class="font-bold text-lg">Madinup Admin</span>
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
+
+@php
+    $nav = [
+        ['route' => 'admin.dashboard', 'pattern' => 'admin.dashboard', 'label' => 'Tableau de bord', 'icon' => 'M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3v-6h6v6h3a1 1 0 001-1V10'],
+        ['route' => 'admin.reports.index', 'pattern' => 'admin.reports.*', 'label' => 'Signalements', 'icon' => 'M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z'],
+        ['route' => 'admin.users.index', 'pattern' => 'admin.users.*', 'label' => 'Utilisateurs', 'icon' => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zm14 10v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75'],
+        ['route' => 'admin.comments.index', 'pattern' => 'admin.comments.*', 'label' => 'Commentaires', 'icon' => 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z'],
+        ['route' => 'admin.categories.index', 'pattern' => 'admin.categories.*', 'label' => 'Catégories', 'icon' => 'M4 6h16M4 12h16M4 18h16'],
+        ['route' => 'admin.cities.index', 'pattern' => 'admin.cities.*', 'label' => 'Villes', 'icon' => 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z M12 10a2 2 0 100-4 2 2 0 000 4z'],
+        ['route' => 'admin.ads.index', 'pattern' => 'admin.ads.*', 'label' => 'Publicités', 'icon' => 'M3 11l18-5v12L3 14v-3z M11.6 16.8a3 3 0 11-5.8-1.6'],
+    ];
+@endphp
+
+<div x-data="{ open: false }" class="flex min-h-screen">
+
+    {{-- Mobile backdrop --}}
+    <div x-show="open"
+         x-transition.opacity
+         @click="open = false"
+         class="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-sm lg:hidden"
+         style="display: none"></div>
+
+    <aside :class="open ? 'translate-x-0' : '-translate-x-full'"
+           class="fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0">
+
+        <div class="flex h-16 items-center gap-3 border-b border-slate-100 px-5">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
+                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-red-600 text-white">
+                    <x-application-logo class="h-5 w-5 fill-current" />
+                </span>
+                <span class="text-[15px] font-bold tracking-tight">Madinup</span>
+            </a>
+            <button @click="open = false" class="ml-auto rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 lg:hidden">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+            @foreach($nav as $item)
+                @php $current = request()->routeIs($item['pattern']); @endphp
+                <a href="{{ route($item['route']) }}"
+                   @class([
+                       'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+                       'bg-red-50 text-red-700' => $current,
+                       'text-slate-600 hover:bg-slate-50 hover:text-slate-900' => ! $current,
+                   ])>
+                    <svg @class(['h-[18px] w-[18px] shrink-0', 'text-red-600' => $current, 'text-slate-400 group-hover:text-slate-500' => ! $current])
+                         fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $item['icon'] }}"/>
+                    </svg>
+                    {{ $item['label'] }}
                 </a>
+            @endforeach
+        </nav>
+
+        <div class="border-t border-slate-100 p-3">
+            <div class="mb-2 flex items-center gap-3 rounded-xl px-3 py-2">
+                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                    {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 2)) }}
+                </span>
+                <div class="min-w-0">
+                    <p class="truncate text-sm font-semibold">{{ auth()->user()->name ?? 'Admin' }}</p>
+                    <p class="truncate text-xs text-slate-400">{{ auth()->user()->email ?? '' }}</p>
+                </div>
             </div>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-rose-50 hover:text-rose-700">
+                    <svg class="h-[18px] w-[18px] text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Déconnexion
+                </button>
+            </form>
+        </div>
+    </aside>
 
-            <nav class="mt-4 px-2 space-y-1 flex-1">
-                <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Dashboard</a>
-                <a href="{{ route('admin.users.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Users</a>
-                <a href="{{ route('admin.reports.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.reports.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Reports</a>
-                <a href="{{ route('admin.comments.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.comments.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Comments</a>
-                <a href="{{ route('admin.cities.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.cities.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Cities</a>
-                <a href="{{ route('admin.ads.index') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('admin.ads.*') ? 'bg-red-700 text-white' : 'text-red-100 hover:bg-red-800 hover:text-white' }}">Ads</a>
-            </nav>
+    <div class="flex min-w-0 flex-1 flex-col">
+        <header class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-slate-200 bg-white/80 px-4 backdrop-blur lg:px-8">
+            <button @click="open = true" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <h1 class="truncate text-base font-semibold">@yield('title', 'Administration')</h1>
+            <a href="{{ route('home') }}" class="ml-auto hidden items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:inline-flex">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                Voir le site
+            </a>
+        </header>
 
-            <!-- Bottom Actions -->
-            <div class="mt-auto px-2 py-4 border-t border-red-800">
-                <form action="{{ route('logout') }}" method="POST" class="w-full">
-                    @csrf
-                    <button type="submit" class="w-full px-4 py-3 rounded-lg bg-red-700 text-white hover:bg-red-600 transition-colors font-medium">
-                        Logout
-                    </button>
-                </form>
-            </div>
-        </aside>
-
-        <main class="flex-1 p-6 lg:p-8">
-            @if (session('success'))
-                <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-700">{{ session('success') }}</div>
-            @endif
-            @if (session('error'))
-                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">{{ session('error') }}</div>
-            @endif
-
+        <main class="flex-1 px-4 py-6 lg:px-8 lg:py-8">
             @yield('content')
         </main>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('[data-confirm-change]').forEach(function (element) {
-                element.addEventListener('change', function () {
-                    var message = this.dataset.confirmMessage || 'Confirmer la modification ?';
-                    var previous = this.dataset.current;
-                    if (confirm(message)) {
-                        this.form.submit();
-                    } else {
-                        this.value = previous;
-                    }
-                });
-            });
+</div>
 
-            const STATUS_STYLES = {
-                OPEN: { label: 'Ouvert', badge: 'bg-amber-100 text-amber-800 border border-amber-300', border: 'border-amber-400 focus:ring-amber-200', bgColor: '#fef3c7', textColor: '#92400e' },
-                IN_PROGRESS: { label: 'En cours', badge: 'bg-sky-100 text-sky-800 border border-sky-300', border: 'border-sky-400 focus:ring-sky-200', bgColor: '#e0f2fe', textColor: '#0c4a6e' },
-                RESOLVED: { label: 'Résolu', badge: 'bg-emerald-100 text-emerald-800 border border-emerald-300', border: 'border-emerald-400 focus:ring-emerald-200', bgColor: '#dcfce7', textColor: '#14532d' },
-                REJECTED: { label: 'Rejeté', badge: 'bg-rose-100 text-rose-800 border border-rose-300', border: 'border-rose-400 focus:ring-rose-200', bgColor: '#ffe4e6', textColor: '#9f1239' },
-                ACTIVE: { label: 'Actif', badge: 'bg-emerald-100 text-emerald-800 border border-emerald-300', border: 'border-emerald-400 focus:ring-emerald-200', bgColor: '#dcfce7', textColor: '#14532d' },
-                INACTIVE: { label: 'Inactif', badge: 'bg-slate-100 text-slate-700 border border-slate-300', border: 'border-slate-400 focus:ring-slate-200', bgColor: '#f8fafc', textColor: '#334155' },
-                DEFAULT: { label: 'Non défini', badge: 'bg-slate-100 text-slate-700 border border-slate-300', border: 'border-slate-400 focus:ring-slate-200', bgColor: '#f8fafc', textColor: '#334155' }
-            };
-
-            function getStatusKey(select) {
-                if (select.name === 'active') {
-                    return select.value === '1' ? 'ACTIVE' : 'INACTIVE';
-                }
-                return select.value || 'DEFAULT';
-            }
-
-            function updateStatusSelect(select) {
-                const status = getStatusKey(select);
-                const style = STATUS_STYLES[status] || STATUS_STYLES.DEFAULT;
-                select.classList.remove('border-amber-400', 'border-sky-400', 'border-emerald-400', 'border-rose-400', 'border-slate-400', 'focus:ring-amber-200', 'focus:ring-sky-200', 'focus:ring-emerald-200', 'focus:ring-rose-200', 'focus:ring-slate-200');
-                select.classList.add(style.border);
-                select.style.backgroundColor = style.bgColor;
-                select.style.color = style.textColor;
-
-                let badge = select.closest('.status-field')?.querySelector('.status-badge');
-                if (!badge) {
-                    badge = document.createElement('span');
-                    badge.className = 'status-badge inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold';
-                    const wrapper = select.closest('.status-field') || select.parentNode;
-                    wrapper.insertBefore(badge, select);
-                }
-                badge.className = 'status-badge inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ' + style.badge;
-                badge.textContent = style.label;
-            }
-
-            document.querySelectorAll('select.status-select').forEach(function (select) {
-                updateStatusSelect(select);
-                select.addEventListener('change', function () {
-                    updateStatusSelect(this);
-                });
-            });
-        });
+{{-- Flash messages are surfaced through the same toast stack as the inline actions. --}}
+@if (session('success') || session('error'))
+    @php
+        $flash = [
+            'message' => session('success') ?: session('error'),
+            'tone' => session('success') ? 'success' : 'error',
+        ];
+    @endphp
+    <script type="application/json" id="flash-message">
+        @json($flash)
     </script>
+@endif
+
+@stack('scripts')
 </body>
 </html>
