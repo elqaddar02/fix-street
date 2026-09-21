@@ -1,200 +1,241 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Manage Reports')
+@section('title', 'Signalements')
 
 @section('content')
+@php
+    $statusOptions = [
+        'OPEN' => 'Ouvert',
+        'IN_PROGRESS' => 'En cours',
+        'RESOLVED' => 'Résolu',
+        'REJECTED' => 'Rejeté',
+    ];
+    $currentStatus = request('status');
+@endphp
+
 <div class="space-y-6">
-    <div>
-        <h1 class="text-3xl font-bold text-gray-900">Gestion des signalements</h1>
-        <p class="text-gray-600">Filtrer et mettre à jour le statut des signalements</p>
-    </div>
 
-    <div class="flex gap-2">
-        @php
-            $currentStatus = request('status');
-            $statusLabel = 'Tous';
-            $statusClass = 'border-slate-400 bg-white text-slate-900';
-
-            if ($currentStatus === 'OPEN') {
-                $statusLabel = 'Ouvert';
-                $statusClass = 'border-amber-400 bg-amber-50 text-amber-900';
-            } elseif ($currentStatus === 'IN_PROGRESS') {
-                $statusLabel = 'En cours';
-                $statusClass = 'border-sky-400 bg-sky-50 text-sky-900';
-            } elseif ($currentStatus === 'RESOLVED') {
-                $statusLabel = 'Résolu';
-                $statusClass = 'border-emerald-400 bg-emerald-50 text-emerald-900';
-            } elseif ($currentStatus === 'REJECTED') {
-                $statusLabel = 'Rejeté';
-                $statusClass = 'border-rose-400 bg-rose-50 text-rose-900';
-            }
-        @endphp
-
-        <form method="GET" class="flex gap-2 items-center flex-wrap">
-            <div class="status-field flex items-center gap-3">
-                <span class="status-badge inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold {{ $currentStatus === 'OPEN' ? 'text-amber-800 bg-amber-100 border-amber-300' : ($currentStatus === 'IN_PROGRESS' ? 'text-sky-800 bg-sky-100 border-sky-300' : ($currentStatus === 'RESOLVED' ? 'text-emerald-800 bg-emerald-100 border-emerald-300' : ($currentStatus === 'REJECTED' ? 'text-rose-800 bg-rose-100 border-rose-300' : 'text-slate-700 bg-slate-100 border-slate-300'))) }}">
-                    {{ $statusLabel }}
-                </span>
-                <select name="status" class="status-select rounded-xl border-2 px-3 py-2 {{ $statusClass }} bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 transition-colors">
-                    <option value="" {{ $currentStatus === '' ? 'selected' : '' }}>Tous</option>
-                    <option value="OPEN" {{ request('status') === 'OPEN' ? 'selected' : '' }}>Ouvert</option>
-                    <option value="IN_PROGRESS" {{ request('status') === 'IN_PROGRESS' ? 'selected' : '' }}>En cours</option>
-                    <option value="RESOLVED" {{ request('status') === 'RESOLVED' ? 'selected' : '' }}>Résolu</option>
-                    <option value="REJECTED" {{ request('status') === 'REJECTED' ? 'selected' : '' }}>Rejeté</option>
-                </select>
-            </div>
-
-            <select name="sort" class="rounded-xl border-2 border-slate-400 px-3 py-2 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-200 transition-colors">
-                <option value="latest" @selected($sortBy === 'latest')>Récent</option>
-                <option value="oldest" @selected($sortBy === 'oldest')>Ancien</option>
-                <option value="mostLiked" @selected($sortBy === 'mostLiked')>Plus Important</option>
-            </select>
-
-            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">Appliquer</button>
-        </form>
-    </div>
-
-    <form method="POST" action="{{ route('admin.reports.bulkUpdateStatus') }}" id="bulk-action-form" class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        @csrf
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div class="flex flex-wrap items-center gap-3">
-                <label for="bulk-status" class="text-sm font-medium text-gray-700">Changer le statut :</label>
-                <div class="status-field flex items-center gap-3">
-                    <span class="status-badge inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold text-slate-700 bg-slate-100 border-slate-300">
-                        Statut
-                    </span>
-                    <select id="bulk-status" name="status" class="status-select rounded-xl border-2 px-3 py-2 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 transition-colors">
-                        <option value="">Sélectionner...</option>
-                        <option value="OPEN">Ouvert</option>
-                        <option value="IN_PROGRESS">En cours</option>
-                        <option value="RESOLVED">Résolu</option>
-                        <option value="REJECTED">Rejeté</option>
-                    </select>
-                </div>
-                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">Appliquer</button>
-            </div>
-            <p class="text-sm text-gray-500">Cochez les signalements à mettre à jour en lot.</p>
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight">Signalements</h2>
+            <p class="mt-1 text-sm text-slate-500">{{ $reports->total() }} signalement(s)</p>
         </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <input id="select-all" type="checkbox" class="h-4 w-4 text-red-600 rounded border-gray-300">
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ville</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Importance</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                @forelse($reports as $report)
-                <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <input type="checkbox" name="report_ids[]" value="{{ $report->id }}" class="h-4 w-4 text-red-600 rounded border-gray-300">
-                    </td>
-                    <td class="px-6 py-4">
-                        <div class="text-sm font-medium text-gray-900">{{ $report->title }}</div>
-                        <div class="text-sm text-gray-500">{{ Str::limit($report->description, 50) }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ $report->city->display_name ?? '-' }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <form action="{{ route('admin.reports.updateStatus', $report) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <div class="status-field flex items-center gap-3">
-                                <span class="status-badge inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold
-                                    {{ $report->status === 'OPEN' ? 'text-amber-800 bg-amber-100 border-amber-300' : ($report->status === 'IN_PROGRESS' ? 'text-sky-800 bg-sky-100 border-sky-300' : ($report->status === 'RESOLVED' ? 'text-emerald-800 bg-emerald-100 border-emerald-300' : ($report->status === 'REJECTED' ? 'text-rose-800 bg-rose-100 border-rose-300' : 'text-slate-700 bg-slate-100 border-slate-300'))) }}">
-                                    {{ $report->status === 'OPEN' ? 'Ouvert' : ($report->status === 'IN_PROGRESS' ? 'En cours' : ($report->status === 'RESOLVED' ? 'Résolu' : ($report->status === 'REJECTED' ? 'Rejeté' : 'Non défini'))) }}
-                                </span>
-                                <select name="status" data-current="{{ $report->status }}" data-confirm-change="true" data-confirm-message="Changer le statut du signalement ?" class="status-select rounded-xl border-2 px-3 py-2 bg-white text-sm font-medium shadow-sm focus:outline-none focus:ring-2 transition-colors {{ $report->status === 'OPEN' ? 'border-amber-400 bg-amber-50 text-amber-900' : ($report->status === 'IN_PROGRESS' ? 'border-sky-400 bg-sky-50 text-sky-900' : ($report->status === 'RESOLVED' ? 'border-emerald-400 bg-emerald-50 text-emerald-900' : ($report->status === 'REJECTED' ? 'border-rose-400 bg-rose-50 text-rose-900' : 'border-slate-400 bg-slate-50 text-slate-900'))) }}">
-                                    <option value="OPEN" {{ $report->status === 'OPEN' ? 'selected' : '' }}>Ouvert</option>
-                                    <option value="IN_PROGRESS" {{ $report->status === 'IN_PROGRESS' ? 'selected' : '' }}>En cours</option>
-                                    <option value="RESOLVED" {{ $report->status === 'RESOLVED' ? 'selected' : '' }}>Résolu</option>
-                                    <option value="REJECTED" {{ $report->status === 'REJECTED' ? 'selected' : '' }}>Rejeté</option>
-                                </select>
-                            </div>
-                        </form>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="inline-flex items-center gap-2 {{ $report->likes_count > 0 ? 'bg-red-50 text-red-600' : 'bg-gray-50 text-gray-600' }} px-3 py-1 rounded-lg">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                            </svg>
-                            <span class="text-xs font-semibold">{{ $report->likes_count ?? 0 }}</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                        <a href="{{ route('admin.reports.show', $report) }}"
-                           class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                            </svg>
-                            Détails
-                        </a>
-                        <form action="{{ route('admin.reports.destroy', $report) }}" method="POST" onsubmit="return confirm('Confirmer suppression ?')" class="inline-block">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-colors">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                                Supprimer
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="px-6 py-8 text-center">
-                        <div class="text-gray-500">
-                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            <p>Aucun signalement trouvé.</p>
-                        </div>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
     </div>
+
+    {{-- Filters --}}
+    <form method="GET" class="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-3">
+        <div class="flex flex-wrap items-center gap-1.5">
+            <a href="{{ route('admin.reports.index', array_filter(['sort' => $sortBy])) }}"
+               @class([
+                   'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                   'bg-slate-900 text-white' => ! $currentStatus,
+                   'text-slate-600 hover:bg-slate-100' => (bool) $currentStatus,
+               ])>Tous</a>
+            @foreach($statusOptions as $value => $label)
+                <a href="{{ route('admin.reports.index', array_filter(['status' => $value, 'sort' => $sortBy])) }}"
+                   @class([
+                       'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                       'bg-slate-900 text-white' => $currentStatus === $value,
+                       'text-slate-600 hover:bg-slate-100' => $currentStatus !== $value,
+                   ])>{{ $label }}</a>
+            @endforeach
+        </div>
+
+        <div class="ml-auto flex items-center gap-2">
+            @if($currentStatus)
+                <input type="hidden" name="status" value="{{ $currentStatus }}">
+            @endif
+            <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Trier</label>
+            <select id="sort" name="sort" onchange="this.form.submit()"
+                    class="rounded-xl border border-slate-300 px-3 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                <option value="latest" @selected($sortBy === 'latest')>Plus récents</option>
+                <option value="oldest" @selected($sortBy === 'oldest')>Plus anciens</option>
+                <option value="mostLiked" @selected($sortBy === 'mostLiked')>Plus soutenus</option>
+            </select>
+        </div>
     </form>
 
-    <script>
-        document.getElementById('select-all')?.addEventListener('change', function (event) {
-            document.querySelectorAll('input[name="report_ids[]"]').forEach(function (checkbox) {
-                checkbox.checked = event.target.checked;
+    <form method="POST" action="{{ route('admin.reports.bulkUpdateStatus') }}" id="bulk-action-form"
+          class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        @csrf
+
+        {{-- Bulk bar: only meaningful once rows are selected, so it stays out of the way until then. --}}
+        <div id="bulk-bar" hidden
+             class="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-slate-50 px-6 py-3">
+            <span class="text-sm font-medium text-slate-700">
+                <span id="bulk-count">0</span> sélectionné(s)
+            </span>
+            <label for="bulk-status" class="sr-only">Statut à appliquer</label>
+            <select id="bulk-status" name="status"
+                    class="rounded-xl border border-slate-300 px-3 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                <option value="">Choisir un statut…</option>
+                @foreach($statusOptions as $value => $label)
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </select>
+            <button type="submit" class="rounded-xl bg-red-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700">
+                Appliquer
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-left">
+                <thead>
+                    <tr class="border-b border-slate-200 bg-slate-50/80">
+                        <th scope="col" class="w-10 px-6 py-3">
+                            <input id="select-all" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500">
+                            <label for="select-all" class="sr-only">Tout sélectionner</label>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Signalement</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Ville</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Soutiens</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($reports as $report)
+                        <tr class="transition-colors hover:bg-slate-50/60">
+                            <td class="px-6 py-3.5">
+                                <input type="checkbox" name="report_ids[]" value="{{ $report->id }}"
+                                       class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500">
+                                <span class="sr-only">Sélectionner {{ $report->title }}</span>
+                            </td>
+                            <td class="px-6 py-3.5">
+                                <p class="text-sm font-medium">{{ $report->title }}</p>
+                                <p class="text-xs text-slate-500">{{ Str::limit($report->description, 60) }}</p>
+                            </td>
+                            <td class="px-6 py-3.5">
+                                <span class="text-sm text-slate-600">{{ $report->city->display_name ?? '—' }}</span>
+                            </td>
+                            <td class="px-6 py-3.5">
+                                {{--
+                                    No nested <form> here: this row sits inside the bulk form and
+                                    nested forms are invalid HTML. The select posts on its own.
+                                --}}
+                                <label class="sr-only" for="status-{{ $report->id }}">Statut de {{ $report->title }}</label>
+                                <select id="status-{{ $report->id }}"
+                                        name="status"
+                                        data-status-select
+                                        data-action="{{ route('admin.reports.updateStatus', $report) }}"
+                                        @class([
+                                            'rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors focus:ring-1 disabled:opacity-50',
+                                            'border-amber-200 bg-amber-50 text-amber-800 focus:border-amber-500 focus:ring-amber-500' => $report->status === 'OPEN',
+                                            'border-sky-200 bg-sky-50 text-sky-800 focus:border-sky-500 focus:ring-sky-500' => $report->status === 'IN_PROGRESS',
+                                            'border-emerald-200 bg-emerald-50 text-emerald-800 focus:border-emerald-500 focus:ring-emerald-500' => $report->status === 'RESOLVED',
+                                            'border-rose-200 bg-rose-50 text-rose-800 focus:border-rose-500 focus:ring-rose-500' => $report->status === 'REJECTED',
+                                        ])>
+                                    @foreach($statusOptions as $value => $label)
+                                        <option value="{{ $value }}" @selected($report->status === $value)>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="px-6 py-3.5">
+                                <span @class([
+                                    'inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold',
+                                    'bg-red-50 text-red-600' => $report->likes_count > 0,
+                                    'bg-slate-50 text-slate-400' => ! $report->likes_count,
+                                ])>
+                                    <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                    {{ $report->likes_count ?? 0 }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-3.5">
+                                <div class="flex items-center justify-end gap-1">
+                                    <a href="{{ route('admin.reports.show', $report) }}"
+                                       class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                                       title="Détails">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <span class="sr-only">Détails de {{ $report->title }}</span>
+                                    </a>
+                                    <button type="button"
+                                            data-delete-report="{{ route('admin.reports.destroy', $report) }}"
+                                            data-delete-label="{{ $report->title }}"
+                                            class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                                            title="Supprimer">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        <span class="sr-only">Supprimer {{ $report->title }}</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-16 text-center">
+                                <svg class="mx-auto mb-3 h-10 w-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <p class="text-sm font-medium text-slate-600">Aucun signalement trouvé</p>
+                                @if($currentStatus)
+                                    <a href="{{ route('admin.reports.index') }}" class="mt-1 inline-block text-sm text-red-600 hover:text-red-700">Retirer le filtre</a>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($reports->hasPages())
+            <div class="border-t border-slate-200 px-6 py-3">
+                {{ $reports->links() }}
+            </div>
+        @endif
+    </form>
+</div>
+
+{{-- Delete posts through a form kept outside the bulk form, again to avoid nesting. --}}
+<form id="delete-report-form" method="POST" class="hidden">
+    @csrf
+    @method('DELETE')
+</form>
+
+@push('scripts')
+<script>
+    (function () {
+        const bulkForm = document.getElementById('bulk-action-form');
+        const bar = document.getElementById('bulk-bar');
+        const counter = document.getElementById('bulk-count');
+        const selectAll = document.getElementById('select-all');
+        const boxes = () => bulkForm.querySelectorAll('input[name="report_ids[]"]');
+
+        function syncCount() {
+            const all = boxes();
+            const count = bulkForm.querySelectorAll('input[name="report_ids[]"]:checked').length;
+            counter.textContent = count;
+            bar.hidden = count === 0;
+            selectAll.checked = count > 0 && count === all.length;
+            selectAll.indeterminate = count > 0 && count < all.length;
+        }
+
+        selectAll?.addEventListener('change', (event) => {
+            boxes().forEach((box) => { box.checked = event.target.checked; });
+            syncCount();
+        });
+
+        bulkForm.addEventListener('change', (event) => {
+            if (event.target.name === 'report_ids[]') syncCount();
+        });
+
+        bulkForm.addEventListener('submit', (event) => {
+            const count = bulkForm.querySelectorAll('input[name="report_ids[]"]:checked').length;
+            if (!count || !document.getElementById('bulk-status').value) {
+                event.preventDefault();
+                return;
+            }
+            if (!confirm(`Appliquer ce statut à ${count} signalement(s) ?`)) {
+                event.preventDefault();
+            }
+        });
+
+        // Delete buttons submit the standalone form so no <form> is nested.
+        const deleteForm = document.getElementById('delete-report-form');
+        document.querySelectorAll('[data-delete-report]').forEach((button) => {
+            button.addEventListener('click', () => {
+                if (!confirm(`Supprimer définitivement « ${button.dataset.deleteLabel} » ?`)) return;
+                deleteForm.action = button.dataset.deleteReport;
+                deleteForm.submit();
             });
         });
-
-        document.getElementById('bulk-action-form')?.addEventListener('submit', function (event) {
-            const selectedCount = document.querySelectorAll('input[name="report_ids[]"]:checked').length;
-            const selectedStatus = document.getElementById('bulk-status').value;
-
-            if (!selectedCount) {
-                alert('Veuillez sélectionner au moins un signalement.');
-                event.preventDefault();
-                return;
-            }
-
-            if (!selectedStatus) {
-                alert('Veuillez choisir un statut à appliquer.');
-                event.preventDefault();
-                return;
-            }
-
-            if (!confirm('Appliquer le statut sélectionné aux signalements cochés ?')) {
-                event.preventDefault();
-            }
-        });
-    </script>
-
-    <div>{{ $reports->links() }}</div>
-</div>
+    })();
+</script>
+@endpush
 @endsection

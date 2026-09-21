@@ -1,81 +1,106 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Cities')
+@section('title', 'Villes')
 
 @section('content')
 <div class="space-y-6">
-    <div>
-        <h1 class="text-3xl font-bold text-gray-900">Gestion des villes</h1>
-        <p class="text-gray-600">Ajouter, modifier et activer/désactiver les villes</p>
+
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold tracking-tight">Villes</h2>
+            <p class="mt-1 text-sm text-slate-500">{{ $cities->total() }} ville(s) · activez ou désactivez directement dans la liste.</p>
+        </div>
     </div>
 
-    <form method="POST" action="{{ route('admin.cities.store') }}" class="grid gap-3 md:grid-cols-3 items-end">
+    {{-- Create --}}
+    <form method="POST" action="{{ route('admin.cities.store') }}"
+          class="flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4">
         @csrf
-        <div><label class="text-sm font-semibold">Nom</label><input name="name" class="mt-1 w-full rounded-lg border-2 border-gray-400 px-3 py-2"/></div>
-        <div><label class="text-sm font-semibold">Actif</label><select name="active" class="mt-1 w-full rounded-lg border-2 border-gray-400 px-3 py-2"><option value="1">Oui</option><option value="0">Non</option></select></div>
-        <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-white">Ajouter</button>
+        <div class="min-w-[220px] flex-1">
+            <label for="city-name" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nouvelle ville</label>
+            <input id="city-name" name="name" required
+                   placeholder="Nom de la ville"
+                   class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-red-500 focus:ring-1 focus:ring-red-500">
+        </div>
+        <div>
+            <label for="city-active" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</label>
+            <select id="city-active" name="active"
+                    class="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                <option value="1">Actif</option>
+                <option value="0">Inactif</option>
+            </select>
+        </div>
+        <button type="submit" class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700">
+            Ajouter
+        </button>
+        @error('name')
+            <p class="w-full text-sm text-rose-600">{{ $message }}</p>
+        @enderror
     </form>
 
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 class="text-lg font-semibold text-gray-900">Liste des villes</h2>
-        </div>
+    {{-- List --}}
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <table class="min-w-full text-left">
+                <thead>
+                    <tr class="border-b border-slate-200 bg-slate-50/80">
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Nom</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($cities as $city)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ $city->name }}</div>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($cities as $city)
+                        <tr class="transition-colors hover:bg-slate-50/60">
+                            <td class="px-6 py-3.5">
+                                <span class="text-sm font-medium">{{ $city->name }}</span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <form action="{{ route('admin.cities.updateStatus', $city) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <div class="status-field inline-flex items-center gap-3">
-                                        <span class="status-badge inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold {{ $city->active ? 'text-emerald-800 bg-emerald-100 border-emerald-300' : 'text-slate-700 bg-slate-100 border-slate-300' }}">
-                                            {{ $city->active ? 'Actif' : 'Inactif' }}
-                                        </span>
-                                        <select name="active" data-current="{{ $city->active ? 1 : 0 }}" data-confirm-change="true" data-confirm-message="Changer le statut de la ville ?" class="status-select rounded-xl border-2 px-3 py-2 {{ $city->active ? 'border-emerald-400 bg-emerald-50 text-emerald-900' : 'border-slate-400 bg-slate-50 text-slate-900' }} text-sm font-medium shadow-sm focus:outline-none focus:ring-2 transition-colors">
-                                            <option value="1" {{ $city->active ? 'selected' : '' }}>Actif</option>
-                                            <option value="0" {{ !$city->active ? 'selected' : '' }}>Inactif</option>
-                                        </select>
-                                    </div>
-                                </form>
+                            <td class="px-6 py-3.5">
+                                <x-admin.status-toggle
+                                    :action="route('admin.cities.updateStatus', $city)"
+                                    :active="(bool) $city->active"
+                                    :label="$city->name"
+                                    feminine />
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                <a href="{{ route('admin.cities.edit', $city) }}"
-                                   class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                    Modifier
-                                </a>
-                                <form action="{{ route('admin.cities.destroy', $city) }}" method="POST" class="inline-block" onsubmit="return confirm('Supprimer cette ville ?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-colors">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
-                                        Supprimer
-                                    </button>
-                                </form>
+                            <td class="px-6 py-3.5">
+                                <div class="flex items-center justify-end gap-1">
+                                    <a href="{{ route('admin.cities.edit', $city) }}"
+                                       class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                                       title="Modifier">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                        <span class="sr-only">Modifier {{ $city->name }}</span>
+                                    </a>
+                                    <form action="{{ route('admin.cities.destroy', $city) }}" method="POST"
+                                          onsubmit="return confirm('Supprimer définitivement « {{ $city->name }} » ?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                                                title="Supprimer">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                            <span class="sr-only">Supprimer {{ $city->name }}</span>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-16 text-center">
+                                <p class="text-sm font-medium text-slate-600">Aucune ville</p>
+                                <p class="mt-1 text-sm text-slate-400">Ajoutez-en une avec le formulaire ci-dessus.</p>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
-    </div>
 
-    <div>{{ $cities->links() }}</div>
+        @if($cities->hasPages())
+            <div class="border-t border-slate-200 px-6 py-3">
+                {{ $cities->links() }}
+            </div>
+        @endif
+    </div>
 </div>
 @endsection

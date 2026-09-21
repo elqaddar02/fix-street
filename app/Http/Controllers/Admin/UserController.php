@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\RespondsToStatusChange;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    use RespondsToStatusChange;
+
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -31,9 +34,13 @@ class UserController extends Controller
     {
         $request->validate(['active' => 'required|boolean']);
 
-        $user->update(['active' => $request->active]);
+        $user->update(['active' => (bool) $request->active]);
 
-        return back()->with('success', 'Utilisateur mis à jour.');
+        return $this->statusResponse(
+            $request,
+            $user->active ? 'Compte activé.' : 'Compte désactivé.',
+            ['active' => $user->active]
+        );
     }
 
     public function destroy(User $user)

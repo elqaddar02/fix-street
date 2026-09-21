@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\RespondsToStatusChange;
 use App\Http\Controllers\Controller;
 use App\Models\City;
 use Illuminate\Http\Request;
 
 class CityController extends Controller
 {
+    use RespondsToStatusChange;
+
     public function index()
     {
         $cities = City::orderBy('name')->paginate(10);
@@ -48,9 +51,13 @@ class CityController extends Controller
     {
         $request->validate(['active' => 'required|boolean']);
 
-        $city->update(['active' => $request->active]);
+        $city->update(['active' => (bool) $request->active]);
 
-        return back()->with('success', 'Statut de la ville mis à jour.');
+        return $this->statusResponse(
+            $request,
+            $city->active ? 'Ville activée.' : 'Ville désactivée.',
+            ['active' => $city->active]
+        );
     }
 
     public function destroy(City $city)

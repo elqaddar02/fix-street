@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\RespondsToStatusChange;
 use App\Http\Controllers\Controller;
 use App\Models\Report;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
+    use RespondsToStatusChange;
+
     public function index(Request $request)
     {
         $status = $request->input('status');
@@ -50,7 +53,11 @@ class ReportController extends Controller
 
         $report->update(['status' => $request->status]);
 
-        return back()->with('success', 'Statut du signalement mis à jour.');
+        return $this->statusResponse(
+            $request,
+            'Statut du signalement mis à jour.',
+            ['status' => $report->status]
+        );
     }
 
     public function bulkUpdateStatus(Request $request)
