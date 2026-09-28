@@ -25,28 +25,30 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="space-y-8">
+                    <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="space-y-6">
                         @csrf
 
                         <!-- Image Upload (FIRST FIELD - REQUIRED) -->
                         <div>
                             <x-input-label for="image" :value="__('Upload Photo')" class="text-lg font-semibold" />
                             <div class="mt-2">
-                                <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-6 transition hover:border-red-500 hover:bg-red-50 cursor-pointer" id="image-upload-area">
+                                {{-- Single row rather than a tall drop area: the photo is the
+                                     first field, so its height set the tone for the whole form. --}}
+                                <div class="relative flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-lg px-4 py-3 transition hover:border-red-500 hover:bg-red-50 cursor-pointer" id="image-upload-area">
                                     <input id="image" name="image" type="file" accept=".jpg,.jpeg,.png" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                                    <div class="text-center">
-                                        <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                        <p class="text-gray-700 font-semibold">{{ __('Click to upload or drag and drop') }}</p>
-                                        <p class="text-sm text-gray-500">{{ __('Photos from your phone are resized automatically.') }}</p>
+                                    <svg class="w-6 h-6 flex-none text-gray-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-semibold text-gray-700">{{ __('Click to upload or drag and drop') }}</p>
+                                        <p class="text-xs text-gray-500">{{ __('Photos from your phone are resized automatically.') }}</p>
                                     </div>
                                 </div>
                                 <p id="image-processing" class="mt-2 hidden text-sm text-gray-600">{{ __('Preparing photo...') }}</p>
-                                <div id="image-preview" class="mt-4 hidden">
-                                    <img id="preview-image" src="" alt="Preview" class="max-h-48 rounded-lg shadow-md mx-auto">
+                                <div id="image-preview" class="mt-3 hidden">
+                                    <img id="preview-image" src="" alt="Preview" class="max-h-32 rounded-lg shadow-sm">
                                 </div>
-                                <div id="image-alert" class="mt-4 hidden rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-start gap-3">
+                                <div id="image-alert" class="mt-3 hidden rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-start gap-3">
                                     <svg class="w-5 h-5 flex-none text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-12.728 12.728m0-12.728l12.728 12.728" />
                                     </svg>
@@ -260,5 +262,8 @@
             }
         };
     </script>
+    {{-- create.js calls window.madinupImage.compress(); without this the call
+         throws and every photo is rejected as unreadable. --}}
+    <script src="{{ asset('js/reports/image-compress.js') }}"></script>
     <script src="{{ asset('js/reports/create.js') }}"></script>
 </x-app-layout>

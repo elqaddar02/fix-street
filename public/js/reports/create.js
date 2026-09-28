@@ -56,17 +56,41 @@ async function showImagePreview() {
     imageProcessing = true;
     imageProcessingText?.classList.remove('hidden');
 
+    // Shrinking the photo is an optimisation, not a requirement: the server
+    // accepts the original up to UPLOAD_LIMIT. So a failure here only matters
+    // when the file is genuinely too big to send — otherwise fall back to the
+    // original rather than refusing a perfectly valid photo.
+    const helper = window.madinupImage;
+    const uploadLimit = helper?.UPLOAD_LIMIT_BYTES ?? 6 * 1024 * 1024;
+
     try {
-        const compressed = await window.madinupImage.compress(file);
-        const replaced = window.madinupImage.replaceInputFile(imageInput, compressed);
-        if (!replaced && file.size > window.madinupImage.UPLOAD_LIMIT_BYTES) {
+        let upload = file;
+
+        if (helper) {
+            const compressed = await helper.compress(file);
+            if (helper.replaceInputFile(imageInput, compressed)) {
+                upload = compressed;
+            }
+        }
+
+        if (upload === file && file.size > uploadLimit) {
             rejectImage(window.reportConfig.translations.imageSize);
             return;
         }
-        previewImage.src = URL.createObjectURL(replaced ? compressed : file);
+
+        previewImage.src = URL.createObjectURL(upload);
         imagePreview.classList.remove('hidden');
     } catch (error) {
-        rejectImage(window.reportConfig.translations.imageUnreadable);
+        // The browser already accepted the type, so an error here means the
+        // resize failed, not that the photo is the wrong format. Only block it
+        // if sending the original would exceed the limit.
+        if (file.size > uploadLimit) {
+            rejectImage(window.reportConfig.translations.imageSize);
+            return;
+        }
+
+        previewImage.src = URL.createObjectURL(file);
+        imagePreview.classList.remove('hidden');
     } finally {
         imageProcessing = false;
         imageProcessingText?.classList.add('hidden');

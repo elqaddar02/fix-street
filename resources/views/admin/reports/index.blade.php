@@ -89,7 +89,7 @@
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Signalement</th>
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Ville</th>
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Soutiens</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Confirmations</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
                     </tr>
                 </thead>
@@ -133,10 +133,10 @@
                             <td class="px-6 py-3.5">
                                 <span @class([
                                     'inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold',
-                                    'bg-red-50 text-red-600' => $report->likes_count > 0,
+                                    'bg-amber-50 text-amber-700' => $report->likes_count > 0,
                                     'bg-slate-50 text-slate-400' => ! $report->likes_count,
                                 ])>
-                                    <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
                                     {{ $report->likes_count ?? 0 }}
                                 </span>
                             </td>

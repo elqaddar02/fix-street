@@ -35,38 +35,53 @@
                         <div class="lg:w-{{ $report->image ? '1/2' : 'full' }}">
                             <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ $report->title }}</h1>
 
-                            <!-- Like Section -->
+                            {{--
+                                Confirmations, not "likes": the count means "this many
+                                neighbours confirm the problem is real and still there",
+                                which is the part a municipality can act on.
+                            --}}
                             @auth
                                 @php
                                     $userHasLiked = auth()->user()->likedReports()->where('report_id', $report->id)->exists();
                                 @endphp
-                                <div x-data="reportLike({{ $report->id }}, {{ $userHasLiked ? 'true' : 'false' }}, {{ $report->likes_count ?? 0 }})" class="mb-6 flex items-center gap-3 pb-4 border-b border-gray-200">
-                                    <button type="button" @click="toggle()" :class="liked ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all">
+                                <div x-data="reportLike({{ $report->id }}, {{ $userHasLiked ? 'true' : 'false' }}, {{ $report->likes_count ?? 0 }})" class="mb-6 flex flex-wrap items-center gap-x-3 gap-y-2 pb-4 border-b border-gray-200">
+                                    <button type="button" @click="toggle()" :disabled="loading"
+                                            :class="liked ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                                            :aria-pressed="liked ? 'true' : 'false'"
+                                            class="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all disabled:opacity-60">
                                         <svg class="w-5 h-5" :fill="liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
                                         </svg>
-                                        <span class="font-semibold" x-text="likes + ' ' + (likes === 1 ? 'Like' : 'Likes')"></span>
+                                        <span x-text="liked ? @js(__('report.confirmed')) : @js(__('report.confirm'))"></span>
                                     </button>
+                                    <span class="text-sm font-medium text-gray-600" x-text="countLabel()"></span>
                                 </div>
                             @else
-                                <div class="mb-6 flex items-center gap-3 pb-4 border-b border-gray-200">
+                                <div class="mb-6 flex flex-wrap items-center gap-x-3 gap-y-2 pb-4 border-b border-gray-200">
                                     <form method="POST" class="flex items-center gap-2" id="like-form-guest">
                                         @csrf
-                                        <button type="submit" class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all bg-gray-100 text-gray-600 hover:bg-gray-200">
+                                        <button type="submit" class="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all bg-gray-100 text-gray-700 hover:bg-gray-200">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
                                             </svg>
-                                            <span class="font-semibold">{{ $report->likes_count ?? 0 }} {{ $report->likes_count === 1 ? 'Like' : 'Likes' }}</span>
+                                            {{ __('report.confirm') }}
                                         </button>
                                     </form>
+                                    <span class="text-sm font-medium text-gray-600">
+                                        {{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}
+                                    </span>
                                 </div>
                             @endauth
 
                             <div class="space-y-4">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-700">Description</h3>
-                                    <p class="text-gray-600 mt-2">{{ $report->description }}</p>
-                                </div>
+                                {{-- Identical to the title for reports made with the current
+                                     form, so only worth a section of its own when it differs. --}}
+                                @if(filled($report->description) && $report->description !== $report->title)
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-700">{{ __('Description') }}</h3>
+                                        <p class="text-gray-600 mt-2">{{ $report->description }}</p>
+                                    </div>
+                                @endif
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -118,8 +133,9 @@
                                     <p class="text-gray-600 mt-1">{{ $report->created_at->format('F j, Y \a\t g:i A') }}</p>
                                 </div>
 
+                                @if(config('features.comments'))
                                 <div class="mt-8">
-                                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Comments</h3>
+                                    <h3 class="text-lg font-semibold text-gray-700 mb-3">{{ __('Comments') }}</h3>
 
                                     <div id="comments-list" class="space-y-3 mb-4">
                                         @forelse($report->visibleComments as $comment)
@@ -144,6 +160,7 @@
                                         </div>
                                     </form>
                                 </div>
+                                @endif
                             </div>
 
                             <div class="mt-8 flex gap-4">
@@ -159,12 +176,25 @@
     </div>
 
     <script>
+        // Server-rendered wording for each count, so the label stays translated
+        // (and correctly pluralised) after the count changes client-side.
+        const CONFIRMATION_LABELS = {
+            zero: @js(trans_choice('report.confirmations_count', 0, ['count' => 0])),
+            one: @js(trans_choice('report.confirmations_count', 1, ['count' => 1])),
+            many: @js(trans_choice('report.confirmations_count', 2, ['count' => ':count'])),
+        };
+
         function reportLike(reportId, initialLiked, initialLikes) {
             return {
                 reportId,
                 liked: initialLiked,
                 likes: initialLikes,
                 loading: false,
+                countLabel() {
+                    if (this.likes === 0) return CONFIRMATION_LABELS.zero;
+                    if (this.likes === 1) return CONFIRMATION_LABELS.one;
+                    return CONFIRMATION_LABELS.many.replace(':count', this.likes);
+                },
                 async toggle() {
                     if (this.loading) return;
                     this.loading = true;
@@ -206,7 +236,8 @@
             });
         }
 
-        document.getElementById('comment-form').addEventListener('submit', function(e) {
+        // Absent while the comments feature is switched off.
+        document.getElementById('comment-form')?.addEventListener('submit', function(e) {
             @if(!auth()->check())
                 e.preventDefault();
                 const currentUrl = window.location.href;

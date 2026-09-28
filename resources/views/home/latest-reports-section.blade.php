@@ -65,8 +65,12 @@
                                             <time class="text-xs text-gray-500 font-semibold">{{ $report->created_at->format('M d, Y') }}</time>
                                         </div>
 
-                                        <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{{ $report->title }}</h3>
-                                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $report->description }}</p>
+                                        {{-- title and description hold the same sentence (the form
+                                             collects one field), so only show description when it differs. --}}
+                                        <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-3">{{ $report->title }}</h3>
+                                        @if(filled($report->description) && $report->description !== $report->title)
+                                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $report->description }}</p>
+                                        @endif
 
                                         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                                             <div class="flex items-center gap-2">
@@ -75,9 +79,12 @@
                                                 </div>
                                                 <span class="text-xs text-gray-700 font-semibold">{{ $report->user->name ?? 'Anonymous' }}</span>
                                             </div>
-                                            <div class="flex items-center gap-1 text-gray-500">
-                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M7 10a2 2 0 104 0 2 2 0 00-4 0zM14 10a2 2 0 104 0 2 2 0 00-4 0z"/></svg>
-                                                <span class="text-xs font-semibold">{{ $report->visibleComments->count() }}</span>
+                                            {{-- Was a comment count, which is meaningless now that
+                                                 comments are off. Confirmations are the useful signal. --}}
+                                            <div class="flex items-center gap-1 text-gray-500"
+                                                 title="{{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}">
+                                                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                                                <span class="text-xs font-semibold">{{ $report->likes_count ?? 0 }}</span>
                                             </div>
                                         </div>
                                     </div>

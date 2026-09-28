@@ -52,6 +52,10 @@ class PilotReadinessTest extends TestCase
 
     public function test_rejected_comments_are_hidden_on_the_report_page(): void
     {
+        // Comments are behind a feature flag (off by default for the pilot);
+        // this test covers the behaviour that applies when they are enabled.
+        config(['features.comments' => true]);
+
         $report = $this->makeReport(User::factory()->create());
         $commenter = User::factory()->create();
 
@@ -91,6 +95,10 @@ class PilotReadinessTest extends TestCase
 
     public function test_comment_posting_is_rate_limited(): void
     {
+        // Comments are behind a feature flag (off by default for the pilot);
+        // this test covers the behaviour that applies when they are enabled.
+        config(['features.comments' => true]);
+
         $report = $this->makeReport(User::factory()->create());
         $user = User::factory()->create();
 

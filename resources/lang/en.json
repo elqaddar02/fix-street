@@ -143,6 +143,10 @@
     "The platform includes moderation by administrators. Admins may review, update status, hide, or remove reports and comments to maintain data quality, legal compliance, and public safety.": "The platform includes moderation by administrators. Admins may review, update status, hide, or remove reports and comments to maintain data quality, legal compliance, and public safety.",
     "Madinup is provided on an 'as available' basis. We strive for reliability, but we do not guarantee uninterrupted service or immediate issue resolution by municipal teams.": "Madinup is provided on an 'as available' basis. We strive for reliability, but we do not guarantee uninterrupted service or immediate issue resolution by municipal teams.",
     "Continued use of the platform indicates acceptance of any future policy updates.": "Continued use of the platform indicates acceptance of any future policy updates.",
+    "report.confirm": "I confirm",
+    "report.confirmed": "Confirmed",
+    "report.confirm_hint": "Confirm that this problem is real and still there.",
+    "report.confirmations_count": "{0} No confirmations yet|{1} :count confirmation|[2,*] :count confirmations",
     "nav.home": "Home",
     "nav.my_reports": "My Reports",
     "nav.all_reports": "All Reports",
@@ -355,5 +359,14 @@
     "validation.longitude_numeric": "The longitude must be a number.",
     "validation.longitude_range": "The longitude must be between -180 and 180.",
     "validation.district_city_mismatch": "The selected district does not belong to the selected city.",
-    "validation.quartier_district_mismatch": "The selected quartier does not belong to the selected district."
+    "validation.quartier_district_mismatch": "The selected quartier does not belong to the selected district.",
+    "dashboard.greeting": "Hello, :name",
+    "dashboard.subtitle": "Your reports and where each one stands.",
+    "dashboard.new_report": "New report",
+    "dashboard.breakdown.title": "Where your reports stand",
+    "dashboard.breakdown.categories": "By category",
+    "dashboard.empty.headline": "You have not reported anything yet",
+    "dashboard.empty.body": "Spotted a pothole, a broken streetlight or damaged pavement? Report it and your neighbours can confirm it.",
+    "dashboard.stats.rejected": "Rejected",
+    "dashboard.of_total": ":count of :total"
 }

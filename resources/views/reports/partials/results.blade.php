@@ -18,8 +18,9 @@
 
                 <div class="absolute bottom-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                     <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-2xl shadow-xl">
-                        <svg class="w-3.5 h-3.5 text-red-600" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                        <span class="text-xs font-black text-slate-900">{{ $report->likes_count ?? 0 }}</span>
+                        {{-- Confirmations, not likes: how many neighbours corroborate the problem. --}}
+                        <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
+                        <span class="text-xs font-black text-slate-900" title="{{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}">{{ $report->likes_count ?? 0 }}</span>
                     </div>
                 </div>
             </div>
@@ -35,8 +36,12 @@
                     @endif
                 </div>
 
-                <h4 class="text-xl font-black text-slate-900 mb-3 group-hover:text-red-600 transition-colors leading-tight">{{ $report->title }}</h4>
-                <p class="text-sm text-slate-500 leading-relaxed line-clamp-2 mb-6 font-medium italic">"{{ $report->description }}"</p>
+                {{-- The form only collects one piece of text, which is mirrored into
+                     description, so printing both showed the same sentence twice. --}}
+                <h4 class="text-xl font-black text-slate-900 mb-3 group-hover:text-red-600 transition-colors leading-tight line-clamp-3">{{ $report->title }}</h4>
+                @if(filled($report->description) && $report->description !== $report->title)
+                    <p class="text-sm text-slate-500 leading-relaxed line-clamp-2 mb-6 font-medium">{{ $report->description }}</p>
+                @endif
 
                 <div class="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
                     <div class="flex items-center gap-3">
