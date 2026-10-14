@@ -4,46 +4,35 @@
     "Report Streets,": "أبلِغ عن مشاكل الشوارع،",
     "Get Them Fixed": "وساهم في إصلاحها",
     "Report potholes, broken lights and damaged infrastructure, rally your neighbors, and follow each problem until it is fixed. Madinup is an independent citizen initiative.": "أبلِغ عن الحفر والإنارة المعطلة والبنية التحتية المتضررة، واحشد جيرانك، وتابع كل مشكلة حتى يتم إصلاحها. Madinup مبادرة مواطنة مستقلة.",
-    
     "Report a Problem": "الإبلاغ عن مشكلة",
     "View Reports": "عرض الإبلاغات",
     "Total Reports": "إجمالي الإبلاغات",
     "Resolved Issues": "المشكلات التي تم حلها",
     "Cities Covered": "المدن المشمولة",
     "Categories": "الفئات",
-
     "Report What You See": "أبلِغ عمّا تراه",
     "Choose from these common street maintenance issues": "اختر من بين مشاكل الصيانة الشائعة التالية",
-    
     "Road Damage": "أضرار الطريق",
     "Potholes, cracks, uneven pavement, and other surface damage that poses safety risks.": "الحفر، والتشققات، وعدم استواء الطريق، وغيرها من الأضرار السطحية التي تشكل خطراً على السلامة.",
-    
     "Street Lighting": "إنارة الشوارع",
     "Broken, malfunctioning, or missing street lights affecting pedestrian and driver safety.": "أضواء الشوارع المعطلة أو غير العاملة أو المفقودة والتي تؤثر على سلامة المشاة والسائقين.",
-    
     "Infrastructure": "البنية التحتية",
     "Damaged signs, barriers, sidewalks, curbs, drainage issues, and other street infrastructure.": "اللافتات والحواجز والأرصفة والأرصفة الجانبية المتضررة، ومشاكل تصريف المياه، وغيرها من عناصر البنية التحتية.",
-
     "Recent Activity": "النشاط الأخير",
     "Latest Reports": "أحدث الإبلاغات",
     "View All Reports": "عرض جميع الإبلاغات",
     "No reports yet": "لا توجد إبلاغات حتى الآن",
     "Be the first to report an issue in your area.": "كن أول من يُبلّغ عن مشكلة في منطقتك.",
     "Create First Report": "إنشاء أول إبلاغ",
-
     "Process": "العملية",
     "How It Works": "كيف يعمل",
     "Simple steps to report and track street issues": "خطوات بسيطة للإبلاغ عن مشاكل الشوارع وتتبعها",
-    
     "Take a Photo": "التقط صورة",
     "Capture a clear image of the street issue you found.": "التقط صورة واضحة للمشكلة التي لاحظتها في الشارع.",
-    
     "Describe Issue": "وصف المشكلة",
     "Fill in category, location, and detailed description.": "حدّد الفئة والموقع، وأضف وصفاً تفصيلياً.",
-    
     "Submit & Track": "الإرسال والمتابعة",
     "Track your report status and see when issues are resolved.": "تابع حالة إبلاغك واعرف متى يتم حل المشكلة.",
-
     "All Reports": "جميع الإبلاغات",
     "About": "حول",
     "Help": "مساعدة",
@@ -57,35 +46,28 @@
     "Terms": "الشروط",
     "Contact": "اتصل بنا",
     "Dashboard": "لوحة التحكم",
-
     "This is a secure area of the application. Please confirm your password before continuing.": "هذه منطقة آمنة في التطبيق. يرجى تأكيد كلمة المرور قبل المتابعة.",
     "Password": "كلمة المرور",
     "Confirm": "تأكيد",
-
     "Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.": "هل نسيت كلمة المرور؟ لا مشكلة. أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.",
     "Email": "البريد الإلكتروني",
     "Email Password Reset Link": "إرسال رابط إعادة تعيين كلمة المرور",
-
     "Help & Support": "المساعدة والدعم",
     "Welcome back,": "مرحباً بعودتك،",
     "Remember me": "تذكرني",
     "Forgot your password?": "هل نسيت كلمة المرور؟",
     "Log in": "تسجيل الدخول",
-
     "Name": "الاسم",
     "Confirm Password": "تأكيد كلمة المرور",
     "Already registered?": "هل لديك حساب بالفعل؟",
-
     "Reports": "الإبلاغات",
     "Create Report": "إنشاء إبلاغ",
     "Report Title": "عنوان الإبلاغ",
     "Brief description of the problem": "وصف مختصر للمشكلة",
     "Detailed Description": "الوصف التفصيلي",
     "Provide detailed information about the problem...": "قدّم تفاصيل دقيقة حول المشكلة...",
-
     "Category": "الفئة",
     "-- Select a category --": "-- اختر فئة --",
-
     "City": "المدينة",
     "-- Select a city --": "-- اختر مدينة --",
     "District / Arrondissement": "المقاطعة / العمالة",
@@ -97,25 +79,19 @@
     "This location is outside our coverage area. Please set it manually.": "هذا الموقع خارج منطقة تغطيتنا. يرجى تحديده يدوياً.",
     "Not available": "غير متوفر",
     "Pin corrected. Location updated.": "تم تصحيح الموقع. تم تحديث الموقع.",
-
     "Quartier": "الحي",
     "-- Select a city first --": "-- اختر المدينة أولاً --",
-
     "Latitude (optional)": "خط العرض (اختياري)",
     "GPS coordinate - leave blank if unknown": "إحداثيات GPS (اتركها فارغة إن لم تكن معروفة)",
-
     "Longitude (optional)": "خط الطول (اختياري)",
-
     "Upload Photo (optional but recommended)": "إرفاق صورة (اختياري ولكن يُنصح به)",
     "Click to upload or drag and drop": "انقر للرفع أو اسحب الملف وأفلته هنا",
     "Photos from your phone are resized automatically.": "يتم تصغير صور هاتفك تلقائياً.",
     "Preparing photo...": "جارٍ تجهيز الصورة...",
     "PNG, JPG, GIF up to 2MB": "PNG، JPG، GIF بحجم يصل إلى 6MB",
-
     "Back": "رجوع",
     "Submit Report": "إرسال الإبلاغ",
     "Report submitted successfully!": "تم إرسال الإبلاغ بنجاح!",
-
     "Filter Reports": "تصفية الإبلاغات",
     "All Categories": "جميع الفئات",
     "All Dates": "جميع التواريخ",
@@ -124,31 +100,23 @@
     "This Month": "هذا الشهر",
     "Filter": "تطبيق",
     "Reset": "إعادة تعيين",
-
     "Reports found": "عدد الإبلاغات",
     "Explore reported street issues, sorted by neighborhood and status.": "استعرض مشاكل الشوارع المُبلّغ عنها حسب الحي والحالة.",
     "View Details": "عرض التفاصيل",
-
     "Please fix the following errors:": "يرجى تصحيح الأخطاء التالية:",
-
     "English": "English",
     "French": "Français",
     "Arabic": "العربية",
-
     "Follow Up": "المتابعة",
     "Neighbors can support the report and everyone can follow its status until it is fixed.": "يمكن للجيران دعم البلاغ ويمكن للجميع متابعة حالته حتى يتم إصلاحه.",
-
     "Make a Difference Today": "ساهم في إحداث فرق اليوم",
     "Every report helps improve our city. Be part of the solution.": "كل إبلاغ يساهم في تحسين مدينتنا. كن جزءاً من الحل.",
     "Start Reporting Now": "ابدأ الإبلاغ الآن",
-
     "Loading...": "جارٍ التحميل...",
     "Select a quartier": "-- اختر الحي --",
     "Error loading quartiers": "حدث خطأ أثناء تحميل الأحياء",
-
     "Report a Street Issue": "الإبلاغ عن مشكلة في الشارع",
     "Share details about the street maintenance problem you've found.": "شارك تفاصيل مشكلة صيانة الشارع التي لاحظتها.",
-
     "About Madinup": "حول Madinup",
     "Madinup is not a government service and is not affiliated with any public authority. Publishing a report here is not an official complaint.": "Madinup ليست خدمة حكومية ولا تتبع لأي سلطة عمومية. نشر بلاغ هنا لا يُعدّ شكاية رسمية.",
     "Our mission is to make street problems visible, bring neighbors together around them, and keep a clear public record of what happens next.": "مهمتنا هي إبراز مشاكل الشوارع، وجمع الجيران حولها، والاحتفاظ بسجل عام وواضح لما يحدث بعد ذلك.",
@@ -365,5 +333,18 @@
     "validation.longitude_numeric": "يجب أن يكون خط الطول رقماً.",
     "validation.longitude_range": "يجب أن يكون خط الطول بين -180 و 180.",
     "validation.district_city_mismatch": "المقاطعة المختارة لا تنتمي إلى المدينة المختارة.",
-    "validation.quartier_district_mismatch": "الحي المختار لا ينتمي إلى المقاطعة المختارة."
+    "validation.quartier_district_mismatch": "الحي المختار لا ينتمي إلى المقاطعة المختارة.",
+    "report.confirm": "أؤكد",
+    "report.confirmed": "مؤكَّد",
+    "report.confirm_hint": "أكد أن هذه المشكلة حقيقية وما زالت قائمة.",
+    "report.confirmations_count": "{0} لا توجد تأكيدات|{1} تأكيد واحد|[2,*] :count تأكيدات",
+    "dashboard.greeting": "مرحباً، :name",
+    "dashboard.subtitle": "إبلاغاتك وحالة كل واحد منها.",
+    "dashboard.new_report": "إبلاغ جديد",
+    "dashboard.breakdown.title": "حالة إبلاغاتك",
+    "dashboard.breakdown.categories": "حسب الفئة",
+    "dashboard.empty.headline": "لم تقم بأي إبلاغ بعد",
+    "dashboard.empty.body": "هل لاحظت حفرة أو إنارة معطلة أو رصيفاً متضرراً؟ أبلغ عنه ليتمكن جيرانك من تأكيده.",
+    "dashboard.stats.rejected": "مرفوضة",
+    "dashboard.of_total": ":count من :total"
 }

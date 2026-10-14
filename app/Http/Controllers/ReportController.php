@@ -312,6 +312,10 @@ class ReportController extends Controller
 
     public function storeComment(Request $request, Report $report)
     {
+        // Hiding the form is not enough on its own: without this the endpoint
+        // would still accept comments posted directly.
+        abort_unless(config('features.comments'), 404);
+
         $request->validate([
             'comment' => 'required|string|max:1000',
         ]);

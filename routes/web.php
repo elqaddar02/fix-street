@@ -10,7 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    // withCount('likes') feeds the confirmation badge on each card; without it
+    // likes_count is missing and every card silently reads zero.
     $latestReports = Report::with(['category', 'city', 'user', 'visibleComments.user'])
+        ->withCount('likes')
         ->latest()
         ->take(6)
         ->get();

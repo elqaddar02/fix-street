@@ -355,5 +355,18 @@
     "validation.longitude_numeric": "La longitude doit être un nombre.",
     "validation.longitude_range": "La longitude doit être comprise entre -180 et 180.",
     "validation.district_city_mismatch": "L'arrondissement sélectionné n'appartient pas à la ville sélectionnée.",
-    "validation.quartier_district_mismatch": "Le quartier sélectionné n'appartient pas à l'arrondissement sélectionné."
+    "validation.quartier_district_mismatch": "Le quartier sélectionné n'appartient pas à l'arrondissement sélectionné.",
+    "report.confirm": "Je confirme",
+    "report.confirmed": "Confirmé",
+    "report.confirm_hint": "Confirmez que ce problème est réel et toujours présent.",
+    "report.confirmations_count": "{0} Aucune confirmation|{1} :count confirmation|[2,*] :count confirmations",
+    "dashboard.greeting": "Bonjour, :name",
+    "dashboard.subtitle": "Vos signalements et où en est chacun d'eux.",
+    "dashboard.new_report": "Nouveau signalement",
+    "dashboard.breakdown.title": "Où en sont vos signalements",
+    "dashboard.breakdown.categories": "Par catégorie",
+    "dashboard.empty.headline": "Vous n'avez encore rien signalé",
+    "dashboard.empty.body": "Un nid-de-poule, un lampadaire cassé ou un trottoir abîmé ? Signalez-le et vos voisins pourront le confirmer.",
+    "dashboard.stats.rejected": "Rejetés",
+    "dashboard.of_total": ":count sur :total"
 }
