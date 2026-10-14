@@ -13,7 +13,7 @@
 @endphp
 
 <x-app-layout>
-    <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-6xl px-4 py-10 font-['IBM_Plex_Sans',ui-sans-serif,system-ui,sans-serif] sm:px-6 lg:px-8">
         <header class="flex flex-col gap-5 border-b border-gray-200 pb-8 sm:flex-row sm:items-end sm:justify-between">
             <div class="min-w-0">
                 <p class="text-xs font-medium uppercase tracking-[0.14em] text-gray-500">{{ __('nav.my_reports') }}</p>
@@ -24,13 +24,13 @@
             </div>
 
             <a href="{{ route('reports.create') }}"
-               class="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2">
+               class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/></svg>
                 {{ __('dashboard.new_report') }}
             </a>
         </header>
 
-        <section aria-label="{{ __('dashboard.stats.total') }}" class="mt-8 grid grid-cols-2 overflow-hidden rounded-lg border border-gray-200 bg-white sm:grid-cols-4">
+        <section aria-label="{{ __('dashboard.stats.total') }}" class="mt-8 grid grid-cols-2 overflow-hidden rounded-xl border border-gray-200 bg-white sm:grid-cols-4">
             @foreach([
                 ['label' => __('dashboard.stats.total'), 'value' => $totalReports, 'dot' => null],
                 ['label' => $statusMeta['OPEN']['label'], 'value' => $statusMeta['OPEN']['count'], 'dot' => $statusMeta['OPEN']['bar']],
@@ -48,20 +48,20 @@
         </section>
 
         @if($totalReports === 0)
-            <section class="mt-8 rounded-lg border border-gray-200 bg-white px-6 py-14 text-center">
+            <section class="mt-8 rounded-xl border border-gray-200 bg-white px-6 py-14 text-center">
                 <h2 class="text-base font-semibold text-gray-900">{{ __('dashboard.empty.headline') }}</h2>
                 <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">{{ __('dashboard.empty.body') }}</p>
-                <a href="{{ route('reports.create') }}" class="mt-6 inline-flex items-center justify-center gap-2 rounded-md bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2">
+                <a href="{{ route('reports.create') }}" class="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/></svg>
                     {{ __('dashboard.new_report') }}
                 </a>
             </section>
         @else
             <div class="mt-6 grid gap-6 lg:grid-cols-2">
-                <section class="rounded-lg border border-gray-200 bg-white p-5 sm:p-6" aria-labelledby="status-breakdown-title">
+                <section class="rounded-xl border border-gray-200 bg-white p-5 sm:p-6" aria-labelledby="status-breakdown-title">
                     <h2 id="status-breakdown-title" class="text-sm font-semibold text-gray-900">{{ __('dashboard.breakdown.title') }}</h2>
 
-                    <div class="mt-5 flex h-2 w-full overflow-hidden rounded-sm bg-gray-100" role="img" aria-label="{{ __('dashboard.breakdown.title') }}">
+                    <div class="mt-5 flex h-2 w-full overflow-hidden rounded-full bg-gray-100" role="img" aria-label="{{ __('dashboard.breakdown.title') }}">
                         @foreach($statusMeta as $meta)
                             @if($meta['count'] > 0)
                                 <div class="h-full {{ $meta['bar'] }}" style="width: {{ $meta['count'] / $totalReports * 100 }}%"></div>
@@ -73,7 +73,7 @@
                         @foreach($statusMeta as $meta)
                             @if($meta['count'] > 0)
                                 <li class="flex min-w-0 items-center justify-between gap-3 py-2.5 text-sm">
-                                    <span class="flex min-w-0 items-center gap-2.5 text-gray-600"><span class="h-2 w-2 shrink-0 rounded-sm {{ $meta['bar'] }}" aria-hidden="true"></span><span class="truncate">{{ $meta['label'] }}</span></span>
+                                    <span class="flex min-w-0 items-center gap-2.5 text-gray-600"><span class="h-2 w-2 shrink-0 rounded-full {{ $meta['bar'] }}" aria-hidden="true"></span><span class="truncate">{{ $meta['label'] }}</span></span>
                                     <span class="flex shrink-0 items-baseline gap-3">
                                         <span class="text-xs tabular-nums text-gray-400">{{ round($meta['count'] / $totalReports * 100) }}%</span>
                                         <span class="w-8 text-end font-medium tabular-nums text-gray-900">{{ $meta['count'] }}</span>
@@ -84,7 +84,7 @@
                     </ul>
                 </section>
 
-                <section class="rounded-lg border border-gray-200 bg-white p-5 sm:p-6" aria-labelledby="category-breakdown-title">
+                <section class="rounded-xl border border-gray-200 bg-white p-5 sm:p-6" aria-labelledby="category-breakdown-title">
                     <h2 id="category-breakdown-title" class="text-sm font-semibold text-gray-900">{{ __('dashboard.breakdown.categories') }}</h2>
                     @if($sortedReportsByCategory->isNotEmpty())
                         <ul class="mt-5 space-y-4">
@@ -94,8 +94,8 @@
                                         <span class="min-w-0 truncate text-gray-600">{{ $name ?: __('dashboard.labels.unknown') }}</span>
                                         <span class="shrink-0 font-medium tabular-nums text-gray-900">{{ $count }}</span>
                                     </div>
-                                    <div class="mt-2 h-1.5 w-full overflow-hidden rounded-sm bg-gray-100">
-                                        <div class="h-full rounded-sm bg-gray-800" style="width: {{ ($count / $maxCategory) * 100 }}%"></div>
+                                    <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                                        <div class="h-full rounded-full bg-gray-800" style="width: {{ ($count / $maxCategory) * 100 }}%"></div>
                                     </div>
                                 </li>
                             @endforeach
@@ -115,7 +115,7 @@
                     <span class="text-sm tabular-nums text-gray-500">{{ $totalReports }}</span>
                 </div>
 
-                <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+                <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white">
                     <table class="w-full min-w-[640px] text-start">
                         <thead>
                             <tr class="border-b border-gray-200 bg-gray-50/80">
