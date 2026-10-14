@@ -1,5 +1,5 @@
 <details class="relative inline-block text-left">
-    <summary class="inline-flex items-center justify-center w-10 h-10 rounded-lg text-gray-700 hover:bg-gray-100 - focus:outline-none cursor-pointer" title="{{ __('Change Language') }}">
+    <summary class="inline-flex items-center justify-center w-10 h-10 rounded-sm text-gray-700 hover:bg-gray-100 - focus:outline-none cursor-pointer" title="{{ __('Change Language') }}">
         
         <!-- NEW WORLD ICON -->
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -9,7 +9,7 @@
 
     </summary>
 
-    <div class="absolute right-0 z-50 mt-2 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800">
+    <div class="absolute right-0 z-50 mt-2 w-48 rounded-sm border border-gray-300 shadow-md bg-white dark:bg-gray-800">
         <div class="py-1">
             <a href="{{ route('language.switch', 'en') }}" class="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 @if(app()->getLocale() == 'en') bg-gray-50 font-semibold dark:bg-gray-700 @endif">
                 <span class="mr-3">🇬🇧</span>

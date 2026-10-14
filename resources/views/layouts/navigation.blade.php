@@ -2,7 +2,7 @@
     // One source of truth for both the desktop bar and the mobile sheet, so
     // the two can never drift apart.
     $links = [
-        ['route' => 'home', 'active' => request()->routeIs('home'), 'label' => __('nav.home'), 'icon' => '🏠'],
+        ['route' => 'home', 'active' => request()->routeIs('home'), 'label' => __('nav.home')],
     ];
 
     if (auth()->check()) {
@@ -10,12 +10,11 @@
             'route' => 'dashboard',
             'active' => request()->routeIs('dashboard'),
             'label' => __('nav.my_reports'),
-            'icon' => '📌',
         ];
     }
 
-    $links[] = ['route' => 'reports.index', 'active' => request()->routeIs('reports.index'), 'label' => __('nav.all_reports'), 'icon' => '📄'];
-    $links[] = ['route' => 'help', 'active' => request()->routeIs('help'), 'label' => __('nav.help'), 'icon' => '❓'];
+    $links[] = ['route' => 'reports.index', 'active' => request()->routeIs('reports.index'), 'label' => __('nav.all_reports')];
+    $links[] = ['route' => 'help', 'active' => request()->routeIs('help'), 'label' => __('nav.help')];
 @endphp
 
 {{--
@@ -24,7 +23,7 @@
     panel rendered permanently expanded because its :class never evaluated.
 --}}
 <nav x-data="{ open: false }" @keydown.escape.window="open = false"
-     class="fixed top-0 left-0 right-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+     class="fixed top-0 left-0 right-0 z-50 border-b border-gray-300 bg-white">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-20 items-center justify-between gap-4">
@@ -32,7 +31,7 @@
             {{-- LOGO --}}
             <a href="{{ route('home') }}"
                aria-label="{{ __('nav.home') }}"
-               class="flex shrink-0 items-center rounded-xl px-2 py-1 transition-colors hover:bg-gray-50">
+               class="flex shrink-0 items-center rounded-sm px-2 py-1 transition-colors hover:bg-gray-50">
                 <span class="flex h-14 items-center">
                     <x-application-logo class="h-full w-auto" />
                 </span>
@@ -40,16 +39,15 @@
 
             {{-- CENTER NAV --}}
             <div class="hidden flex-1 justify-center lg:flex">
-                <div class="flex items-center gap-1 rounded-full border border-gray-200 bg-white/70 px-1.5 py-1 shadow-sm backdrop-blur-md">
+                <div class="flex items-center gap-8">
                     @foreach($links as $link)
                         <a href="{{ route($link['route']) }}"
                            @if($link['active']) aria-current="page" @endif
                            @class([
-                               'flex h-11 items-center gap-2 rounded-full px-5 text-sm font-medium transition-all duration-200',
-                               'bg-red-600 text-white shadow-sm' => $link['active'],
-                               'text-gray-700 hover:bg-gray-100' => ! $link['active'],
+                               '-mb-px flex h-20 items-center border-b-2 text-sm font-medium transition-colors',
+                               'border-[#1b2a41] text-[#1b2a41]' => $link['active'],
+                               'border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-900' => ! $link['active'],
                            ])>
-                            <span aria-hidden="true">{{ $link['icon'] }}</span>
                             {{ $link['label'] }}
                         </a>
                     @endforeach
@@ -63,8 +61,8 @@
                 @auth
                     <x-dropdown align="right" width="56">
                         <x-slot name="trigger">
-                            <button class="flex h-11 items-center gap-2 rounded-full border border-gray-200 bg-white/70 px-4 text-sm text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:shadow-sm">
-                                <span class="flex h-7 w-7 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700">
+                            <button class="flex h-10 items-center gap-2 rounded-sm border border-gray-300 bg-white px-3 text-sm text-gray-700 transition-colors hover:bg-gray-50">
+                                <span class="flex h-7 w-7 items-center justify-center rounded-sm bg-[#1b2a41] text-xs font-semibold text-white">
                                     {{ strtoupper(mb_substr(Auth::user()->name, 0, 2)) }}
                                 </span>
                                 <span class="max-w-[10rem] truncate font-medium">{{ Auth::user()->name }}</span>
@@ -75,7 +73,7 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <div class="border-b border-gray-100 px-4 py-3">
+                            <div class="border-b border-gray-200 px-4 py-3">
                                 <p class="truncate text-sm font-semibold text-gray-900">{{ Auth::user()->name }}</p>
                                 <p class="truncate text-xs text-gray-500">{{ Auth::user()->email }}</p>
                             </div>
@@ -94,7 +92,7 @@
                                 </x-dropdown-link>
                             @endif
 
-                            <div class="border-t border-gray-100">
+                            <div class="border-t border-gray-200">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <x-dropdown-link :href="route('logout')"
@@ -108,11 +106,11 @@
                 @else
                     <div class="flex items-center gap-2">
                         <a href="{{ route('login') }}"
-                           class="flex h-11 items-center rounded-full px-4 text-sm text-gray-700 transition hover:bg-gray-100">
+                           class="flex h-10 items-center rounded-sm px-4 text-sm text-gray-700 transition hover:bg-gray-100">
                             {{ __('Log in') }}
                         </a>
                         <a href="{{ route('register') }}"
-                           class="flex h-11 items-center rounded-full bg-gradient-to-r from-red-500 to-red-600 px-5 text-sm font-semibold text-white transition hover:shadow-md">
+                           class="flex h-10 items-center rounded-sm bg-[#1b2a41] px-5 text-sm font-medium text-white transition hover:bg-[#122033]">
                             {{ __('Register') }}
                         </a>
                     </div>
@@ -124,7 +122,7 @@
                     @click="open = ! open"
                     :aria-expanded="open ? 'true' : 'false'"
                     aria-controls="mobile-menu"
-                    class="inline-flex h-11 w-11 items-center justify-center rounded-full text-gray-600 transition hover:bg-gray-100 lg:hidden">
+                    class="inline-flex h-11 w-11 items-center justify-center rounded-sm text-gray-600 transition hover:bg-gray-100 lg:hidden">
                 <span class="sr-only" x-text="open ? '{{ __('nav.close_menu') }}' : '{{ __('nav.open_menu') }}'">{{ __('nav.open_menu') }}</span>
                 <svg x-show="! open" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
@@ -149,11 +147,10 @@
                 <a href="{{ route($link['route']) }}"
                    @if($link['active']) aria-current="page" @endif
                    @class([
-                       'flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium transition-colors',
-                       'bg-red-50 text-red-700' => $link['active'],
-                       'text-gray-700 hover:bg-gray-50' => ! $link['active'],
+                       'flex items-center gap-3 rounded-sm border-s-2 px-4 py-3 text-base font-medium transition-colors',
+                       'border-[#1b2a41] bg-gray-100 text-[#1b2a41]' => $link['active'],
+                       'border-transparent text-gray-700 hover:bg-gray-50' => ! $link['active'],
                    ])>
-                    <span aria-hidden="true">{{ $link['icon'] }}</span>
                     {{ $link['label'] }}
                 </a>
             @endforeach
@@ -166,7 +163,7 @@
         <div class="border-t border-gray-200 px-4 py-4">
             @auth
                 <div class="mb-3 flex items-center gap-3 px-2">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-sm font-bold text-red-700">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-sm bg-[#1b2a41] text-sm font-semibold text-white">
                         {{ strtoupper(mb_substr(Auth::user()->name, 0, 2)) }}
                     </span>
                     <div class="min-w-0">
@@ -177,13 +174,13 @@
 
                 <div class="space-y-1">
                     <a href="{{ route('profile.edit') }}"
-                       class="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                       class="flex items-center gap-3 rounded-sm px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-gray-50">
                         {{ __('Profile') }}
                     </a>
 
                     @if(Auth::user()->is_admin)
                         <a href="{{ route('admin.dashboard') }}"
-                           class="flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                           class="flex items-center gap-3 rounded-sm px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-gray-50">
                             {{ __('nav.admin_panel') }}
                         </a>
                     @endif
@@ -191,7 +188,7 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
-                                class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-base font-medium text-red-700 transition-colors hover:bg-red-50">
+                                class="flex w-full items-center gap-3 rounded-sm px-4 py-3 text-left text-base font-medium text-gray-700 transition-colors hover:bg-gray-50">
                             {{ __('Log Out') }}
                         </button>
                     </form>
@@ -199,17 +196,17 @@
             @else
                 <div class="space-y-2">
                     <a href="{{ route('login') }}"
-                       class="flex items-center justify-center rounded-xl border border-gray-200 px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                       class="flex items-center justify-center rounded-sm border border-gray-300 px-4 py-3 text-base font-medium text-gray-700 transition-colors hover:bg-gray-50">
                         {{ __('Log in') }}
                     </a>
                     <a href="{{ route('register') }}"
-                       class="flex items-center justify-center rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-4 py-3 text-base font-semibold text-white transition hover:shadow-md">
+                       class="flex items-center justify-center rounded-sm bg-[#1b2a41] px-4 py-3 text-base font-medium text-white transition hover:bg-[#122033]">
                         {{ __('Register') }}
                     </a>
                 </div>
             @endauth
 
-            <div class="mt-3 border-t border-gray-100 px-2 pt-3">
+            <div class="mt-3 border-t border-gray-200 px-2 pt-3">
                 <x-language-switcher />
             </div>
         </div>
