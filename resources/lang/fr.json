@@ -191,8 +191,6 @@
     "dashboard.table.headers.status": "Statut",
     "dashboard.table.headers.created": "Créé",
     "dashboard.table.headers.actions": "Actions",
-    "dashboard.table.headers.reference": "Réf.",
-    "dashboard.breakdown.count": "Signalements",
     "dashboard.labels.id": "ID",
     "dashboard.labels.unknown": "Inconnu",
     "dashboard.actions.view": "Voir",

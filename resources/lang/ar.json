@@ -169,8 +169,6 @@
     "dashboard.table.headers.status": "الحالة",
     "dashboard.table.headers.created": "تم الإنشاء",
     "dashboard.table.headers.actions": "الإجراءات",
-    "dashboard.table.headers.reference": "المرجع",
-    "dashboard.breakdown.count": "البلاغات",
     "dashboard.labels.id": "المعرّف",
     "dashboard.labels.unknown": "غير معروف",
     "dashboard.actions.view": "عرض",
