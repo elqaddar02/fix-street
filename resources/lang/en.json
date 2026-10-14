@@ -195,6 +195,8 @@
     "dashboard.table.headers.status": "Status",
     "dashboard.table.headers.created": "Created",
     "dashboard.table.headers.actions": "Actions",
+    "dashboard.table.headers.reference": "Ref.",
+    "dashboard.breakdown.count": "Reports",
     "dashboard.labels.id": "ID",
     "dashboard.labels.unknown": "Unknown",
     "dashboard.actions.view": "View",
