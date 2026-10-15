@@ -26,7 +26,7 @@ class DashboardController extends Controller
         $rejectedReports = $reports->where('status', 'REJECTED')->count();
 
         // Reports by category
-        $categoryGroups = $reports->groupBy('category.name');
+        $categoryGroups = $reports->groupBy(fn ($report) => $report->category?->display_name);
         $reportsByCategory = [];
         foreach ($categoryGroups as $category => $group) {
             $reportsByCategory[$category] = $group->count();
