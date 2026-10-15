@@ -10,6 +10,23 @@
 
     $sortedReportsByCategory = collect($reportsByCategory)->sortDesc();
     $maxCategory = $sortedReportsByCategory->max() ?: 1;
+
+    $thisMonth = $reportsByMonth->last()['count'];
+    $monthDiff = $thisMonth - $reportsByMonth->get($reportsByMonth->count() - 2)['count'];
+    $resolvedShare = $totalReports > 0 ? round($resolvedReports / $totalReports * 100) : 0;
+
+    // The busiest month is drawn in the brand colour, the rest in a light tint.
+    $peakCount = $reportsByMonth->max('count');
+    $maxMonth = max(1, $peakCount);
+    $peakIndex = $peakCount > 0 ? $reportsByMonth->search(fn ($m) => $m['count'] === $peakCount) : null;
+    $monthLabel = fn ($month) => $month->copy()->locale(app()->getLocale())->translatedFormat('M');
+
+    $tile = 'flex min-w-0 flex-col gap-1 rounded-xl border bg-white p-4 sm:p-5';
+    $tileShadow = 'border-gray-200 shadow-[0_3px_12px_rgba(17,24,39,0.04)]';
+    $eyebrow = 'truncate text-[11px] font-medium uppercase tracking-wider text-gray-500';
+    $figure = 'text-[32px] font-bold leading-none tabular-nums text-gray-900';
+    $detail = 'text-[12.5px] text-gray-500';
+    $module = 'flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-[0_3px_12px_rgba(17,24,39,0.04)] sm:p-5';
 @endphp
 
 <x-app-layout>
@@ -30,21 +47,33 @@
             </a>
         </header>
 
-        <section aria-label="{{ __('dashboard.stats.total') }}" class="mt-8 grid grid-cols-2 overflow-hidden rounded-xl border border-gray-200 bg-white sm:grid-cols-4">
-            @foreach([
-                ['label' => __('dashboard.stats.total'), 'value' => $totalReports, 'dot' => null],
-                ['label' => $statusMeta['OPEN']['label'], 'value' => $statusMeta['OPEN']['count'], 'dot' => $statusMeta['OPEN']['bar']],
-                ['label' => $statusMeta['IN_PROGRESS']['label'], 'value' => $statusMeta['IN_PROGRESS']['count'], 'dot' => $statusMeta['IN_PROGRESS']['bar']],
-                ['label' => $statusMeta['RESOLVED']['label'], 'value' => $statusMeta['RESOLVED']['count'], 'dot' => $statusMeta['RESOLVED']['bar']],
-            ] as $stat)
-                <article class="border-gray-200 px-5 py-4 max-sm:odd:border-e max-sm:[&:nth-child(n+3)]:border-t sm:border-e sm:last:border-e-0 sm:py-5">
-                    <p class="flex items-center gap-2 text-xs font-medium text-gray-500 sm:text-sm">
-                        @if($stat['dot'])<span class="h-1.5 w-1.5 shrink-0 rounded-full {{ $stat['dot'] }}" aria-hidden="true"></span>@endif
-                        <span class="truncate">{{ $stat['label'] }}</span>
-                    </p>
-                    <p class="mt-1.5 text-3xl font-semibold tabular-nums tracking-tight text-gray-900">{{ $stat['value'] }}</p>
-                </article>
-            @endforeach
+        <section aria-label="{{ __('dashboard.stats.total') }}" class="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <article class="{{ $tile }} border-red-200 shadow-[0_5px_18px_rgba(220,38,38,0.08)]">
+                <span class="{{ $eyebrow }}">{{ __('dashboard.stats.total') }}</span>
+                <span class="{{ $figure }}">{{ $totalReports }}</span>
+                <span class="{{ $detail }}">
+                    <b @class(['font-semibold', 'text-gray-900' => $monthDiff !== 0])>{{ $monthDiff > 0 ? '+' : '' }}{{ $monthDiff }}</b>
+                    {{ __('dashboard.stats.vs_last_month') }}
+                </span>
+            </article>
+            <article class="{{ $tile }} {{ $tileShadow }}">
+                <span class="{{ $eyebrow }}">{{ $statusMeta['OPEN']['label'] }}</span>
+                <span class="{{ $figure }}">{{ $openReports }}</span>
+                <span class="{{ $detail }}">{{ __('dashboard.stats.awaiting') }}</span>
+            </article>
+            <article class="{{ $tile }} {{ $tileShadow }}">
+                <span class="{{ $eyebrow }}">{{ $statusMeta['IN_PROGRESS']['label'] }}</span>
+                <span class="{{ $figure }}">{{ $inProgressReports }}</span>
+                <span class="{{ $detail }}">{{ __('dashboard.stats.being_handled') }}</span>
+            </article>
+            <article class="{{ $tile }} {{ $tileShadow }}">
+                <span class="{{ $eyebrow }}">{{ $statusMeta['RESOLVED']['label'] }}</span>
+                <span class="{{ $figure }}">{{ $resolvedReports }}</span>
+                <span class="{{ $detail }}">
+                    <b class="font-semibold text-emerald-700">{{ $resolvedShare }}%</b>
+                    {{ __('dashboard.stats.of_your_reports') }}
+                </span>
+            </article>
         </section>
 
         @if($totalReports === 0)
@@ -57,52 +86,78 @@
                 </a>
             </section>
         @else
-            <div class="mt-6 grid gap-6 lg:grid-cols-2">
-                <section class="rounded-xl border border-gray-200 bg-white p-5 sm:p-6" aria-labelledby="status-breakdown-title">
-                    <h2 id="status-breakdown-title" class="text-sm font-semibold text-gray-900">{{ __('dashboard.breakdown.title') }}</h2>
-
-                    <div class="mt-5 flex h-2 w-full overflow-hidden rounded-full bg-gray-100" role="img" aria-label="{{ __('dashboard.breakdown.title') }}">
+            <div class="mt-3 grid items-start gap-3 lg:grid-cols-3">
+                <section class="{{ $module }}" aria-labelledby="status-breakdown-title">
+                    <header class="flex items-baseline justify-between gap-3">
+                        <h2 id="status-breakdown-title" class="text-base font-semibold leading-snug text-gray-900">{{ __('dashboard.breakdown.title') }}</h2>
+                        <span class="shrink-0 text-xs tabular-nums text-gray-500">{{ __('dashboard.breakdown.resolved_share', ['percent' => $resolvedShare]) }}</span>
+                    </header>
+                    <dl class="flex flex-col gap-2.5">
                         @foreach($statusMeta as $meta)
-                            @if($meta['count'] > 0)
-                                <div class="h-full {{ $meta['bar'] }}" style="width: {{ $meta['count'] / $totalReports * 100 }}%"></div>
-                            @endif
+                            <div class="grid grid-cols-[7rem_1fr_auto] items-center gap-2.5 text-[13.5px]">
+                                <dt class="flex min-w-0 items-center gap-1.5 text-gray-500">
+                                    <span class="h-2 w-2 shrink-0 rounded-full {{ $meta['bar'] }}" aria-hidden="true"></span>
+                                    <span class="truncate">{{ $meta['label'] }}</span>
+                                </dt>
+                                <span class="h-2 overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
+                                    <span class="block h-full rounded-full {{ $meta['bar'] }}" style="width: {{ $meta['count'] / $totalReports * 100 }}%"></span>
+                                </span>
+                                <dd class="w-6 text-end font-semibold tabular-nums text-gray-900">{{ $meta['count'] }}</dd>
+                            </div>
                         @endforeach
-                    </div>
-
-                    <ul class="mt-5 divide-y divide-gray-100">
-                        @foreach($statusMeta as $meta)
-                            @if($meta['count'] > 0)
-                                <li class="flex min-w-0 items-center justify-between gap-3 py-2.5 text-sm">
-                                    <span class="flex min-w-0 items-center gap-2.5 text-gray-600"><span class="h-2 w-2 shrink-0 rounded-full {{ $meta['bar'] }}" aria-hidden="true"></span><span class="truncate">{{ $meta['label'] }}</span></span>
-                                    <span class="flex shrink-0 items-baseline gap-3">
-                                        <span class="text-xs tabular-nums text-gray-400">{{ round($meta['count'] / $totalReports * 100) }}%</span>
-                                        <span class="w-8 text-end font-medium tabular-nums text-gray-900">{{ $meta['count'] }}</span>
-                                    </span>
-                                </li>
-                            @endif
-                        @endforeach
-                    </ul>
+                    </dl>
                 </section>
 
-                <section class="rounded-xl border border-gray-200 bg-white p-5 sm:p-6" aria-labelledby="category-breakdown-title">
-                    <h2 id="category-breakdown-title" class="text-sm font-semibold text-gray-900">{{ __('dashboard.breakdown.categories') }}</h2>
+                <section class="{{ $module }}" aria-labelledby="category-breakdown-title">
+                    <header class="flex items-baseline justify-between gap-3">
+                        <h2 id="category-breakdown-title" class="text-base font-semibold leading-snug text-gray-900">{{ __('dashboard.breakdown.categories') }}</h2>
+                    </header>
                     @if($sortedReportsByCategory->isNotEmpty())
-                        <ul class="mt-5 space-y-4">
+                        <dl class="flex flex-col gap-2.5">
                             @foreach($sortedReportsByCategory as $name => $count)
-                                <li>
-                                    <div class="flex items-center justify-between gap-3 text-sm">
-                                        <span class="min-w-0 truncate text-gray-600">{{ $name ?: __('dashboard.labels.unknown') }}</span>
-                                        <span class="shrink-0 font-medium tabular-nums text-gray-900">{{ $count }}</span>
-                                    </div>
-                                    <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                                        <div class="h-full rounded-full bg-gray-800" style="width: {{ ($count / $maxCategory) * 100 }}%"></div>
-                                    </div>
-                                </li>
+                                <div class="grid grid-cols-[7rem_1fr_auto] items-center gap-2.5 text-[13.5px]">
+                                    <dt class="truncate text-gray-500">{{ $name ?: __('dashboard.labels.unknown') }}</dt>
+                                    <span class="h-2 overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
+                                        <span class="block h-full rounded-full bg-red-600" style="width: {{ ($count / $maxCategory) * 100 }}%"></span>
+                                    </span>
+                                    <dd class="w-6 text-end font-semibold tabular-nums text-gray-900">{{ $count }}</dd>
+                                </div>
                             @endforeach
-                        </ul>
+                        </dl>
                     @else
-                        <p class="mt-5 text-sm text-gray-500">{{ __('dashboard.labels.unknown') }}</p>
+                        <p class="text-sm text-gray-500">{{ __('dashboard.labels.unknown') }}</p>
                     @endif
+                </section>
+
+                <section class="{{ $module }}" aria-labelledby="activity-title">
+                    <header class="flex items-baseline justify-between gap-3">
+                        <h2 id="activity-title" class="text-base font-semibold leading-snug text-gray-900">{{ __('dashboard.activity.title') }}</h2>
+                        @if($peakIndex !== null)
+                            <span class="shrink-0 text-xs tabular-nums text-gray-500">{{ __('dashboard.activity.peak', ['month' => $monthLabel($reportsByMonth[$peakIndex]['month']), 'count' => $peakCount]) }}</span>
+                        @endif
+                    </header>
+                    <figure class="flex flex-col gap-1.5">
+                        <div class="flex h-28 items-end gap-1.5 border-b border-gray-200">
+                            @foreach($reportsByMonth as $i => $m)
+                                <div class="group relative flex h-full flex-1 items-end" tabindex="0" aria-label="{{ $monthLabel($m['month']) }} {{ $m['month']->year }}: {{ $m['count'] }}">
+                                    <div @class([
+                                            'w-full rounded-t-[3px] transition-opacity group-hover:opacity-75',
+                                            'bg-red-600' => $i === $peakIndex,
+                                            'bg-red-200' => $i !== $peakIndex,
+                                        ])
+                                         style="height: {{ $m['count'] > 0 ? 'max(' . ($m['count'] / $maxMonth * 100) . '%, 3px)' : '0' }}"></div>
+                                    <div class="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700 shadow-md group-hover:block group-focus:block">
+                                        <span class="font-semibold tabular-nums">{{ $monthLabel($m['month']) }} {{ $m['month']->year }}</span> · {{ $m['count'] }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="flex gap-1.5 text-[10px] tabular-nums text-gray-500" aria-hidden="true">
+                            @foreach($reportsByMonth as $m)
+                                <span class="flex-1 text-center">{{ $monthLabel($m['month']) }}</span>
+                            @endforeach
+                        </div>
+                    </figure>
                 </section>
             </div>
 
