@@ -17,6 +17,7 @@
             locatedFromPhoto: "{{ __('Location read from the photo. Drag the pin to fine-tune.') }}",
             locatedFromDevice: "{{ __('Using your current location. Drag the pin to fine-tune.') }}",
             pinnedManually: "{{ __('Pin placed manually.') }}",
+        placedFromArea: "{{ __('Pin placed in the selected area. Tap the map to place it exactly.') }}",
             photoNoGps: "{{ __('This photo has no GPS data (common for shared or screenshot images).') }}",
             photoNoGpsPng: "{{ __('PNG images cannot carry GPS data.') }}",
             tryingDevice: "{{ __('Trying your device location instead...') }}",

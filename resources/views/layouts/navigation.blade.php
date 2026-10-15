@@ -209,8 +209,20 @@
                 </div>
             @endauth
 
-            <div class="mt-3 border-t border-gray-100 px-2 pt-3">
-                <x-language-switcher />
+            {{-- Inline choices rather than the desktop dropdown, which opened
+                 off the edge of the screen inside this panel. --}}
+            <div class="mt-3 border-t border-gray-100 pt-3">
+                <p class="px-1 text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('Change Language') }}</p>
+                <div class="mt-2 grid grid-cols-3 gap-2">
+                    @foreach(['en' => 'English', 'fr' => 'Français', 'ar' => 'العربية'] as $code => $languageName)
+                        <a href="{{ route('language.switch', $code) }}" @if(app()->getLocale() === $code) aria-current="true" @endif
+                           @class([
+                               'flex h-10 items-center justify-center rounded-lg border text-sm font-medium transition-colors',
+                               'border-red-200 bg-red-50 text-red-700' => app()->getLocale() === $code,
+                               'border-gray-200 text-gray-700 hover:bg-gray-50' => app()->getLocale() !== $code,
+                           ])>{{ $languageName }}</a>
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>

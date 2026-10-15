@@ -92,17 +92,22 @@ class ReportController extends Controller
                 break;
         }
 
+        // Across every matching report, not just the page on screen.
+        $newToday = (clone $reportsQuery)->where('created_at', '>=', now()->subDay())->count();
+
         $reports = $reportsQuery->paginate(12)->withQueryString();
 
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'html' => view('reports.partials.results', compact('reports'))->render(),
+                'summary' => view('reports.partials.summary', compact('reports', 'newToday'))->render(),
             ]);
         }
 
         return view('reports.index', compact(
             'reports',
+            'newToday',
             'categories',
             'cities',
             'districts',
@@ -182,7 +187,7 @@ class ReportController extends Controller
 
         Report::create($validated);
 
-        return redirect()->route('dashboard')->with('success', 'Report submitted successfully!');
+        return redirect()->route('dashboard')->with('success', __('flash.report_created'));
     }
 
     public function show(Report $report)
@@ -255,7 +260,7 @@ class ReportController extends Controller
 
         $report->update($validated);
 
-        return redirect()->route('dashboard')->with('success', 'Report updated successfully!');
+        return redirect()->route('dashboard')->with('success', __('flash.report_updated'));
     }
 
     public function destroy(Report $report)
@@ -273,7 +278,7 @@ class ReportController extends Controller
 
         $report->delete();
 
-        return redirect()->route('dashboard')->with('success', 'Report deleted successfully!');
+        return redirect()->route('dashboard')->with('success', __('flash.report_deleted'));
     }
 
     public function getQuartierCoordinates(Quartier $quartier)

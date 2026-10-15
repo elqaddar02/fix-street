@@ -1,5 +1,5 @@
 <!-- Hero Section -->
-<section class="hero-gradient text-white py-14 sm:py-16 relative overflow-hidden fade-in">
+<section class="hero-gradient text-white py-10 sm:py-16 relative overflow-hidden fade-in">
     <div class="absolute inset-0 opacity-5">
         <div class="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
@@ -9,15 +9,15 @@
         <div class="grid md:grid-cols-2 gap-12 items-center">
             <!-- Hero Content -->
             <div>
-                <div class="mb-6 flex items-center gap-3">
+                <div class="mb-4 md:mb-6 flex items-center gap-3">
                     <div class="w-2 h-2 bg-yellow-300 rounded-full pulse-dot"></div>
                     <span class="text-yellow-100 text-sm font-bold uppercase tracking-widest">{{ __('Improving Your City') }}</span>
                 </div>
-                <h1 class="text-5xl md:text-6xl font-black mb-6 leading-[1.5] tracking-tight" aria-label="Report Streets, Get Them Fixed">
+                <h1 class="text-4xl md:text-6xl font-black mb-4 md:mb-6 leading-[1.3] md:leading-[1.5] tracking-tight" aria-label="Report Streets, Get Them Fixed">
                     <span id="line1" data-text="{{ __('Report Streets,') }}" class="inline-block"></span><br>
                     <span id="line2" data-text="{{ __('Get Them Fixed') }}" class="text-yellow-300 inline-block"></span>
                 </h1>
-                <p class="text-lg text-gray-100 mb-8 leading-relaxed max-w-xl">
+                <p class="text-base md:text-lg text-gray-100 mb-6 md:mb-8 leading-relaxed max-w-xl">
                     {{ __('Report potholes, broken lights and damaged infrastructure, rally your neighbors, and follow each problem until it is fixed. Madinup is an independent citizen initiative.') }}
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4">
@@ -58,17 +58,17 @@
             // Only cities where reports can actually be filed (a district is required).
             $citiesCount = \App\Models\City::where('active', true)->whereHas('districts')->count();
         @endphp
-        <div class="grid grid-cols-3 gap-6 mt-10 pt-8 border-t border-white/20">
+        <div class="grid grid-cols-3 gap-4 md:gap-6 mt-8 md:mt-10 pt-6 md:pt-8 border-t border-white/20">
             <!-- Total Reports Stat -->
             <div class="text-center">
-                <div class="stat-counter text-4xl font-black text-yellow-300 mb-3" data-target="{{ $totalReports }}">0</div>
+                <div class="stat-counter text-3xl md:text-4xl font-black text-yellow-300 mb-2 md:mb-3" data-target="{{ $totalReports }}">0</div>
                 <p class="text-sm text-white/80 font-semibold uppercase tracking-wider">{{ __('Total Reports') }}</p>
             </div>
             
             <!-- Resolved Issues Stat with Percentage -->
             <div class="text-center">
                 <div class="mb-3">
-                    <div class="relative w-24 h-24 mx-auto mb-2">
+                    <div class="relative w-16 h-16 md:w-24 md:h-24 mx-auto mb-2">
                         <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                             <!-- Background circle -->
                             <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="8"/>
@@ -76,7 +76,7 @@
                             <circle class="stat-progress-circle" cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-dasharray="282.7" stroke-dashoffset="282.7" style="color: #FBBF24; transition: stroke-dashoffset 2s ease-out;"/>
                         </svg>
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <span class="stat-percentage text-2xl font-black text-yellow-300">0%</span>
+                            <span class="stat-percentage text-lg md:text-2xl font-black text-yellow-300">0%</span>
                         </div>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
             
             <!-- Cities Covered Stat -->
             <div class="text-center">
-                <div class="stat-counter text-4xl font-black text-yellow-300 mb-3" data-target="{{ $citiesCount }}">0</div>
+                <div class="stat-counter text-3xl md:text-4xl font-black text-yellow-300 mb-2 md:mb-3" data-target="{{ $citiesCount }}">0</div>
                 <p class="text-sm text-white/80 font-semibold uppercase tracking-wider">{{ __('Cities Covered') }}</p>
             </div>
         </div>

@@ -491,6 +491,13 @@ function setLocation(lat, lng, source) {
     });
 
     map.setView([lat, lng], 16);
+
+    // Picking a city/district/quartier places the pin too; say so, rather than
+    // leaving an earlier "location access is blocked" message on screen.
+    if (source === 'select') {
+        setLocationStatus('manual', window.reportConfig.translations.placedFromArea);
+    }
+
     applyResolvedLocation(lat, lng, source);
 }
 

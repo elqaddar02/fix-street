@@ -405,5 +405,13 @@
     "reports.new_today": ":count new in the last 24 hours",
     "reports.subtitle": "Every street problem reported by citizens, with its current status.",
     "reports.loading": "Loading reports…",
-    "reports.load_error": "Error loading reports. Please try again."
+    "reports.load_error": "Error loading reports. Please try again.",
+    "report.confirm_failed": "Couldn't save your confirmation. Please try again.",
+    "flash.report_created": "Report submitted. Thank you!",
+    "flash.report_updated": "Report updated.",
+    "flash.report_deleted": "Report deleted.",
+    "help.contact.sent": "Message sent. We'll reply by email.",
+    "help.contact.unavailable": "The contact form isn't available yet. Please try again later.",
+    "nav.main": "Main navigation",
+    "nav.profile_tab": "Profile"
 }

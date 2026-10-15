@@ -16,6 +16,14 @@ return [
     'name' => env('APP_NAME', 'Madinup'),
 
     /*
+    | Where the public contact form is delivered, and the address shown on the
+    | contact page. Left empty, the page hides the address and the form says
+    | that messages can't be sent yet.
+    */
+
+    'contact_email' => env('CONTACT_EMAIL'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
