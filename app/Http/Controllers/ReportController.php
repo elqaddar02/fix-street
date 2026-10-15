@@ -187,7 +187,7 @@ class ReportController extends Controller
 
     public function show(Report $report)
     {
-        $report->load(['visibleComments.user', 'category', 'city', 'user', 'likes']);
+        $report->load(['visibleComments.user', 'category', 'city', 'district', 'quartier', 'user', 'likes']);
         $report->loadCount('likes');
 
         return view('reports.show', compact('report'));
@@ -203,8 +203,9 @@ class ReportController extends Controller
         $categories = Category::all();
         $cities = City::where('active', true)->get();
         $districts = District::all();
+        $quartiers = Quartier::all();
 
-        return view('reports.edit', compact('report', 'categories', 'cities', 'districts'));
+        return view('reports.edit', compact('report', 'categories', 'cities', 'districts', 'quartiers'));
     }
 
     public function update(Request $request, Report $report)
@@ -214,20 +215,39 @@ class ReportController extends Controller
             abort(403);
         }
 
+        // A report in a case only shows title and category on the edit form.
+        $locationEditable = ! $report->dossier_id;
+
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'city_id'     => 'required|exists:cities,id',
-            'district_id' => 'nullable|exists:districts,id',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:6144',
+            'city_id'     => [Rule::requiredIf($locationEditable), 'nullable', 'exists:cities,id'],
+            'district_id' => ['nullable', Rule::exists('districts', 'id')->where('city_id', $request->input('city_id'))],
+            'quartier_id' => ['nullable', Rule::exists('quartiers', 'id')->where('district_id', $request->input('district_id'))],
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:6144',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
+        ], [
+            'image.image' => __('validation.image_required'),
+            'image.mimes' => __('validation.image_types'),
+            'image.max' => __('validation.image_size'),
+            'district_id.exists' => __('validation.district_city_mismatch'),
+            'quartier_id.exists' => __('validation.quartier_district_mismatch'),
         ]);
 
+        // The form collects one piece of text, mirrored into description on
+        // create. Keep the mirror in step; a separately written description stays.
+        if (! filled($validated['description'] ?? null)) {
+            unset($validated['description']);
+            if ($report->description === $report->title) {
+                $validated['description'] = $validated['title'];
+            }
+        }
+
         // A report that is part of a case is evidence: its photo and location can no longer change.
-        if ($report->dossier_id) {
-            unset($validated['image'], $validated['latitude'], $validated['longitude'], $validated['city_id'], $validated['district_id']);
+        if (! $locationEditable) {
+            unset($validated['image'], $validated['latitude'], $validated['longitude'], $validated['city_id'], $validated['district_id'], $validated['quartier_id']);
         } elseif ($request->hasFile('image')) {
             $this->uploads->delete($report->image);
             $validated['image'] = $this->uploads->store($request->file('image'), 'reports');

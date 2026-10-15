@@ -40,8 +40,8 @@
 @endphp
 
 <x-app-layout>
-    <div class="mx-auto max-w-6xl px-4 py-10 font-['IBM_Plex_Sans',ui-sans-serif,system-ui,sans-serif] sm:px-6 lg:px-8">
-        <header class="flex flex-col gap-5 border-b border-gray-200 pb-8 sm:flex-row sm:items-end sm:justify-between">
+    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <header class="flex flex-col gap-4 border-b border-gray-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
             <div class="min-w-0">
                 <p class="text-xs font-medium uppercase tracking-[0.14em] text-gray-500">{{ __('nav.my_reports') }}</p>
                 <h1 class="mt-2 text-2xl font-semibold tracking-tight text-gray-900 sm:text-[1.75rem]">
@@ -51,13 +51,13 @@
             </div>
 
             <a href="{{ route('reports.create') }}"
-               class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2">
+               class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/></svg>
                 {{ __('dashboard.new_report') }}
             </a>
         </header>
 
-        <section aria-label="{{ __('dashboard.stats.total') }}" class="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <section aria-label="{{ __('dashboard.stats.total') }}" class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
             <article class="{{ $tile }} border-red-200 shadow-[0_5px_18px_rgba(220,38,38,0.08)]">
                 <span class="{{ $eyebrow }}">{{ __('dashboard.stats.total') }}</span>
                 <span class="{{ $figure }}">{{ $totalReports }}</span>
@@ -87,10 +87,10 @@
         </section>
 
         @if($totalReports === 0)
-            <section class="mt-8 rounded-xl border border-gray-200 bg-white px-6 py-14 text-center">
+            <section class="mt-6 rounded-xl border border-gray-200 bg-white px-6 py-12 text-center">
                 <h2 class="text-base font-semibold text-gray-900">{{ __('dashboard.empty.headline') }}</h2>
                 <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-gray-500">{{ __('dashboard.empty.body') }}</p>
-                <a href="{{ route('reports.create') }}" class="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2">
+                <a href="{{ route('reports.create') }}" class="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/></svg>
                     {{ __('dashboard.new_report') }}
                 </a>
@@ -190,7 +190,7 @@
                 </section>
             </div>
 
-            <section class="mt-10" aria-labelledby="reports-title">
+            <section class="mt-8" aria-labelledby="reports-title">
                 <div class="mb-3 flex items-end justify-between gap-3">
                     <div>
                         <h2 id="reports-title" class="text-base font-semibold text-gray-900">{{ __('dashboard.table.title') }}</h2>

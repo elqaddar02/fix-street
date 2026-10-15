@@ -126,18 +126,25 @@ function showImageAlert(message) {
 // Every location attempt reports back to the user. Silence was the previous
 // failure mode: when a photo had no GPS tag nothing happened on screen, which
 // is indistinguishable from "the feature is broken".
+const statusIcon = (d) => `<svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="${d}"/></svg>`;
+const ICON_CHECK = statusIcon('M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z');
+const ICON_PIN = statusIcon('M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z');
+const ICON_CLOCK = statusIcon('M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z');
+const ICON_INFO = statusIcon('m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z');
+const ICON_WARN = statusIcon('M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z');
+
 const LOCATION_STATE = {
-    photo: { icon: '📷', tone: 'green' },
-    gps: { icon: '📍', tone: 'green' },
-    manual: { icon: '📍', tone: 'blue' },
-    locating: { icon: '⏳', tone: 'blue' },
-    nophoto: { icon: 'ℹ️', tone: 'amber' },
-    error: { icon: '⚠️', tone: 'amber' },
+    photo: { icon: ICON_CHECK, tone: 'green' },
+    gps: { icon: ICON_PIN, tone: 'green' },
+    manual: { icon: ICON_PIN, tone: 'neutral' },
+    locating: { icon: ICON_CLOCK, tone: 'neutral' },
+    nophoto: { icon: ICON_INFO, tone: 'amber' },
+    error: { icon: ICON_WARN, tone: 'amber' },
 };
 
 const TONE_CLASSES = {
-    green: 'border-green-200 bg-green-50 text-green-800',
-    blue: 'border-blue-200 bg-blue-50 text-blue-800',
+    green: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+    neutral: 'border-gray-200 bg-gray-50 text-gray-700',
     amber: 'border-amber-200 bg-amber-50 text-amber-800',
 };
 
@@ -147,8 +154,8 @@ function setLocationStatus(state, message) {
     if (!box || !text) return;
 
     const { icon, tone } = LOCATION_STATE[state] || LOCATION_STATE.manual;
-    box.className = 'mt-3 rounded-2xl border px-4 py-3 text-sm flex items-start gap-3 ' + TONE_CLASSES[tone];
-    text.innerHTML = `<span class="mr-1">${icon}</span>${message}`;
+    box.className = 'mt-3 rounded-lg border px-3.5 py-2.5 text-sm flex items-start gap-2.5 ' + TONE_CLASSES[tone];
+    text.innerHTML = `<span class="inline-flex items-start gap-2">${icon}<span>${message}</span></span>`;
     box.classList.remove('hidden');
 }
 
@@ -415,11 +422,13 @@ let marker;
 function initMap() {
     if (!document.getElementById('map')) return;
 
+    const markerBase = window.reportConfig.markerBase || '/images';
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
-        iconRetinaUrl: '/images/marker-icon-2x.png',
-        iconUrl: '/images/marker-icon.png',
-        shadowUrl: '/images/marker-shadow.png',
+        // Built from the app's asset URL so it also works when served from a subfolder.
+        iconRetinaUrl: markerBase + '/marker-icon-2x.png',
+        iconUrl: markerBase + '/marker-icon.png',
+        shadowUrl: markerBase + '/marker-shadow.png',
     });
 
     const defaultLat = 31.7917;
@@ -485,8 +494,8 @@ function setLocation(lat, lng, source) {
     applyResolvedLocation(lat, lng, source);
 }
 
-const USE_LOCATION_ICON = `<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`;
-const SPINNER_ICON = `<svg class="w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
+const USE_LOCATION_ICON = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`;
+const SPINNER_ICON = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>`;
 
 // Asks the device for its position. `silent` requests (page load, or an EXIF
 // miss) report failures into the status box instead of an alert() — only an

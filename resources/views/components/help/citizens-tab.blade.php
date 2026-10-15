@@ -4,7 +4,7 @@
         <p class="text-gray-600">{{ __('help.citizens.subtitle') }}</p>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-6">
+    <div class="rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)] p-5 sm:p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __('help.citizens.what_is_madinova.title') }}</h2>
         <div class="space-y-4 text-gray-700">
             <p>{{ __('help.citizens.what_is_madinova.description1') }}</p>
@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-6">
+    <div class="rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)] p-5 sm:p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __('help.citizens.how_to_report.title') }}</h2>
         <div class="space-y-4 text-gray-700">
             <p>{{ __('help.citizens.how_to_report.intro') }}</p>
@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-6">
+    <div class="rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)] p-5 sm:p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __('help.citizens.reports_public.title') }}</h2>
         <div class="space-y-4 text-gray-700">
             <p>{{ __('help.citizens.reports_public.description1') }}</p>
@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-6">
+    <div class="rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)] p-5 sm:p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __('help.citizens.accounts_notifications.title') }}</h2>
         <div class="space-y-4 text-gray-700">
             <p>{{ __('help.citizens.accounts_notifications.description1') }}</p>
@@ -44,7 +44,7 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-6">
+    <div class="rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)] p-5 sm:p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __('help.citizens.what_can_report.title') }}</h2>
         <div class="space-y-4 text-gray-700">
             <p>{{ __('help.citizens.what_can_report.intro') }}</p>
@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm p-6">
+    <div class="rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)] p-5 sm:p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __('help.citizens.technical_problems.title') }}</h2>
         <div class="space-y-4 text-gray-700">
             <p>{{ __('help.citizens.technical_problems.description1') }}</p>

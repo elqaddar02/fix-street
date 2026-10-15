@@ -1,143 +1,119 @@
+@php
+    $title = __('nav.all_reports') . ' - Madinup';
+    $field = 'mt-1.5 block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500';
+    $label = 'block text-sm font-medium text-gray-700';
+    $newToday = $reports->where('created_at', '>=', now()->subDay())->count();
+@endphp
+
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <h2 class="font-black text-2xl text-slate-900 tracking-tightest uppercase">
-                       {{ __('All Reports') }}
-                </h2>
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{{ __('Live Feed Active') }}</span>
-                </div>
+    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <header class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div class="min-w-0">
+                <h1 class="text-2xl font-semibold tracking-tight text-gray-900">{{ __('nav.all_reports') }}</h1>
+                <p class="mt-1 text-sm text-gray-500">
+                    {{ trans_choice('reports.summary', $reports->total(), ['count' => $reports->total()]) }}
+                    @if($newToday > 0)
+                        <span class="text-gray-300" aria-hidden="true">·</span>
+                        <span class="font-medium text-red-700">{{ __('reports.new_today', ['count' => $newToday]) }}</span>
+                    @endif
+                </p>
             </div>
-            
-            <div class="flex items-center gap-6 bg-white border border-slate-200 px-6 py-3 rounded-2xl shadow-sm">
-                <div class="text-center border-r border-slate-100 pr-6">
-                    <p class="text-[10px] font-black uppercase text-slate-400 leading-none mb-1">{{ __('Total') }}</p>
-                    <p class="text-lg font-black text-slate-900 leading-none">{{ $reports->total() }}</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-[10px] font-black uppercase text-slate-400 leading-none mb-1">{{ __('New') }}</p>
-                    <p class="text-lg font-black text-red-600 leading-none">{{ $reports->where('created_at', '>=', now()->subDay())->count() }}</p>
-                </div>
-            </div>
-        </div>
-    </x-slot>
+            <a href="{{ route('reports.create') }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/></svg>
+                {{ __('dashboard.new_report') }}
+            </a>
+        </header>
 
-    <div class="py-12 bg-[#F8FAFC] min-h-screen relative">
-        <div class="absolute inset-0 opacity-[0.015] pointer-events-none" style="background-image: radial-gradient(#0f172a 1px, transparent 1px); background-size: 24px 24px;"></div>
+        <div class="grid gap-6 lg:grid-cols-4">
+            <aside class="lg:col-span-1">
+                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-[0_3px_12px_rgba(17,24,39,0.04)] lg:sticky lg:top-24">
+                    <h2 class="flex items-center gap-2 text-base font-semibold text-gray-900">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/></svg>
+                        {{ __('reports.filters') }}
+                    </h2>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="grid lg:grid-cols-4 gap-10">
-                
-                <aside class="lg:col-span-1">
-                    <div class="sticky top-10 space-y-4">
-                        <div class="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-xl shadow-slate-200/40">
-                            <div class="flex items-center justify-between mb-8">
-                                <h3 class="text-sm font-black uppercase tracking-widest text-slate-900">{{ __('Filter Panel') }}</h3>
-                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                            </div>
-
-                            <form method="GET" action="{{ route('reports.index') }}" class="space-y-6">
-                                <div class="group">
-                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-red-600 transition">{{ __('Category') }}</label>
-                                    <select name="category" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none">
-                                        <option value="">{{ __('All Domains') }}</option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}" @selected($selectedCategory == $category->id)>{{ $category->display_name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="group">
-                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-red-600 transition">{{ __('City') }}</label>
-                                    <select name="city" id="city-select" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none">
-                                        <option value="">{{ __('All Cities') }}</option>
-                                        @foreach ($cities as $city)
-                                            <option value="{{ $city->id }}" @selected($selectedCity == $city->id)>{{ $city->display_name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="group">
-                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-red-600 transition">{{ __('District') }}</label>
-                                    <select name="district" id="district-select" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none">
-                                        <option value="">{{ __('All Districts') }}</option>
-                                        @foreach ($districts as $district)
-                                            <option value="{{ $district->id }}" data-city-id="{{ $district->city_id }}" @selected($selectedDistrict == $district->id)>{{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="group">
-                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-red-600 transition">{{ __('Quartier') }}</label>
-                                    <select name="quartier" id="quartier-select" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none">
-                                        <option value="">{{ __('All Quartiers') }}</option>
-                                        @foreach ($quartiers as $quartier)
-                                            <option value="{{ $quartier->id }}" data-district-id="{{ $quartier->district_id }}" @selected($selectedQuartier == $quartier->id)>{{ app()->getLocale() === 'ar' ? $quartier->name_ar : $quartier->name_fr }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="group">
-                                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 group-focus-within:text-red-600 transition">{{ __('Timeline') }}</label>
-                                    <select name="date" class="w-full rounded-2xl border-slate-100 bg-slate-50 px-5 py-3.5 text-sm font-bold text-slate-700 transition focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-50/50 appearance-none">
-                                        <option value="">{{ __('Full History') }}</option>
-                                        <option value="today" @selected($selectedDate === 'today')>{{ __('Last 24 Hours') }}</option>
-                                        <option value="week" @selected($selectedDate === 'week')>{{ __('This Week') }}</option>
-                                        <option value="month" @selected($selectedDate === 'month')>{{ __('This Month') }}</option>
-                                    </select>
-                                </div>
-
-                                <div class="pt-6 border-t border-slate-50 space-y-3">
-                                    <button type="submit" class="w-full rounded-2xl bg-slate-900 px-4 py-4 text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-red-600 shadow-lg shadow-slate-900/10 active:scale-95">
-                                        {{ __('Update View') }}
-                                    </button>
-                                    <a href="{{ route('reports.index') }}" class="block w-full text-center text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-600 transition">
-                                        {{ __('Clear Filters') }}
-                                    </a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </aside>
-
-                <section x-data="reportsView()" x-init="init()" class="lg:col-span-3 space-y-8">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <h3 class="text-sm font-black uppercase tracking-widest text-slate-900">{{ __('Sort Selection') }}</h3>
-                            <div class="h-px w-12 bg-slate-200"></div>
-                            <select id="sort-select" class="border-none bg-transparent text-xs font-black uppercase tracking-widest text-red-600 focus:ring-0 cursor-pointer">
-                                <option value="latest" {{ $sortBy === 'latest' ? 'selected' : '' }}>{{ __('Latest First') }}</option>
-                                <option value="mostLiked" {{ $sortBy === 'mostLiked' ? 'selected' : '' }}>{{ __('Most Urgent') }}</option>
-                                <option value="oldest" {{ $sortBy === 'oldest' ? 'selected' : '' }}>{{ __('Oldest First') }}</option>
+                    <form method="GET" action="{{ route('reports.index') }}" class="mt-4 space-y-4">
+                        <div>
+                            <label class="{{ $label }}" for="filter-category">{{ __('Category') }}</label>
+                            <select name="category" id="filter-category" class="{{ $field }}">
+                                <option value="">{{ __('reports.all_categories') }}</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}" @selected($selectedCategory == $category->id)>{{ $category->display_name }}</option>
+                                @endforeach
                             </select>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <a href="{{ route('reports.create') }}" class="group inline-flex items-center gap-3 rounded-full bg-red-600 pl-6 pr-2 py-2 text-xs font-black uppercase tracking-widest text-white shadow-xl shadow-red-200 hover:bg-slate-900 transition-all">
-                                {{ __('New Report') }}
-                                <div class="bg-white/20 p-2 rounded-full group-hover:bg-red-500 transition">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
-                                </div>
-                            </a>
+
+                        <div>
+                            <label class="{{ $label }}" for="city-select">{{ __('City') }}</label>
+                            <select name="city" id="city-select" class="{{ $field }}">
+                                <option value="">{{ __('reports.all_cities') }}</option>
+                                @foreach ($cities as $city)
+                                    <option value="{{ $city->id }}" @selected($selectedCity == $city->id)>{{ $city->display_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="{{ $label }}" for="district-select">{{ __('District / Arrondissement') }}</label>
+                            <select name="district" id="district-select" class="{{ $field }}">
+                                <option value="">{{ __('reports.all_districts') }}</option>
+                                @foreach ($districts as $district)
+                                    <option value="{{ $district->id }}" data-city-id="{{ $district->city_id }}" @selected($selectedDistrict == $district->id)>{{ app()->getLocale() === 'ar' ? $district->name_ar : $district->name_fr }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="{{ $label }}" for="quartier-select">{{ __('Quartier') }}</label>
+                            <select name="quartier" id="quartier-select" class="{{ $field }}">
+                                <option value="">{{ __('reports.all_quartiers') }}</option>
+                                @foreach ($quartiers as $quartier)
+                                    <option value="{{ $quartier->id }}" data-district-id="{{ $quartier->district_id }}" @selected($selectedQuartier == $quartier->id)>{{ app()->getLocale() === 'ar' ? $quartier->name_ar : $quartier->name_fr }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="{{ $label }}" for="filter-date">{{ __('reports.date') }}</label>
+                            <select name="date" id="filter-date" class="{{ $field }}">
+                                <option value="">{{ __('reports.any_time') }}</option>
+                                <option value="today" @selected($selectedDate === 'today')>{{ __('reports.last_24h') }}</option>
+                                <option value="week" @selected($selectedDate === 'week')>{{ __('reports.this_week') }}</option>
+                                <option value="month" @selected($selectedDate === 'month')>{{ __('reports.this_month') }}</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center gap-3 border-t border-gray-100 pt-4">
+                            <x-primary-button class="flex-1">{{ __('reports.apply') }}</x-primary-button>
+                            <a href="{{ route('reports.index') }}" class="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900">{{ __('reports.clear') }}</a>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+
+            <section x-data="reportsView()" x-init="init()" class="space-y-4 lg:col-span-3">
+                <div class="flex items-center justify-end gap-2">
+                    <label for="sort-select" class="text-sm text-gray-500">{{ __('reports.sort_by') }}</label>
+                    <select id="sort-select" class="rounded-lg border-gray-300 py-1.5 text-sm shadow-sm focus:border-red-500 focus:ring-red-500">
+                        <option value="latest" @selected($sortBy === 'latest')>{{ __('reports.sort.latest') }}</option>
+                        <option value="mostLiked" @selected($sortBy === 'mostLiked')>{{ __('reports.sort.most_confirmed') }}</option>
+                        <option value="oldest" @selected($sortBy === 'oldest')>{{ __('reports.sort.oldest') }}</option>
+                    </select>
+                </div>
+
+                <div id="list-view" class="relative">
+                    <div id="loading-indicator" class="absolute inset-0 z-20 flex hidden items-center justify-center rounded-xl bg-white/80 backdrop-blur-sm">
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <svg class="h-4 w-4 animate-spin text-red-600" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            <span>{{ __('reports.loading') }}</span>
                         </div>
                     </div>
 
-                    <!-- List View -->
-                    <div id="list-view" class="relative">
-                        <div id="loading-indicator" class="absolute inset-0 z-20 bg-white/80 backdrop-blur-sm flex items-center justify-center hidden">
-                            <div class="flex items-center gap-3 text-slate-700">
-                                <div class="h-4 w-4 rounded-full animate-bounce bg-red-600"></div>
-                                <span class="font-semibold">Loading reports…</span>
-                            </div>
-                        </div>
-
-                        <div id="results-container">
-                            @include('reports.partials.results')
-                        </div>
+                    <div id="results-container">
+                        @include('reports.partials.results')
                     </div>
-                </section>
-            </div>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -225,7 +201,7 @@
                         }
                     } catch (err) {
                         console.error('Error fetching reports:', err);
-                        container.innerHTML = '<p class="col-span-2 text-center text-red-600 font-semibold">Error loading reports. Please try again.</p>';
+                        container.innerHTML = '<p class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">' + @js(__('reports.load_error')) + '</p>';
                     } finally {
                         if (loadingEl) loadingEl.classList.add('hidden');
                         this.loading = false;

@@ -9,18 +9,17 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=ibm-plex-sans:400,500,600,700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-            <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;900&display=swap" rel="stylesheet">
             <script src="https://cdn.tailwindcss.com"></script>
             <script>
                 tailwind.config = {
                     theme: {
                         extend: {
                             fontFamily: {
-                                sans: ['Figtree', 'sans-serif'],
+                                sans: ["IBM Plex Sans", "sans-serif"],
                             },
                         },
                     },
@@ -47,7 +46,7 @@
 
                 <a href="/" class="relative z-10 flex items-center gap-3">
                     <x-application-logo class="h-9 w-9" />
-                    <span class="font-black text-xl tracking-tight">Madinova</span>
+                    <span class="font-bold text-xl tracking-tight">Madinova</span>
                 </a>
 
                 <div class="relative z-10 hidden lg:block max-w-md">
@@ -55,7 +54,7 @@
                         <div class="w-2 h-2 bg-yellow-300 rounded-full"></div>
                         <span class="text-yellow-100 text-sm font-bold uppercase tracking-widest">{{ __('Improving Your City') }}</span>
                     </div>
-                    <h1 class="text-4xl font-black leading-tight mb-4">
+                    <h1 class="text-4xl font-bold leading-tight mb-4">
                         {{ __('Report Streets,') }}<br>
                         <span class="text-yellow-300">{{ __('Get Them Fixed') }}</span>
                     </h1>
@@ -72,7 +71,7 @@
             <!-- Form panel -->
             <div class="flex-1 flex items-center justify-center px-6 py-12 sm:px-10 bg-gray-50">
                 <div class="w-full max-w-md">
-                    <div class="bg-white px-6 py-8 sm:px-10 sm:py-10 shadow-xl rounded-2xl border border-gray-100">
+                    <div class="rounded-xl border border-gray-200 bg-white px-6 py-8 shadow-[0_3px_12px_rgba(17,24,39,0.04)] sm:px-8">
                         {{ $slot }}
                     </div>
                 </div>

@@ -41,9 +41,27 @@ class ReportCreatePageAssetsTest extends TestCase
 
     public function test_edit_page_also_loads_the_helper_it_depends_on(): void
     {
-        $content = file_get_contents(resource_path('views/reports/edit.blade.php'));
+        $user = User::factory()->create();
+        $report = \App\Models\Report::create([
+            'title' => 'Nid-de-poule',
+            'description' => 'Nid-de-poule',
+            'status' => 'OPEN',
+            'user_id' => $user->id,
+            'category_id' => Category::create(['name' => 'Roads', 'name_ar' => 'الطرق'])->id,
+            'city_id' => City::create(['name' => 'Casablanca', 'active' => true])->id,
+        ]);
+
+        $content = $this->actingAs($user)
+            ->get(route('reports.edit', $report))
+            ->assertOk()
+            ->getContent();
 
         $this->assertStringContainsString('js/reports/image-compress.js', $content);
+        $this->assertLessThan(
+            strpos($content, 'js/reports/create.js'),
+            strpos($content, 'js/reports/image-compress.js'),
+            'The edit page shares the create form and its scripts, in the same order.'
+        );
     }
 
     #[DataProvider('acceptedImageTypes')]

@@ -1,14 +1,14 @@
 <!-- Recent Reports Section -->
-<section id="recent-reports" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="flex items-center justify-between mb-16">
+<section id="recent-reports" class="bg-white py-12 sm:py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <span class="inline-block text-red-600 font-bold text-sm uppercase tracking-wider mb-3">{{ __('Recent Activity') }}</span>
-                <h2 class="text-4xl font-black text-gray-900">{{ __('Latest Reports') }}</h2>
+                <p class="text-xs font-semibold uppercase tracking-wider text-red-600">{{ __('Recent Activity') }}</p>
+                <h2 class="mt-1.5 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">{{ __('Latest Reports') }}</h2>
             </div>
-            <a href="{{ route('reports.index') }}" class="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all">
+            <a href="{{ route('reports.index') }}" class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700">
                 {{ __('View All Reports') }}
-                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                <svg class="h-4 w-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
             </a>
         </div>
 
@@ -20,72 +20,57 @@
                 prev() { if (this.currentIndex > 0) this.currentIndex--; },
                 goTo(index) { this.currentIndex = index; }
             }" class="relative overflow-hidden">
-                <div class="flex transition-transform duration-300 ease-in-out" :style="`transform: translateX(-${currentIndex * 100}%)`">
+                <div class="flex transition-transform duration-300 ease-in-out" :style="`transform: translateX(${document.dir === 'rtl' ? '' : '-'}${currentIndex * 100}%)`">
                     @foreach($latestReports->chunk(3) as $chunk)
-                        <div class="flex-none w-full grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+                        {{-- A little padding so card shadows aren't clipped by the slider. --}}
+                        <div class="grid w-full flex-none grid-cols-1 gap-5 p-1 md:grid-cols-3">
                             @foreach($chunk as $report)
-                                <a href="{{ route('reports.show', $report) }}" class="block card-hover bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-lg hover:shadow-2xl">
-                                    <div class="relative h-48 bg-gray-100 overflow-hidden">
-                                        @if($report->image && file_exists(storage_path('app/public/' . $report->image)))
-                                            <img src="{{ asset('storage/' . $report->image) }}" alt="{{ $report->title }}" class="report-card-image w-full h-full">
+                                @php
+                                    $hasImage = $report->image && file_exists(storage_path('app/public/' . $report->image));
+                                    $confirmations = $report->likes_count ?? 0;
+                                @endphp
+                                <a href="{{ route('reports.show', $report) }}" class="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)] transition hover:border-gray-300 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
+                                    <div class="relative aspect-[16/9] overflow-hidden bg-gray-100">
+                                        @if($hasImage)
+                                            <img src="{{ asset('storage/' . $report->image) }}" alt="{{ $report->title }}" loading="lazy" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]">
                                         @else
-                                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50">
-                                                <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                </svg>
+                                            <div class="flex h-full w-full items-center justify-center text-gray-300">
+                                                <svg class="h-10 w-10" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
                                             </div>
                                         @endif
-                                        <div class="absolute top-3 right-3">
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase"
-                                                @switch($report->status)
-                                                    @case('OPEN')
-                                                        style="background-color: #fee2e2; color: #991b1b;"
-                                                    @break
-                                                    @case('IN_PROGRESS')
-                                                        style="background-color: #fed7aa; color: #92400e;"
-                                                    @break
-                                                    @case('RESOLVED')
-                                                        style="background-color: #dcfce7; color: #166534;"
-                                                    @break
-                                                @endswitch
-                                            >{{ $report->status }}</span>
-                                        </div>
+                                        <x-status-badge :status="$report->status" class="absolute end-3 top-3 shadow-sm" />
                                     </div>
 
-                                    <div class="p-6">
-                                        <div class="flex items-start justify-between mb-3">
-                                            <div class="flex flex-wrap gap-2">
-                                                <span class="inline-block px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
-                                                    {{ $report->category->display_name ?? 'Unknown' }}
-                                                </span>
-                                                <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
-                                                    {{ $report->city->display_name ?? 'Unknown' }}
-                                                </span>
-                                            </div>
-                                            <time class="text-xs text-gray-500 font-semibold">{{ $report->created_at->format('M d, Y') }}</time>
+                                    <div class="flex flex-1 flex-col p-5">
+                                        <div class="flex items-center justify-between gap-3 text-xs">
+                                            <p class="flex min-w-0 items-center gap-1.5 text-gray-500">
+                                                <span class="truncate font-medium text-red-700">{{ $report->category->display_name ?? __('dashboard.labels.unknown') }}</span>
+                                                <span class="text-gray-300" aria-hidden="true">·</span>
+                                                <span class="truncate">{{ $report->city->display_name ?? __('dashboard.labels.unknown') }}</span>
+                                            </p>
+                                            <time class="shrink-0 text-gray-500" datetime="{{ $report->created_at->toIso8601String() }}">{{ $report->created_at->copy()->locale(app()->getLocale())->translatedFormat('j M Y') }}</time>
                                         </div>
 
                                         {{-- title and description hold the same sentence (the form
                                              collects one field), so only show description when it differs. --}}
-                                        <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-3">{{ $report->title }}</h3>
+                                        <h3 class="mt-2 line-clamp-2 text-base font-semibold leading-snug text-gray-900 group-hover:text-red-700">{{ $report->title }}</h3>
                                         @if(filled($report->description) && $report->description !== $report->title)
-                                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $report->description }}</p>
+                                            <p class="mt-1 line-clamp-2 text-sm text-gray-500">{{ $report->description }}</p>
                                         @endif
 
-                                        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                                            <div class="flex items-center gap-2">
-                                                <div class="w-6 h-6 bg-red-200 rounded-full flex items-center justify-center">
-                                                    <span class="text-xs font-bold text-red-700">{{ substr($report->user->name ?? 'A', 0, 1) }}</span>
-                                                </div>
-                                                <span class="text-xs text-gray-700 font-semibold">{{ $report->user->name ?? 'Anonymous' }}</span>
+                                        <div class="min-h-4 flex-1" aria-hidden="true"></div>
+                                        <div class="flex items-center justify-between gap-3 border-t border-gray-100 pt-3">
+                                            <div class="flex min-w-0 items-center gap-2">
+                                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-50 text-[11px] font-semibold text-red-700">{{ mb_substr($report->user->name ?? 'A', 0, 1) }}</span>
+                                                <span class="truncate text-xs font-medium text-gray-700">{{ $report->user->name ?? 'Anonymous' }}</span>
                                             </div>
                                             {{-- Was a comment count, which is meaningless now that
                                                  comments are off. Confirmations are the useful signal. --}}
-                                            <div class="flex items-center gap-1 text-gray-500"
-                                                 title="{{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}">
-                                                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-                                                <span class="text-xs font-semibold">{{ $report->likes_count ?? 0 }}</span>
-                                            </div>
+                                            <span class="inline-flex shrink-0 items-center gap-1 text-xs text-gray-500"
+                                                  title="{{ trans_choice('report.confirmations_count', $confirmations, ['count' => $confirmations]) }}">
+                                                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                                                <span class="tabular-nums">{{ $confirmations }}</span>
+                                            </span>
                                         </div>
                                     </div>
                                 </a>
@@ -95,20 +80,17 @@
                 </div>
 
                 <!-- Dots -->
-                <div class="flex justify-center mt-8 space-x-2">
+                <div class="mt-6 flex justify-center gap-2">
                     <template x-for="(slide, index) in Array.from({length: totalSlides})" :key="index">
-                        <button @click="goTo(index)" class="w-3 h-3 rounded-full transition-all" :class="index === currentIndex ? 'bg-red-600' : 'bg-gray-300'"></button>
+                        <button type="button" @click="goTo(index)" class="h-2 rounded-full transition-all" :class="index === currentIndex ? 'w-6 bg-red-600' : 'w-2 bg-gray-300 hover:bg-gray-400'" :aria-label="`${index + 1} / ${totalSlides}`"></button>
                     </template>
                 </div>
             </div>
         @else
-            <div class="text-center py-16">
-                <svg class="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <p class="text-gray-600 font-semibold mb-4">{{ __('No reports yet') }}</p>
-                <p class="text-gray-500 mb-6">{{ __('Be the first to report an issue in your area.') }}</p>
-                <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all">
+            <div class="rounded-xl border border-dashed border-gray-300 px-6 py-12 text-center">
+                <p class="text-base font-semibold text-gray-900">{{ __('No reports yet') }}</p>
+                <p class="mt-1 text-sm text-gray-500">{{ __('Be the first to report an issue in your area.') }}</p>
+                <a href="{{ auth()->check() ? route('reports.create') : route('login') }}" class="mt-5 inline-flex items-center rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700">
                     {{ __('Create First Report') }}
                 </a>
             </div>

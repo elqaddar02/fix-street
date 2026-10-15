@@ -1,15 +1,12 @@
 @php($title = __('Contact') . ' - Madinup')
 
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Contact') }}
-        </h2>
-    </x-slot>
 
-    <div class="py-10">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white border border-red-200 shadow-sm sm:rounded-lg">
+    <div class="py-8">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+            <h1 class="mb-6 text-2xl font-semibold tracking-tight text-gray-900">{{ __('Contact') }}</h1>
+
+            <div class="rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)]">
                 <div class="p-6 text-gray-800 space-y-5 leading-relaxed">
                     <p>
                         {{ __('Need help with a report or account access? Reach our support team and we will respond as soon as possible.') }}
