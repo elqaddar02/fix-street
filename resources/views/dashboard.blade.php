@@ -9,17 +9,27 @@
     ];
 
     $sortedReportsByCategory = collect($reportsByCategory)->sortDesc();
-    $maxCategory = $sortedReportsByCategory->max() ?: 1;
 
     $thisMonth = $reportsByMonth->last()['count'];
     $monthDiff = $thisMonth - $reportsByMonth->get($reportsByMonth->count() - 2)['count'];
     $resolvedShare = $totalReports > 0 ? round($resolvedReports / $totalReports * 100) : 0;
 
-    // The busiest month is drawn in the brand colour, the rest in a light tint.
-    $peakCount = $reportsByMonth->max('count');
-    $maxMonth = max(1, $peakCount);
-    $peakIndex = $peakCount > 0 ? $reportsByMonth->search(fn ($m) => $m['count'] === $peakCount) : null;
+    // The current month is drawn in the brand colour, earlier months in a light tint.
+    $maxMonth = max(1, $reportsByMonth->max('count'));
+    $currentIndex = $reportsByMonth->count() - 1;
     $monthLabel = fn ($month) => $month->copy()->locale(app()->getLocale())->translatedFormat('M');
+
+    // Donut slices for the category chart: the five largest, the rest folded into one.
+    $categoryColors = ['#dc2626', '#f59e0b', '#0284c7', '#059669', '#7c3aed'];
+    $categorySlices = $sortedReportsByCategory->take(5)->values()->map(fn ($count, $i) => [
+        'label' => $sortedReportsByCategory->keys()[$i] ?: __('dashboard.labels.unknown'),
+        'count' => $count,
+        'color' => $categoryColors[$i],
+    ]);
+    if ($sortedReportsByCategory->count() > 5) {
+        $categorySlices->push(['label' => __('dashboard.labels.other'), 'count' => $sortedReportsByCategory->slice(5)->sum(), 'color' => '#9ca3af']);
+    }
+    $categoryTotal = max(1, $categorySlices->sum('count'));
 
     $tile = 'flex min-w-0 flex-col gap-1 rounded-xl border bg-white p-4 sm:p-5';
     $tileShadow = 'border-gray-200 shadow-[0_3px_12px_rgba(17,24,39,0.04)]';
@@ -86,7 +96,7 @@
                 </a>
             </section>
         @else
-            <div class="mt-3 grid items-start gap-3 lg:grid-cols-3">
+            <div class="mt-3 grid gap-3 lg:grid-cols-3">
                 <section class="{{ $module }}" aria-labelledby="status-breakdown-title">
                     <header class="flex items-baseline justify-between gap-3">
                         <h2 id="status-breakdown-title" class="text-base font-semibold leading-snug text-gray-900">{{ __('dashboard.breakdown.title') }}</h2>
@@ -113,17 +123,38 @@
                         <h2 id="category-breakdown-title" class="text-base font-semibold leading-snug text-gray-900">{{ __('dashboard.breakdown.categories') }}</h2>
                     </header>
                     @if($sortedReportsByCategory->isNotEmpty())
-                        <dl class="flex flex-col gap-2.5">
-                            @foreach($sortedReportsByCategory as $name => $count)
-                                <div class="grid grid-cols-[7rem_1fr_auto] items-center gap-2.5 text-[13.5px]">
-                                    <dt class="truncate text-gray-500">{{ $name ?: __('dashboard.labels.unknown') }}</dt>
-                                    <span class="h-2 overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
-                                        <span class="block h-full rounded-full bg-red-600" style="width: {{ ($count / $maxCategory) * 100 }}%"></span>
-                                    </span>
-                                    <dd class="w-6 text-end font-semibold tabular-nums text-gray-900">{{ $count }}</dd>
-                                </div>
-                            @endforeach
-                        </dl>
+                        <div class="flex flex-1 items-center gap-5">
+                            <figure class="relative h-28 w-28 shrink-0">
+                                <svg viewBox="0 0 36 36" class="h-full w-full" aria-hidden="true">
+                                    <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#f3f4f6" stroke-width="4"></circle>
+                                    @php $offset = 0; @endphp
+                                    @foreach($categorySlices as $slice)
+                                        @php $pct = $slice['count'] / $categoryTotal * 100; @endphp
+                                        <circle cx="18" cy="18" r="15.9155" fill="none" stroke="{{ $slice['color'] }}" stroke-width="4"
+                                                stroke-dasharray="{{ $pct }} {{ 100 - $pct }}" stroke-dashoffset="{{ 25 - $offset }}">
+                                            <title>{{ $slice['label'] }} · {{ $slice['count'] }}</title>
+                                        </circle>
+                                        @php $offset += $pct; @endphp
+                                    @endforeach
+                                </svg>
+                                <figcaption class="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span class="text-xl font-bold leading-none tabular-nums text-gray-900">{{ $totalReports }}</span>
+                                    <span class="mt-1 text-[10px] uppercase tracking-wider text-gray-500">{{ __('dashboard.breakdown.count') }}</span>
+                                </figcaption>
+                            </figure>
+                            <dl class="flex min-w-0 flex-1 flex-col gap-2.5">
+                                @foreach($categorySlices as $slice)
+                                    <div class="grid grid-cols-[minmax(0,1fr)_auto_2.5rem] items-center gap-2 text-[13.5px]">
+                                        <dt class="flex min-w-0 items-center gap-1.5 text-gray-500">
+                                            <span class="h-2 w-2 shrink-0 rounded-full" style="background-color: {{ $slice['color'] }}" aria-hidden="true"></span>
+                                            <span class="truncate">{{ $slice['label'] }}</span>
+                                        </dt>
+                                        <dd class="text-end font-semibold tabular-nums text-gray-900">{{ $slice['count'] }}</dd>
+                                        <dd class="text-end text-xs tabular-nums text-gray-400">{{ round($slice['count'] / $categoryTotal * 100) }}%</dd>
+                                    </div>
+                                @endforeach
+                            </dl>
+                        </div>
                     @else
                         <p class="text-sm text-gray-500">{{ __('dashboard.labels.unknown') }}</p>
                     @endif
@@ -132,18 +163,16 @@
                 <section class="{{ $module }}" aria-labelledby="activity-title">
                     <header class="flex items-baseline justify-between gap-3">
                         <h2 id="activity-title" class="text-base font-semibold leading-snug text-gray-900">{{ __('dashboard.activity.title') }}</h2>
-                        @if($peakIndex !== null)
-                            <span class="shrink-0 text-xs tabular-nums text-gray-500">{{ __('dashboard.activity.peak', ['month' => $monthLabel($reportsByMonth[$peakIndex]['month']), 'count' => $peakCount]) }}</span>
-                        @endif
+                        <span class="shrink-0 text-xs tabular-nums text-gray-500">{{ __('dashboard.activity.this_month', ['count' => $thisMonth]) }}</span>
                     </header>
-                    <figure class="flex flex-col gap-1.5">
-                        <div class="flex h-28 items-end gap-1.5 border-b border-gray-200">
+                    <figure class="flex flex-1 flex-col gap-1.5">
+                        <div class="flex min-h-28 flex-1 items-end gap-1.5 border-b border-gray-200">
                             @foreach($reportsByMonth as $i => $m)
                                 <div class="group relative flex h-full flex-1 items-end" tabindex="0" aria-label="{{ $monthLabel($m['month']) }} {{ $m['month']->year }}: {{ $m['count'] }}">
                                     <div @class([
                                             'w-full rounded-t-[3px] transition-opacity group-hover:opacity-75',
-                                            'bg-red-600' => $i === $peakIndex,
-                                            'bg-red-200' => $i !== $peakIndex,
+                                            'bg-red-600' => $i === $currentIndex,
+                                            'bg-red-200' => $i !== $currentIndex,
                                         ])
                                          style="height: {{ $m['count'] > 0 ? 'max(' . ($m['count'] / $maxMonth * 100) . '%, 3px)' : '0' }}"></div>
                                     <div class="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-gray-200 bg-white px-2 py-1 text-xs text-gray-700 shadow-md group-hover:block group-focus:block">

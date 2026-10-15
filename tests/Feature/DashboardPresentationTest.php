@@ -64,18 +64,26 @@ class DashboardPresentationTest extends TestCase
     {
         $user = User::factory()->create();
 
+        // Two months ago is the busier month; the current month must still be the highlighted one.
         $this->makeReport($user, 'OPEN', 'Roads');
-        $this->makeReport($user, 'RESOLVED', 'Roads');
-        $older = $this->makeReport($user, 'OPEN', 'Lighting');
-        $older->forceFill(['created_at' => now()->startOfMonth()->subMonths(2)->addDay()])->save();
+        foreach (['OPEN', 'RESOLVED', 'OPEN'] as $status) {
+            $this->makeReport($user, $status, 'Lighting')
+                ->forceFill(['created_at' => now()->startOfMonth()->subMonths(2)->addDay()])
+                ->save();
+        }
 
         $content = $this->actingAs($user)->get(route('dashboard'))->assertOk()->getContent();
 
         $this->assertTrue(str_contains($content, 'id="activity-title"'), 'The monthly activity chart should be rendered.');
-        $this->assertSame(1, substr_count($content, 'group-hover:opacity-75 bg-red-600"'), 'Exactly one month, the busiest, should be highlighted.');
+        $this->assertSame(1, substr_count($content, 'group-hover:opacity-75 bg-red-600"'), 'Only one month should be highlighted.');
+        $this->assertLessThan(
+            strrpos($content, 'group-hover:opacity-75 bg-red-600"'),
+            strrpos($content, 'group-hover:opacity-75 bg-red-200"'),
+            'The highlighted bar should be the last one, the current month.'
+        );
         $this->assertTrue(
-            str_contains($content, __('dashboard.activity.peak', ['month' => now()->translatedFormat('M'), 'count' => 2])),
-            'The busiest month and its count should be named beside the chart.'
+            str_contains($content, __('dashboard.activity.this_month', ['count' => 1])),
+            "This month's count should be named beside the chart."
         );
     }
 
