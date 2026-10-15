@@ -60,6 +60,25 @@ class DashboardPresentationTest extends TestCase
         }
     }
 
+    public function test_dashboard_charts_reports_per_month_and_marks_the_peak(): void
+    {
+        $user = User::factory()->create();
+
+        $this->makeReport($user, 'OPEN', 'Roads');
+        $this->makeReport($user, 'RESOLVED', 'Roads');
+        $older = $this->makeReport($user, 'OPEN', 'Lighting');
+        $older->forceFill(['created_at' => now()->startOfMonth()->subMonths(2)->addDay()])->save();
+
+        $content = $this->actingAs($user)->get(route('dashboard'))->assertOk()->getContent();
+
+        $this->assertTrue(str_contains($content, 'id="activity-title"'), 'The monthly activity chart should be rendered.');
+        $this->assertSame(1, substr_count($content, 'group-hover:opacity-75 bg-red-600"'), 'Exactly one month, the busiest, should be highlighted.');
+        $this->assertTrue(
+            str_contains($content, __('dashboard.activity.peak', ['month' => now()->translatedFormat('M'), 'count' => 2])),
+            'The busiest month and its count should be named beside the chart.'
+        );
+    }
+
     private function makeReport(User $user, string $status, string $categoryName, ?string $image = null): Report
     {
         $category = Category::firstOrCreate(['name' => $categoryName], ['name_ar' => $categoryName]);

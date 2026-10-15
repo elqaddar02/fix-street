@@ -40,6 +40,16 @@ class DashboardController extends Controller
             'Rejected' => $rejectedReports,
         ];
 
+        // Reports filed in each of the last six months, oldest first
+        $reportsByMonth = collect(range(5, 0))->map(function ($monthsAgo) use ($reports) {
+            $month = now()->startOfMonth()->subMonths($monthsAgo);
+
+            return [
+                'month' => $month,
+                'count' => $reports->filter(fn ($report) => $report->created_at->isSameMonth($month))->count(),
+            ];
+        });
+
         // Recent reports (last 5)
         $recentReports = $reports->take(5);
 
@@ -52,6 +62,7 @@ class DashboardController extends Controller
             'rejectedReports',
             'reportsByCategory',
             'reportsByStatus',
+            'reportsByMonth',
             'recentReports'
         ));
     }
