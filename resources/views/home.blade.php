@@ -7,8 +7,10 @@
     @include('home.hero-section')
 
     <!-- Ad Banner -->
-    <section class="max-w-7xl mx-auto px-6 py-8">
-        <x-ad-banner type="horizontal" />
+    <section class="bg-gray-50">
+        <div class="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+            <x-ad-banner type="horizontal" />
+        </div>
     </section>
 
     <!-- Categories Section -->

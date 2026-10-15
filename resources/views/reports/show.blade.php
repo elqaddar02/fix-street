@@ -1,181 +1,185 @@
+@php
+    $title = $report->title . ' - Madinup';
+
+    $hasImage = $report->image && file_exists(storage_path('app/public/' . $report->image));
+    $isOwner = auth()->id() === $report->user_id;
+    $districtName = $report->district ? (app()->getLocale() === 'ar' ? $report->district->name_ar : $report->district->name_fr) : null;
+    $quartierName = $report->quartier ? (app()->getLocale() === 'ar' ? $report->quartier->name_ar : $report->quartier->name_fr) : null;
+    $reportedOn = $report->created_at->copy()->locale(app()->getLocale());
+
+    $card = 'rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)]';
+    $cardTitle = 'text-base font-semibold text-gray-900';
+@endphp
+
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Report Details') }}
-        </h2>
-    </x-slot>
+    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <header class="mb-6">
+            <a href="{{ route('reports.index') }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900">
+                <svg class="h-4 w-4 rtl:rotate-180" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+                {{ __('nav.all_reports') }}
+            </a>
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
-                    <a href="{{ route('reports.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all mb-6">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                        {{ __('Back to Reports') }}
-                    </a>
-                    <div class="flex flex-col lg:flex-row">
-                        <!-- Report Image -->
-                        <div class="lg:w-1/2 mb-6 lg:mb-0 lg:pr-6">
-                            <div class="w-full h-64 lg:h-96 bg-gradient-to-br from-red-50 to-orange-50 rounded-lg shadow-md overflow-hidden flex items-center justify-center">
-                                @if($report->image && file_exists(storage_path('app/public/' . $report->image)))
-                                    <img src="{{ asset('storage/' . $report->image) }}" 
-                                         alt="{{ $report->title }}"
-                                         class="w-full h-full object-cover">
-                                @else
-                                    <svg class="w-20 h-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                    </svg>
-                                @endif
-                            </div>
-                        </div>
-
-                        <!-- Report Details -->
-                        <div class="lg:w-{{ $report->image ? '1/2' : 'full' }}">
-                            <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ $report->title }}</h1>
-
-                            {{--
-                                Confirmations, not "likes": the count means "this many
-                                neighbours confirm the problem is real and still there",
-                                which is the part a municipality can act on.
-                            --}}
-                            @auth
-                                @php
-                                    $userHasLiked = auth()->user()->likedReports()->where('report_id', $report->id)->exists();
-                                @endphp
-                                <div x-data="reportLike({{ $report->id }}, {{ $userHasLiked ? 'true' : 'false' }}, {{ $report->likes_count ?? 0 }})" class="mb-6 flex flex-wrap items-center gap-x-3 gap-y-2 pb-4 border-b border-gray-200">
-                                    <button type="button" @click="toggle()" :disabled="loading"
-                                            :class="liked ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                                            :aria-pressed="liked ? 'true' : 'false'"
-                                            class="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all disabled:opacity-60">
-                                        <svg class="w-5 h-5" :fill="liked ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
-                                        </svg>
-                                        <span x-text="liked ? @js(__('report.confirmed')) : @js(__('report.confirm'))"></span>
-                                    </button>
-                                    <span class="text-sm font-medium text-gray-600" x-text="countLabel()"></span>
-                                </div>
-                            @else
-                                <div class="mb-6 flex flex-wrap items-center gap-x-3 gap-y-2 pb-4 border-b border-gray-200">
-                                    <form method="POST" class="flex items-center gap-2" id="like-form-guest">
-                                        @csrf
-                                        <button type="submit" class="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all bg-gray-100 text-gray-700 hover:bg-gray-200">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
-                                            </svg>
-                                            {{ __('report.confirm') }}
-                                        </button>
-                                    </form>
-                                    <span class="text-sm font-medium text-gray-600">
-                                        {{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}
-                                    </span>
-                                </div>
-                            @endauth
-
-                            <div class="space-y-4">
-                                {{-- Identical to the title for reports made with the current
-                                     form, so only worth a section of its own when it differs. --}}
-                                @if(filled($report->description) && $report->description !== $report->title)
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-700">{{ __('Description') }}</h3>
-                                        <p class="text-gray-600 mt-2">{{ $report->description }}</p>
-                                    </div>
-                                @endif
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-700">Category</h3>
-                                        <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium mt-1">
-                                            {{ $report->category->display_name }}
-                                        </span>
-                                    </div>
-
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-700">City</h3>
-                                        <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium mt-1">
-                                            {{ $report->city->display_name }}
-                                        </span>
-                                    </div>
-
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-700">Status</h3>
-                                        @php
-                                            $statusClass = match ($report->status) {
-                                                'OPEN' => 'bg-red-100 text-red-800',
-                                                'IN_PROGRESS' => 'bg-orange-100 text-orange-800',
-                                                'RESOLVED' => 'bg-green-100 text-green-800',
-                                                default => 'bg-gray-100 text-gray-800',
-                                            };
-                                        @endphp
-                                        <span class="inline-block {{ $statusClass }} px-3 py-1 rounded-full text-sm font-medium mt-1">
-                                            {{ $report->status }}
-                                        </span>
-                                    </div>
-
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-700">Reported By</h3>
-                                        <p class="text-gray-600 mt-1">{{ $report->user->name }}</p>
-                                    </div>
-                                </div>
-
-                                @if($report->latitude && $report->longitude)
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-700">Location</h3>
-                                        <p class="text-gray-600 mt-1">
-                                            Latitude: {{ $report->latitude }}, Longitude: {{ $report->longitude }}
-                                        </p>
-                                    </div>
-                                @endif
-
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-700">Reported On</h3>
-                                    <p class="text-gray-600 mt-1">{{ $report->created_at->format('F j, Y \a\t g:i A') }}</p>
-                                </div>
-
-                                @if(config('features.comments'))
-                                <div class="mt-8">
-                                    <h3 class="text-lg font-semibold text-gray-700 mb-3">{{ __('Comments') }}</h3>
-
-                                    <div id="comments-list" class="space-y-3 mb-4">
-                                        @forelse($report->visibleComments as $comment)
-                                            <div class="border border-red-100 p-3 rounded">
-                                                <p class="text-sm font-semibold text-gray-800">{{ $comment->user->name ?? 'Guest' }} <span class="text-gray-500">({{ $comment->created_at->diffForHumans() }})</span></p>
-                                                <p class="text-gray-700">{{ $comment->comment }}</p>
-                                            </div>
-                                        @empty
-                                            <p id="no-comments" class="text-gray-500">No comments yet.</p>
-                                        @endforelse
-                                    </div>
-
-                                    <form id="comment-form" class="space-y-3">
-                                        @csrf
-                                        <textarea name="comment" rows="3" class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Write your comment..." required></textarea>
-                                        <div class="flex gap-2 items-center">
-                                            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200">Post Comment</button>
-                                            <span id="comment-loading" class="hidden flex items-center gap-2 text-gray-600">
-                                                <svg class="animate-spin h-4 w-4 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3 2.353z"></path></svg>
-                                                <span>Posting...</span>
-                                            </span>
-                                        </div>
-                                    </form>
-                                </div>
-                                @endif
-                            </div>
-
-                            <div class="mt-8 flex gap-4">
-                                <a href="{{ route('reports.index') }}"
-                                   class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200">
-                                    Back to Reports
-                                </a>
-                        </div>
+            <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div class="min-w-0">
+                    <h1 class="text-2xl font-semibold tracking-tight text-gray-900">{{ $report->title }}</h1>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-gray-500">
+                        <x-status-badge :status="$report->status" />
+                        <span>{{ $report->category->display_name ?? __('dashboard.labels.unknown') }}</span>
+                        <span class="text-gray-300" aria-hidden="true">·</span>
+                        <span>{{ $report->city->display_name ?? __('dashboard.labels.unknown') }}</span>
+                        <span class="text-gray-300" aria-hidden="true">·</span>
+                        <time datetime="{{ $report->created_at->toIso8601String() }}">{{ $reportedOn->translatedFormat('j M Y') }}</time>
                     </div>
                 </div>
+
+                @if($isOwner)
+                    <a href="{{ route('reports.edit', $report) }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>
+                        {{ __('dashboard.actions.edit') }}
+                    </a>
+                @endif
             </div>
+        </header>
+
+        <div class="grid gap-6 lg:grid-cols-3">
+            {{-- MAIN COLUMN --}}
+            <div class="space-y-6 lg:col-span-2">
+                <figure class="{{ $card }} overflow-hidden">
+                    @if($hasImage)
+                        <img src="{{ asset('storage/' . $report->image) }}" alt="{{ $report->title }}" class="aspect-[4/3] w-full bg-gray-100 object-cover sm:aspect-[16/10]">
+                    @else
+                        <div class="flex aspect-[16/9] w-full items-center justify-center bg-gray-50 text-gray-300">
+                            <svg class="h-14 w-14" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/></svg>
+                        </div>
+                    @endif
+                </figure>
+
+                {{-- Identical to the title for reports made with the current
+                     form, so only worth a section of its own when it differs. --}}
+                @if(filled($report->description) && $report->description !== $report->title)
+                    <section class="{{ $card }} p-5 sm:p-6">
+                        <h2 class="{{ $cardTitle }}">{{ __('report.description') }}</h2>
+                        <p class="mt-2 whitespace-pre-line text-sm leading-6 text-gray-700">{{ $report->description }}</p>
+                    </section>
+                @endif
+
+                @if(config('features.comments'))
+                    <section class="{{ $card }} p-5 sm:p-6">
+                        <h2 class="{{ $cardTitle }}">{{ __('report.comments') }}</h2>
+
+                        <div id="comments-list" class="mt-4 space-y-3">
+                            @forelse($report->visibleComments as $comment)
+                                <div class="rounded-lg border border-gray-200 px-4 py-3">
+                                    <p class="text-sm font-semibold text-gray-900">{{ $comment->user->name ?? 'Guest' }} <span class="font-normal text-gray-500">({{ $comment->created_at->diffForHumans() }})</span></p>
+                                    <p class="mt-1 text-sm text-gray-700">{{ $comment->comment }}</p>
+                                </div>
+                            @empty
+                                <p id="no-comments" class="text-sm text-gray-500">No comments yet.</p>
+                            @endforelse
+                        </div>
+
+                        <form id="comment-form" class="mt-4 space-y-3">
+                            @csrf
+                            <textarea name="comment" rows="3" class="block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500" placeholder="Write your comment..." required></textarea>
+                            <div class="flex items-center gap-3">
+                                <x-primary-button>Post Comment</x-primary-button>
+                                <span id="comment-loading" class="hidden items-center gap-2 text-sm text-gray-500">
+                                    <svg class="h-4 w-4 animate-spin text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3 2.353z"></path></svg>
+                                    <span>Posting...</span>
+                                </span>
+                            </div>
+                        </form>
+                    </section>
+                @endif
+            </div>
+
+            {{-- SIDEBAR --}}
+            <aside class="space-y-6">
+                {{--
+                    Confirmations, not "likes": the count means "this many
+                    neighbours confirm the problem is real and still there",
+                    which is the part a municipality can act on.
+                --}}
+                <section class="{{ $card }} p-5 sm:p-6">
+                    <p class="text-sm text-gray-500">{{ __('report.confirm_hint') }}</p>
+                    @auth
+                        @php
+                            $userHasLiked = auth()->user()->likedReports()->where('report_id', $report->id)->exists();
+                        @endphp
+                        <div x-data="reportLike({{ $report->id }}, {{ $userHasLiked ? 'true' : 'false' }}, {{ $report->likes_count ?? 0 }})" class="mt-4">
+                            <button type="button" @click="toggle()" :disabled="loading"
+                                    :class="liked ? 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100' : 'border-red-600 bg-red-600 text-white hover:bg-red-700'"
+                                    :aria-pressed="liked ? 'true' : 'false'"
+                                    class="flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors disabled:opacity-60">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                                <span x-text="liked ? @js(__('report.confirmed')) : @js(__('report.confirm'))"></span>
+                            </button>
+                            <p class="mt-2 text-center text-sm font-medium text-gray-700" x-text="countLabel()"></p>
+                        </div>
+                    @else
+                        <form method="POST" class="mt-4" id="like-form-guest">
+                            @csrf
+                            <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                                {{ __('report.confirm') }}
+                            </button>
+                        </form>
+                        <p class="mt-2 text-center text-sm font-medium text-gray-700">
+                            {{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}
+                        </p>
+                    @endauth
+                </section>
+
+                <section class="{{ $card }} p-5 sm:p-6">
+                    <h2 class="{{ $cardTitle }}">{{ __('report.details') }}</h2>
+                    <dl class="mt-4 divide-y divide-gray-100 text-sm">
+                        @foreach(array_filter([
+                            __('dashboard.table.headers.status') => 'status',
+                            __('Category') => $report->category->display_name ?? null,
+                            __('City') => $report->city->display_name ?? null,
+                            __('District / Arrondissement') => $districtName,
+                            __('Quartier') => $quartierName,
+                            __('report.reported_by') => $report->user->name ?? null,
+                            __('report.reported_on') => $reportedOn->translatedFormat('j F Y, H:i'),
+                        ]) as $label => $value)
+                            <div class="flex items-center justify-between gap-4 py-2.5 first:pt-0 last:pb-0">
+                                <dt class="text-gray-500">{{ $label }}</dt>
+                                <dd class="min-w-0 truncate text-end font-medium text-gray-900">
+                                    @if($value === 'status')
+                                        <x-status-badge :status="$report->status" />
+                                    @else
+                                        {{ $value }}
+                                    @endif
+                                </dd>
+                            </div>
+                        @endforeach
+                    </dl>
+                </section>
+
+                @if($report->latitude && $report->longitude)
+                    <section class="{{ $card }} overflow-hidden">
+                        <div class="flex items-baseline justify-between gap-3 px-5 pt-5 sm:px-6">
+                            <h2 class="{{ $cardTitle }}">{{ __('Location') }}</h2>
+                            <span class="text-xs tabular-nums text-gray-500">{{ number_format($report->latitude, 4) }}, {{ number_format($report->longitude, 4) }}</span>
+                        </div>
+                        <div id="report-map" class="mt-4 h-56 w-full border-t border-gray-200" data-lat="{{ $report->latitude }}" data-lng="{{ $report->longitude }}"></div>
+                    </section>
+                @endif
+            </aside>
         </div>
     </div>
 
     <script>
+        // Read-only map of where the report was filed. Leaflet is loaded by the app layout.
+        (function () {
+            const el = document.getElementById('report-map');
+            if (!el || typeof L === 'undefined') return;
+            const point = [parseFloat(el.dataset.lat), parseFloat(el.dataset.lng)];
+            const map = L.map(el, { scrollWheelZoom: false }).setView(point, 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+            L.marker(point).addTo(map);
+        })();
+
         // Server-rendered wording for each count, so the label stays translated
         // (and correctly pluralised) after the count changes client-side.
         const CONFIRMATION_LABELS = {
@@ -253,7 +257,7 @@
                 if (!textarea.value.trim()) return;
 
                 submitBtn.disabled = true;
-                loadingSpan.classList.remove('hidden');
+                loadingSpan.classList.replace('hidden', 'flex');
 
                 fetch(`/reports/${reportId}/comments`, {
                     method: 'POST',
@@ -280,19 +284,19 @@
 
                         // Create new comment element
                         const commentDiv = document.createElement('div');
-                        commentDiv.className = 'border border-red-100 p-3 rounded';
+                        commentDiv.className = 'rounded-lg border border-gray-200 px-4 py-3';
 
                         // Build with textContent so user-written text is never interpreted as HTML.
                         const meta = document.createElement('p');
-                        meta.className = 'text-sm font-semibold text-gray-800';
+                        meta.className = 'text-sm font-semibold text-gray-900';
                         meta.textContent = data.comment.user + ' ';
                         const time = document.createElement('span');
-                        time.className = 'text-gray-500';
+                        time.className = 'font-normal text-gray-500';
                         time.textContent = `(${data.comment.created_at})`;
                         meta.appendChild(time);
 
                         const text = document.createElement('p');
-                        text.className = 'text-gray-700';
+                        text.className = 'mt-1 text-sm text-gray-700';
                         text.textContent = data.comment.text;
 
                         commentDiv.append(meta, text);
@@ -310,7 +314,7 @@
                 })
                 .finally(() => {
                     submitBtn.disabled = false;
-                    loadingSpan.classList.add('hidden');
+                    loadingSpan.classList.replace('flex', 'hidden');
                 });
             @endif
         });

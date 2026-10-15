@@ -13,14 +13,14 @@
         <!-- Email Address -->
         <div>
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1.5 w-full rounded-xl border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 py-2.5 px-4" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+            <x-text-input id="email" class="block mt-1.5 w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 py-2.5 px-4" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
         <div>
             <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1.5 w-full rounded-xl border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 py-2.5 px-4"
+            <x-text-input id="password" class="block mt-1.5 w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 py-2.5 px-4"
                             type="password"
                             name="password"
                             required autocomplete="current-password" />
@@ -41,7 +41,7 @@
             @endif
         </div>
 
-        <x-primary-button class="w-full justify-center rounded-xl bg-red-600 hover:bg-red-700 focus:ring-red-500 active:bg-red-800 py-3 text-sm">
+        <x-primary-button class="w-full justify-center rounded-lg bg-red-600 hover:bg-red-700 focus:ring-red-500 active:bg-red-800 py-3 text-sm">
             {{ __('Log in') }}
         </x-primary-button>
 
