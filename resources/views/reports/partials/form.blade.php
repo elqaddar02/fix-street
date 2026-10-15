@@ -198,7 +198,7 @@
                 <div class="flex flex-1 gap-3">
                     <div class="flex-1">
                         <x-input-label for="latitude" :value="__('Latitude')" />
-                        <input id="latitude" name="latitude" type="text" class="{{ $field }} bg-gray-50 text-gray-600"
+                        <input id="latitude" name="latitude" type="text" dir="ltr" class="{{ $field }} bg-gray-50 text-gray-600"
                                placeholder="33.9716" value="{{ old('latitude', $report?->latitude) }}" readonly>
                         @error('latitude')
                             <p class="mt-1.5 text-sm text-rose-600">{{ $message }}</p>
@@ -206,7 +206,7 @@
                     </div>
                     <div class="flex-1">
                         <x-input-label for="longitude" :value="__('Longitude')" />
-                        <input id="longitude" name="longitude" type="text" class="{{ $field }} bg-gray-50 text-gray-600"
+                        <input id="longitude" name="longitude" type="text" dir="ltr" class="{{ $field }} bg-gray-50 text-gray-600"
                                placeholder="-6.8498" value="{{ old('longitude', $report?->longitude) }}" readonly>
                         @error('longitude')
                             <p class="mt-1.5 text-sm text-rose-600">{{ $message }}</p>

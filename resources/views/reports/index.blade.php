@@ -3,6 +3,7 @@
     $field = 'mt-1.5 block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500';
     $label = 'block text-sm font-medium text-gray-700';
     $newToday = $reports->where('created_at', '>=', now()->subDay())->count();
+    $hasActiveFilters = filled($selectedCategory) || filled($selectedCity) || filled($selectedDistrict) || filled($selectedQuartier) || filled($selectedDate);
 @endphp
 
 <x-app-layout>
@@ -26,13 +27,18 @@
 
         <div class="grid gap-6 lg:grid-cols-4">
             <aside class="lg:col-span-1">
-                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-[0_3px_12px_rgba(17,24,39,0.04)] lg:sticky lg:top-24">
-                    <h2 class="flex items-center gap-2 text-base font-semibold text-gray-900">
-                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/></svg>
-                        {{ __('reports.filters') }}
+                {{-- Collapsed on phones so the reports aren't pushed a full screen
+                     down; always open on desktop, and open on phones once a filter is set. --}}
+                <div x-data="{ open: @js($hasActiveFilters) }" class="rounded-xl border border-gray-200 bg-white p-5 shadow-[0_3px_12px_rgba(17,24,39,0.04)] lg:sticky lg:top-24">
+                    <h2 class="text-base font-semibold text-gray-900">
+                        <button type="button" @click="open = ! open" :aria-expanded="open ? 'true' : 'false'" aria-controls="filters-form" class="flex w-full items-center gap-2 text-start lg:pointer-events-none">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"/></svg>
+                            {{ __('reports.filters') }}
+                            <svg class="ms-auto h-4 w-4 text-gray-400 transition-transform lg:hidden" :class="open && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+                        </button>
                     </h2>
 
-                    <form method="GET" action="{{ route('reports.index') }}" class="mt-4 space-y-4">
+                    <form id="filters-form" method="GET" action="{{ route('reports.index') }}" class="mt-4 space-y-4 lg:!block" :class="open ? '' : 'hidden'">
                         <div>
                             <label class="{{ $label }}" for="filter-category">{{ __('Category') }}</label>
                             <select name="category" id="filter-category" class="{{ $field }}">

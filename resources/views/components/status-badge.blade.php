@@ -10,7 +10,7 @@
     $style = $styles[$status] ?? $styles['OPEN'];
 @endphp
 
-<span {{ $attributes->merge(['class' => 'inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ' . $style['class']]) }}>
+<span {{ $attributes->merge(['class' => 'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset ' . $style['class']]) }}>
     <span class="h-1.5 w-1.5 shrink-0 rounded-full {{ $style['dot'] }}" aria-hidden="true"></span>
     {{ $style['label'] }}
 </span>

@@ -62,7 +62,7 @@
                 <span class="{{ $eyebrow }}">{{ __('dashboard.stats.total') }}</span>
                 <span class="{{ $figure }}">{{ $totalReports }}</span>
                 <span class="{{ $detail }}">
-                    <b @class(['font-semibold', 'text-gray-900' => $monthDiff !== 0])>{{ $monthDiff > 0 ? '+' : '' }}{{ $monthDiff }}</b>
+                    <b @class(['font-semibold', 'text-gray-900' => $monthDiff !== 0]) dir="ltr">{{ $monthDiff > 0 ? '+' : '' }}{{ $monthDiff }}</b>
                     {{ __('dashboard.stats.vs_last_month') }}
                 </span>
             </article>
@@ -199,7 +199,50 @@
                     <span class="text-sm tabular-nums text-gray-500">{{ $totalReports }}</span>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+                {{-- Phones get a stacked list: the table's status, date and actions
+                     would otherwise sit off-screen behind a sideways scroll. --}}
+                <ul class="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white sm:hidden">
+                    @foreach($reports as $report)
+                        @php($hasImage = $report->image && file_exists(storage_path('app/public/' . $report->image)))
+                        <li class="flex gap-3 p-4">
+                            <a href="{{ route('reports.show', $report) }}" class="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-gray-100 ring-1 ring-inset ring-gray-200" aria-hidden="true" tabindex="-1">
+                                @if($hasImage)
+                                    <img src="{{ asset('storage/' . $report->image) }}" alt="" loading="lazy" class="h-full w-full object-cover">
+                                @else
+                                    <span class="flex h-full w-full items-center justify-center text-gray-400">
+                                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 19V5a2 2 0 012-2h14a2 2 0 012 2v14M3 19l5-5 4 4 3-3 6 5M8.5 8.5h.01"/></svg>
+                                    </span>
+                                @endif
+                            </a>
+                            <div class="min-w-0 flex-1">
+                                <a href="{{ route('reports.show', $report) }}" class="line-clamp-2 text-sm font-medium text-gray-900 hover:underline">{{ $report->title }}</a>
+                                <p class="mt-0.5 truncate text-xs text-gray-500">{{ $report->city->display_name ?? __('dashboard.labels.unknown') }} · {{ $report->category->display_name ?? __('dashboard.labels.unknown') }}</p>
+                                <div class="mt-2 flex items-center justify-between gap-2">
+                                    <div class="flex min-w-0 items-center gap-2">
+                                        <x-status-badge :status="$report->status" />
+                                        <time class="truncate text-xs text-gray-500" datetime="{{ $report->created_at->toIso8601String() }}">{{ $report->created_at->diffForHumans() }}</time>
+                                    </div>
+                                    <div class="flex shrink-0 items-center">
+                                        <a href="{{ route('reports.edit', $report) }}" class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700" title="{{ __('dashboard.actions.edit') }}">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828z"/></svg>
+                                            <span class="sr-only">{{ __('dashboard.actions.edit') }}</span>
+                                        </a>
+                                        <form method="POST" action="{{ route('reports.destroy', $report) }}" onsubmit='return confirm({{ json_encode(__('dashboard.confirm.delete_report')) }})'>
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-rose-50 hover:text-rose-600" title="{{ __('dashboard.actions.delete') }}">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                <span class="sr-only">{{ __('dashboard.actions.delete') }}</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="hidden overflow-x-auto rounded-xl border border-gray-200 bg-white sm:block">
                     <table class="w-full min-w-[640px] text-start">
                         <thead>
                             <tr class="border-b border-gray-200 bg-gray-50/80">

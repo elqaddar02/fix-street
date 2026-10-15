@@ -160,7 +160,7 @@
                     <section class="{{ $card }} overflow-hidden">
                         <div class="flex items-baseline justify-between gap-3 px-5 pt-5 sm:px-6">
                             <h2 class="{{ $cardTitle }}">{{ __('Location') }}</h2>
-                            <span class="text-xs tabular-nums text-gray-500">{{ number_format($report->latitude, 4) }}, {{ number_format($report->longitude, 4) }}</span>
+                            <span class="text-xs tabular-nums text-gray-500" dir="ltr">{{ number_format($report->latitude, 4) }}, {{ number_format($report->longitude, 4) }}</span>
                         </div>
                         <div id="report-map" class="mt-4 h-56 w-full border-t border-gray-200" data-lat="{{ $report->latitude }}" data-lng="{{ $report->longitude }}"></div>
                     </section>
