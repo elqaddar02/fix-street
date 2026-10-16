@@ -63,12 +63,12 @@ Route::get('/login-redirect', function (Request $request) {
     return redirect()->route('login');
 })->name('login.redirect');
 
-Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+// Publishing anything (a report, a confirmation, a comment) needs a confirmed
+// email address, so every report and every confirmation is tied to a real person.
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-   
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
-    
     Route::post('/reports', [ReportController::class, 'store'])->middleware('throttle:10,1')->name('reports.store');
     Route::post('/reports/{report}/comments', [ReportController::class, 'storeComment'])->middleware('throttle:10,1')->name('reports.comments.store');
     Route::post('/reports/{report}/likes/toggle', [\App\Http\Controllers\ReportLikeController::class, 'toggle'])->middleware('throttle:60,1')->name('reports.likes.toggle');
@@ -76,7 +76,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/{report}/edit', [ReportController::class, 'edit'])->name('reports.edit');
     Route::patch('/reports/{report}', [ReportController::class, 'update'])->name('reports.update');
     Route::delete('/reports/{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
+});
 
+// Profile stays reachable without verification, so a mistyped email can be corrected.
+Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

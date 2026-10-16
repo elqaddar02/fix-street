@@ -448,5 +448,15 @@
     "signin.show_password": "إظهار كلمة المرور",
     "signin.hide_password": "إخفاء كلمة المرور",
     "signin.password_hint": "8 أحرف على الأقل.",
-    "signin.terms_notice": "بإنشاء حساب فإنك توافق على"
+    "signin.terms_notice": "بإنشاء حساب فإنك توافق على",
+    "signin.forgot_subtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابطاً لاختيار كلمة مرور جديدة.",
+    "signin.reset_title": "اختر كلمة مرور جديدة",
+    "signin.reset_subtitle": "اختر كلمة مرور لا تستخدمها في مواقع أخرى.",
+    "signin.confirm_title": "أكّد كلمة المرور",
+    "signin.verify_title": "تحقق من بريدك الإلكتروني",
+    "signin.back_to_login": "العودة إلى تسجيل الدخول",
+    "signin.verify_banner": "أكّد بريدك الإلكتروني (:email) لنشر البلاغات وتأكيد المشاكل.",
+    "signin.resend_link": "إعادة إرسال الرابط",
+    "signin.link_sent": "تم إرسال الرابط. تحقق من بريدك.",
+    "signin.email_verified": "تم تأكيد بريدك الإلكتروني. يمكنك الآن نشر البلاغات."
 }

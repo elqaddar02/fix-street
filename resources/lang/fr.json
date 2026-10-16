@@ -463,5 +463,15 @@
     "signin.show_password": "Afficher le mot de passe",
     "signin.hide_password": "Masquer le mot de passe",
     "signin.password_hint": "Au moins 8 caractères.",
-    "signin.terms_notice": "En créant un compte, vous acceptez les"
+    "signin.terms_notice": "En créant un compte, vous acceptez les",
+    "signin.forgot_subtitle": "Saisissez votre e-mail : nous vous enverrons un lien pour choisir un nouveau mot de passe.",
+    "signin.reset_title": "Choisissez un nouveau mot de passe",
+    "signin.reset_subtitle": "Choisissez un mot de passe que vous n’utilisez pas sur d’autres sites.",
+    "signin.confirm_title": "Confirmez votre mot de passe",
+    "signin.verify_title": "Vérifiez votre boîte mail",
+    "signin.back_to_login": "Retour à la connexion",
+    "signin.verify_banner": "Confirmez votre adresse e-mail (:email) pour publier des signalements et confirmer des problèmes.",
+    "signin.resend_link": "Renvoyer le lien",
+    "signin.link_sent": "Lien envoyé. Consultez votre boîte mail.",
+    "signin.email_verified": "Adresse e-mail confirmée. Vous pouvez maintenant publier des signalements."
 }
