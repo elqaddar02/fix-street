@@ -8,21 +8,27 @@
         </div>
 
         <div class="flex justify-center items-center">
-            <div class="grid w-full max-w-4xl grid-cols-1 gap-5 md:grid-cols-3">
-                <div class="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-6 text-center shadow-[0_3px_12px_rgba(17,24,39,0.04)]">
-                    <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-red-600 text-base font-semibold text-white">1</div>
-                    <h3 class="text-lg font-semibold text-gray-900">{{ __('Take a Photo') }}</h3>
+            <div class="grid w-full max-w-4xl grid-cols-1 gap-3 md:grid-cols-3 md:gap-5">
+                <div class="flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-4 text-start shadow-[0_3px_12px_rgba(17,24,39,0.04)] md:flex-col md:items-center md:p-6 md:text-center">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full md:mb-4 bg-red-600 text-base font-semibold text-white">1</div>
+                    <div class="min-w-0">
+                    <h3 class="text-base font-semibold text-gray-900 md:text-lg">{{ __('Take a Photo') }}</h3>
                     <p class="mt-1.5 text-sm leading-6 text-gray-500">{{ __('Capture a clear image of the street issue you found.') }}</p>
+                    </div>
                 </div>
-                <div class="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-6 text-center shadow-[0_3px_12px_rgba(17,24,39,0.04)]">
-                    <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-amber-500 text-base font-semibold text-white">2</div>
-                    <h3 class="text-lg font-semibold text-gray-900">{{ __('Describe Issue') }}</h3>
+                <div class="flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-4 text-start shadow-[0_3px_12px_rgba(17,24,39,0.04)] md:flex-col md:items-center md:p-6 md:text-center">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full md:mb-4 bg-amber-500 text-base font-semibold text-white">2</div>
+                    <div class="min-w-0">
+                    <h3 class="text-base font-semibold text-gray-900 md:text-lg">{{ __('Describe Issue') }}</h3>
                     <p class="mt-1.5 text-sm leading-6 text-gray-500">{{ __('Fill in category, location, and detailed description.') }}</p>
+                    </div>
                 </div>
-                <div class="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-6 text-center shadow-[0_3px_12px_rgba(17,24,39,0.04)]">
-                    <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-emerald-600 text-base font-semibold text-white">3</div>
-                    <h3 class="text-lg font-semibold text-gray-900">{{ __('Follow Up') }}</h3>
+                <div class="flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-4 text-start shadow-[0_3px_12px_rgba(17,24,39,0.04)] md:flex-col md:items-center md:p-6 md:text-center">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full md:mb-4 bg-emerald-600 text-base font-semibold text-white">3</div>
+                    <div class="min-w-0">
+                    <h3 class="text-base font-semibold text-gray-900 md:text-lg">{{ __('Follow Up') }}</h3>
                     <p class="mt-1.5 text-sm leading-6 text-gray-500">{{ __('Neighbors can support the report and everyone can follow its status until it is fixed.') }}</p>
+                    </div>
                 </div>
             </div>
         </div>

@@ -48,9 +48,17 @@ Route::view('/contact', 'contact')->name('contact');
 Route::view('/privacy', 'privacy')->name('privacy');
 Route::view('/terms', 'terms')->name('terms');
 Route::view('/help', 'help')->name('help');
+Route::post('/help/contact', [\App\Http\Controllers\ContactMessageController::class, 'store'])->middleware('throttle:5,1')->name('help.contact');
 
 Route::get('/login-redirect', function (Request $request) {
     $intendedUrl = $request->get('intended', url()->previous());
+
+    // Only ever send people back into this site after login, never to an outside address.
+    $home = rtrim(url('/'), '/');
+    if (! is_string($intendedUrl) || ($intendedUrl !== $home && ! str_starts_with($intendedUrl, $home . '/'))) {
+        $intendedUrl = route('dashboard');
+    }
+
     $request->session()->put('url.intended', $intendedUrl);
     return redirect()->route('login');
 })->name('login.redirect');

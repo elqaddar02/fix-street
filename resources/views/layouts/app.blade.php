@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="description" content="Report street problems and help improve your city with Madinup.">
 
@@ -26,8 +26,14 @@
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     </head>
     <body class="font-sans antialiased bg-gray-50">
-        <div class="flex flex-col min-h-screen">
+        {{-- Phones: room at the bottom for the tab bar (and a page's sticky action bar, if any). --}}
+        <div @class([
+            "flex min-h-screen flex-col lg:pb-0",
+            "pb-[calc(4rem+env(safe-area-inset-bottom))]" => ! isset($stickyBar),
+            "pb-[calc(8.5rem+env(safe-area-inset-bottom))]" => isset($stickyBar),
+        ])>
             @include('layouts.navigation')
+            <x-flash-message />
 
             <!-- Page Heading -->
             @isset($header)
@@ -42,6 +48,14 @@
             <main @class(["flex-grow", "pt-16" => ! isset($header)])>
                 {{ $slot }}
             </main>
+
+            @isset($stickyBar)
+                <div class="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-gray-200 bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
+                    {{ $stickyBar }}
+                </div>
+            @endisset
+
+            @include('layouts.bottom-nav')
 
             <!-- Terms Modal -->
             <div id="termsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Terms of Service">

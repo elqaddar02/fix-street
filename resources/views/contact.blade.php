@@ -12,7 +12,9 @@
                         {{ __('Need help with a report or account access? Reach our support team and we will respond as soon as possible.') }}
                     </p>
                     <div class="rounded-lg border border-gray-200 p-4">
-                        <p><strong>{{ __('Email:') }}</strong> {{ __('support@fixstreet.local') }}</p>
+                        @if(config('app.contact_email'))
+                            <p><strong>{{ __('Email:') }}</strong> <a href="mailto:{{ config('app.contact_email') }}" class="font-medium text-red-700 underline-offset-2 hover:underline" dir="ltr">{{ config('app.contact_email') }}</a></p>
+                        @endif
                         <p><strong>{{ __('Office Hours:') }}</strong> {{ __('Monday - Friday, 09:00 - 17:00') }}</p>
                         <p><strong>{{ __('Response Time:') }}</strong> {{ __('Usually within 1-2 business days') }}</p>
                     </div>

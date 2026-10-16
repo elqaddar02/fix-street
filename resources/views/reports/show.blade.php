@@ -41,10 +41,22 @@
             </div>
         </header>
 
-        <div class="grid gap-6 lg:grid-cols-3">
+
+        @php
+            $userHasLiked = auth()->check() && auth()->user()->likedReports()->where('report_id', $report->id)->exists();
+            $guestConfirmUrl = route('login.redirect', ['intended' => url()->current()]);
+            $checkIcon = 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z';
+        @endphp
+
+        {{--
+            One set of sections. On phones the two column wrappers dissolve
+            (display: contents) so the sections can be ordered photo → details →
+            description → map; on desktop they are the main column and sidebar.
+        --}}
+        <div class="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:gap-6">
             {{-- MAIN COLUMN --}}
-            <div class="space-y-6 lg:col-span-2">
-                <figure class="{{ $card }} overflow-hidden">
+            <div class="contents lg:block lg:col-span-2 lg:space-y-6">
+                <figure class="{{ $card }} order-1 overflow-hidden">
                     @if($hasImage)
                         <img src="{{ asset('storage/' . $report->image) }}" alt="{{ $report->title }}" class="aspect-[4/3] w-full bg-gray-100 object-cover sm:aspect-[16/10]">
                     @else
@@ -57,14 +69,14 @@
                 {{-- Identical to the title for reports made with the current
                      form, so only worth a section of its own when it differs. --}}
                 @if(filled($report->description) && $report->description !== $report->title)
-                    <section class="{{ $card }} p-5 sm:p-6">
+                    <section class="{{ $card }} order-3 p-5 sm:p-6">
                         <h2 class="{{ $cardTitle }}">{{ __('report.description') }}</h2>
                         <p class="mt-2 whitespace-pre-line text-sm leading-6 text-gray-700">{{ $report->description }}</p>
                     </section>
                 @endif
 
                 @if(config('features.comments'))
-                    <section class="{{ $card }} p-5 sm:p-6">
+                    <section class="{{ $card }} order-5 p-5 sm:p-6">
                         <h2 class="{{ $cardTitle }}">{{ __('report.comments') }}</h2>
 
                         <div id="comments-list" class="mt-4 space-y-3">
@@ -94,43 +106,39 @@
             </div>
 
             {{-- SIDEBAR --}}
-            <aside class="space-y-6">
+            <aside class="contents lg:block lg:space-y-6">
                 {{--
                     Confirmations, not "likes": the count means "this many
                     neighbours confirm the problem is real and still there",
                     which is the part a municipality can act on.
+                    Desktop only; phones get the sticky bar below.
                 --}}
-                <section class="{{ $card }} p-5 sm:p-6">
+                <section class="{{ $card }} hidden p-5 sm:p-6 lg:block">
                     <p class="text-sm text-gray-500">{{ __('report.confirm_hint') }}</p>
                     @auth
-                        @php
-                            $userHasLiked = auth()->user()->likedReports()->where('report_id', $report->id)->exists();
-                        @endphp
-                        <div x-data="reportLike({{ $report->id }}, {{ $userHasLiked ? 'true' : 'false' }}, {{ $report->likes_count ?? 0 }})" class="mt-4">
+                        <div x-data="reportLike({{ $report->id }}, @js($userHasLiked), {{ $report->likes_count ?? 0 }})" class="mt-4">
                             <button type="button" @click="toggle()" :disabled="loading"
                                     :class="liked ? 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100' : 'border-red-600 bg-red-600 text-white hover:bg-red-700'"
                                     :aria-pressed="liked ? 'true' : 'false'"
                                     class="flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors disabled:opacity-60">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $checkIcon }}"/></svg>
                                 <span x-text="liked ? @js(__('report.confirmed')) : @js(__('report.confirm'))"></span>
                             </button>
                             <p class="mt-2 text-center text-sm font-medium text-gray-700" x-text="countLabel()"></p>
+                            <p x-show="failed" x-cloak class="mt-2 text-center text-sm text-rose-600" role="alert">{{ __('report.confirm_failed') }}</p>
                         </div>
                     @else
-                        <form method="POST" class="mt-4" id="like-form-guest">
-                            @csrf
-                            <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                                {{ __('report.confirm') }}
-                            </button>
-                        </form>
+                        <a href="{{ $guestConfirmUrl }}" class="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $checkIcon }}"/></svg>
+                            {{ __('report.confirm') }}
+                        </a>
                         <p class="mt-2 text-center text-sm font-medium text-gray-700">
                             {{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}
                         </p>
                     @endauth
                 </section>
 
-                <section class="{{ $card }} p-5 sm:p-6">
+                <section class="{{ $card }} order-2 p-5 sm:p-6">
                     <h2 class="{{ $cardTitle }}">{{ __('report.details') }}</h2>
                     <dl class="mt-4 divide-y divide-gray-100 text-sm">
                         @foreach(array_filter([
@@ -157,7 +165,7 @@
                 </section>
 
                 @if($report->latitude && $report->longitude)
-                    <section class="{{ $card }} overflow-hidden">
+                    <section class="{{ $card }} order-4 overflow-hidden">
                         <div class="flex items-baseline justify-between gap-3 px-5 pt-5 sm:px-6">
                             <h2 class="{{ $cardTitle }}">{{ __('Location') }}</h2>
                             <span class="text-xs tabular-nums text-gray-500" dir="ltr">{{ number_format($report->latitude, 4) }}, {{ number_format($report->longitude, 4) }}</span>
@@ -168,6 +176,37 @@
             </aside>
         </div>
     </div>
+
+    {{-- Phones: the main action stays in reach (the layout pins this above the tab bar). --}}
+    <x-slot name="stickyBar">
+        @auth
+            <div x-data="reportLike({{ $report->id }}, @js($userHasLiked), {{ $report->likes_count ?? 0 }})" class="flex items-center gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-medium text-gray-900" x-text="countLabel()"></p>
+                    <p x-show="!failed" class="truncate text-xs text-gray-500">{{ __('report.confirm_hint') }}</p>
+                    <p x-show="failed" x-cloak class="truncate text-xs text-rose-600" role="alert">{{ __('report.confirm_failed') }}</p>
+                </div>
+                <button type="button" @click="toggle()" :disabled="loading"
+                        :class="liked ? 'border-red-200 bg-red-50 text-red-700' : 'border-red-600 bg-red-600 text-white'"
+                        :aria-pressed="liked ? 'true' : 'false'"
+                        class="inline-flex shrink-0 items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors disabled:opacity-60">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $checkIcon }}"/></svg>
+                    <span x-text="liked ? @js(__('report.confirmed')) : @js(__('report.confirm'))"></span>
+                </button>
+            </div>
+        @else
+            <div class="flex items-center gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-medium text-gray-900">{{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}</p>
+                    <p class="truncate text-xs text-gray-500">{{ __('report.confirm_hint') }}</p>
+                </div>
+                <a href="{{ $guestConfirmUrl }}" class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $checkIcon }}"/></svg>
+                    {{ __('report.confirm') }}
+                </a>
+            </div>
+        @endauth
+    </x-slot>
 
     <script>
         // Read-only map of where the report was filed. Leaflet is loaded by the app layout.
@@ -194,6 +233,7 @@
                 liked: initialLiked,
                 likes: initialLikes,
                 loading: false,
+                failed: false,
                 countLabel() {
                     if (this.likes === 0) return CONFIRMATION_LABELS.zero;
                     if (this.likes === 1) return CONFIRMATION_LABELS.one;
@@ -202,9 +242,10 @@
                 async toggle() {
                     if (this.loading) return;
                     this.loading = true;
+                    this.failed = false;
 
                     try {
-                        const response = await fetch(`/reports/${this.reportId}/likes/toggle`, {
+                        const response = await fetch(@js(route('reports.likes.toggle', ['report' => '__ID__'])).replace('__ID__', this.reportId), {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -223,6 +264,7 @@
                         this.likes = data.likes_count;
                     } catch (error) {
                         console.error('Like toggle failed:', error);
+                        this.failed = true;
                     } finally {
                         this.loading = false;
                     }
@@ -230,15 +272,6 @@
             };
         }
 
-        // Handle like button redirect for unauthenticated users
-        const guestLikeForm = document.getElementById('like-form-guest');
-        if (guestLikeForm) {
-            guestLikeForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const currentUrl = window.location.href;
-                window.location.href = '{{ route("login.redirect") }}?intended=' + encodeURIComponent(currentUrl);
-            });
-        }
 
         // Absent while the comments feature is switched off.
         document.getElementById('comment-form')?.addEventListener('submit', function(e) {
@@ -259,7 +292,7 @@
                 submitBtn.disabled = true;
                 loadingSpan.classList.replace('hidden', 'flex');
 
-                fetch(`/reports/${reportId}/comments`, {
+                fetch(@js(route('reports.comments.store', ['report' => '__ID__'])).replace('__ID__', reportId), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

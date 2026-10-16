@@ -46,7 +46,7 @@
 
                 <a href="/" class="relative z-10 flex items-center gap-3">
                     <x-application-logo class="h-9 w-9" />
-                    <span class="font-bold text-xl tracking-tight">Madinova</span>
+                    <span class="font-bold text-xl tracking-tight">Madinup</span>
                 </a>
 
                 <div class="relative z-10 hidden lg:block max-w-md">
@@ -64,7 +64,7 @@
                 </div>
 
                 <p class="relative z-10 text-sm text-red-100 hidden lg:block">
-                    &copy; {{ date('Y') }} Madinova
+                    &copy; {{ date('Y') }} Madinup
                 </p>
             </div>
 

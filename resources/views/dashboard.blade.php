@@ -50,13 +50,18 @@
                 <p class="mt-1.5 text-sm text-gray-500">{{ __('dashboard.subtitle') }}</p>
             </div>
 
+            @if($totalReports > 0)
+            {{-- Phones use the tab bar's "+" instead. --}}
             <a href="{{ route('reports.create') }}"
-               class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
+               class="hidden shrink-0 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 lg:inline-flex">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/></svg>
                 {{ __('dashboard.new_report') }}
             </a>
+            @endif
         </header>
 
+        {{-- A new account has nothing to count yet: the invitation below says it all. --}}
+        @if($totalReports > 0)
         <section aria-label="{{ __('dashboard.stats.total') }}" class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
             <article class="{{ $tile }} border-red-200 shadow-[0_5px_18px_rgba(220,38,38,0.08)]">
                 <span class="{{ $eyebrow }}">{{ __('dashboard.stats.total') }}</span>
@@ -85,6 +90,7 @@
                 </span>
             </article>
         </section>
+        @endif
 
         @if($totalReports === 0)
             <section class="mt-6 rounded-xl border border-gray-200 bg-white px-6 py-12 text-center">

@@ -1,74 +1,72 @@
-<div class="space-y-6">
+@php
+    $field = 'block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500';
+    $topics = [
+        'platform' => 'help.contact.contact_form.topic_platform',
+        'feedback' => 'help.contact.contact_form.topic_feedback',
+        'authority' => 'help.contact.contact_form.topic_authority',
+        'report' => 'help.contact.contact_form.topic_report',
+        'not-fixed' => 'help.contact.contact_form.topic_not_fixed',
+    ];
+@endphp
+
+<div class="space-y-5">
     <div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ __('help.contact.title') }}</h1>
-        <p class="text-gray-600">{{ __('help.contact.subtitle') }}</p>
+        <h2 class="text-xl font-semibold text-gray-900">{{ __('help.contact.title') }}</h2>
+        <p class="mt-1 text-sm text-gray-500">{{ __('help.contact.subtitle') }}</p>
     </div>
 
-    <!-- Contact Form Card -->
-    <div class="rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)] p-5 sm:p-6">
-        <form action="#" method="POST" class="space-y-6">
-            <!-- Topic Radio Buttons -->
+    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-[0_3px_12px_rgba(17,24,39,0.04)] sm:p-6">
+        @unless(config('app.contact_email'))
+            <p class="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-sm text-amber-800">{{ __('help.contact.unavailable') }}</p>
+        @endunless
+
+        <form action="{{ route('help.contact') }}" method="POST" class="space-y-5">
+            @csrf
+
             <fieldset>
-                <legend class="text-lg font-semibold text-gray-900 mb-4">{{ __('help.contact.contact_form.topic') }}</legend>
-                <div class="space-y-2">
-                    <div class="flex items-center">
-                        <input id="topic-platform" name="topic" type="radio" value="platform" class="h-4 w-4 text-red-600 focus:ring-red-200 border-gray-300">
-                        <label for="topic-platform" class="ml-2 text-gray-700">{{ __('help.contact.contact_form.topic_platform') }}</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input id="topic-feedback" name="topic" type="radio" value="feedback" class="h-4 w-4 text-red-600 focus:ring-red-200 border-gray-300">
-                        <label for="topic-feedback" class="ml-2 text-gray-700">{{ __('help.contact.contact_form.topic_feedback') }}</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input id="topic-authority" name="topic" type="radio" value="authority" class="h-4 w-4 text-red-600 focus:ring-red-200 border-gray-300">
-                        <label for="topic-authority" class="ml-2 text-gray-700">{{ __('help.contact.contact_form.topic_authority') }}</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input id="topic-report" name="topic" type="radio" value="report" class="h-4 w-4 text-red-600 focus:ring-red-200 border-gray-300">
-                        <label for="topic-report" class="ml-2 text-gray-700">{{ __('help.contact.contact_form.topic_report') }}</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input id="topic-not-fixed" name="topic" type="radio" value="not-fixed" class="h-4 w-4 text-red-600 focus:ring-red-200 border-gray-300">
-                        <label for="topic-not-fixed" class="ml-2 text-gray-700">{{ __('help.contact.contact_form.topic_not_fixed') }}</label>
-                    </div>
+                <legend class="text-base font-semibold text-gray-900">{{ __('help.contact.contact_form.topic') }}</legend>
+                <div class="mt-3 space-y-1">
+                    @foreach($topics as $value => $key)
+                        <label class="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 hover:bg-gray-50">
+                            <input name="topic" type="radio" value="{{ $value }}" @checked(old('topic', 'platform') === $value) required
+                                   class="h-4 w-4 border-gray-300 text-red-600 focus:ring-red-500">
+                            <span class="text-sm text-gray-700">{{ __($key) }}</span>
+                        </label>
+                    @endforeach
                 </div>
+                @error('topic') <p class="mt-1.5 text-sm text-rose-600">{{ $message }}</p> @enderror
             </fieldset>
 
-            <!-- Inputs -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">{{ __('help.contact.contact_form.name') }}</label>
-                    <input type="text" id="name" name="name" class="block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500">
-                </div>
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">{{ __('help.contact.contact_form.email') }}</label>
-                    <input type="email" id="email" name="email" class="block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">{{ __('help.contact.contact_form.phone') }}</label>
-                    <input type="tel" id="phone" name="phone" class="block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500">
-                </div>
-                <div>
-                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">{{ __('help.contact.contact_form.subject') }}</label>
-                    <input type="text" id="subject" name="subject" class="block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500">
-                </div>
-            </div>
-            <div>
-                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">{{ __('help.contact.contact_form.message') }}</label>
-                <textarea id="message" name="message" rows="4" class="block w-full rounded-lg border-gray-300 text-sm shadow-sm focus:border-red-500 focus:ring-red-500"></textarea>
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                @foreach([
+                    ['name', 'text', 'help.contact.contact_form.name', true, 'name'],
+                    ['email', 'email', 'help.contact.contact_form.email', true, 'email'],
+                    ['phone', 'tel', 'help.contact.contact_form.phone', false, 'tel'],
+                    ['subject', 'text', 'help.contact.contact_form.subject', true, 'off'],
+                ] as [$name, $type, $labelKey, $required, $autocomplete])
+                    <div>
+                        <label for="contact-{{ $name }}" class="mb-1.5 block text-sm font-medium text-gray-700">{{ __($labelKey) }}</label>
+                        <input type="{{ $type }}" id="contact-{{ $name }}" name="{{ $name }}" value="{{ old($name) }}" autocomplete="{{ $autocomplete }}"
+                               @if($required) required @endif class="{{ $field }}" @if($type === 'tel' || $type === 'email') dir="ltr" @endif>
+                        @error($name) <p class="mt-1.5 text-sm text-rose-600">{{ $message }}</p> @enderror
+                    </div>
+                @endforeach
             </div>
 
-            <!-- Submit Section -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center">
-                    <input id="captcha" name="captcha" type="checkbox" class="h-4 w-4 text-red-600 focus:ring-red-200 border-gray-300 rounded">
-                    <label for="captcha" class="ml-2 text-sm text-gray-700">{{ __('help.contact.contact_form.captcha') }}</label>
-                </div>
-                <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700">
-                    {{ __('help.contact.contact_form.send') }}
-                </button>
+            <div>
+                <label for="contact-message" class="mb-1.5 block text-sm font-medium text-gray-700">{{ __('help.contact.contact_form.message') }}</label>
+                <textarea id="contact-message" name="message" rows="5" required maxlength="5000" class="{{ $field }}">{{ old('message') }}</textarea>
+                @error('message') <p class="mt-1.5 text-sm text-rose-600">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Honeypot: invisible to people, so anything typed here came from a bot. --}}
+            <div class="hidden" aria-hidden="true">
+                <label for="contact-website">Website</label>
+                <input type="text" id="contact-website" name="website" tabindex="-1" autocomplete="off">
+            </div>
+
+            <div class="flex justify-end border-t border-gray-100 pt-4">
+                <x-primary-button class="w-full sm:w-auto">{{ __('help.contact.contact_form.send') }}</x-primary-button>
             </div>
         </form>
     </div>
