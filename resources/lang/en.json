@@ -426,5 +426,9 @@
     "signin.reset_subtitle": "Pick a password you don't use on other sites.",
     "signin.confirm_title": "Confirm your password",
     "signin.verify_title": "Check your email",
-    "signin.back_to_login": "Back to sign in"
+    "signin.back_to_login": "Back to sign in",
+    "signin.verify_banner": "Confirm your email address (:email) to publish reports and confirm problems.",
+    "signin.resend_link": "Resend the link",
+    "signin.link_sent": "Link sent. Check your inbox.",
+    "signin.email_verified": "Email confirmed. You can now publish reports."
 }

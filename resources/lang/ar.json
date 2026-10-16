@@ -454,5 +454,9 @@
     "signin.reset_subtitle": "اختر كلمة مرور لا تستخدمها في مواقع أخرى.",
     "signin.confirm_title": "أكّد كلمة المرور",
     "signin.verify_title": "تحقق من بريدك الإلكتروني",
-    "signin.back_to_login": "العودة إلى تسجيل الدخول"
+    "signin.back_to_login": "العودة إلى تسجيل الدخول",
+    "signin.verify_banner": "أكّد بريدك الإلكتروني (:email) لنشر البلاغات وتأكيد المشاكل.",
+    "signin.resend_link": "إعادة إرسال الرابط",
+    "signin.link_sent": "تم إرسال الرابط. تحقق من بريدك.",
+    "signin.email_verified": "تم تأكيد بريدك الإلكتروني. يمكنك الآن نشر البلاغات."
 }

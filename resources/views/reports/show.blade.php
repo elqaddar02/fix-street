@@ -44,7 +44,9 @@
 
         @php
             $userHasLiked = auth()->check() && auth()->user()->likedReports()->where('report_id', $report->id)->exists();
-            $guestConfirmUrl = route('login.redirect', ['intended' => url()->current()]);
+            // Only a verified account can confirm; others are sent to sign in or to check their email.
+            $canConfirm = auth()->check() && auth()->user()->hasVerifiedEmail();
+            $guestConfirmUrl = auth()->check() ? route('verification.notice') : route('login.redirect', ['intended' => url()->current()]);
             $checkIcon = 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z';
         @endphp
 
@@ -115,7 +117,7 @@
                 --}}
                 <section class="{{ $card }} hidden p-5 sm:p-6 lg:block">
                     <p class="text-sm text-gray-500">{{ __('report.confirm_hint') }}</p>
-                    @auth
+                    @if($canConfirm)
                         <div x-data="reportLike({{ $report->id }}, @js($userHasLiked), {{ $report->likes_count ?? 0 }})" class="mt-4">
                             <button type="button" @click="toggle()" :disabled="loading"
                                     :class="liked ? 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100' : 'border-red-600 bg-red-600 text-white hover:bg-red-700'"
@@ -135,7 +137,7 @@
                         <p class="mt-2 text-center text-sm font-medium text-gray-700">
                             {{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}
                         </p>
-                    @endauth
+                    @endif
                 </section>
 
                 <section class="{{ $card }} order-2 p-5 sm:p-6">
@@ -179,7 +181,7 @@
 
     {{-- Phones: the main action stays in reach (the layout pins this above the tab bar). --}}
     <x-slot name="stickyBar">
-        @auth
+        @if($canConfirm)
             <div x-data="reportLike({{ $report->id }}, @js($userHasLiked), {{ $report->likes_count ?? 0 }})" class="flex items-center gap-3">
                 <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-medium text-gray-900" x-text="countLabel()"></p>
@@ -205,7 +207,7 @@
                     {{ __('report.confirm') }}
                 </a>
             </div>
-        @endauth
+        @endif
     </x-slot>
 
     <script>

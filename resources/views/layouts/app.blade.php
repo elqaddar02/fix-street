@@ -46,6 +46,7 @@
 
             <!-- Page Content - Flex Grow -->
             <main @class(["flex-grow", "pt-16" => ! isset($header)])>
+                <x-verify-email-banner />
                 {{ $slot }}
             </main>
 
