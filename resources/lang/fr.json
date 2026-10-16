@@ -456,5 +456,12 @@
     "A new verification link has been sent to the email address you provided during registration.": "Un nouveau lien de vérification a été envoyé à l’adresse e-mail indiquée lors de l’inscription.",
     "Resend Verification Email": "Renvoyer l’e-mail de vérification",
     "nav.profile_tab": "Profil",
-    "Close": "Fermer"
+    "Close": "Fermer",
+    "signin.benefit.report": "Photographiez un nid-de-poule ou un lampadaire en panne et signalez-le en moins d’une minute.",
+    "signin.benefit.confirm": "Les voisins confirment que le problème est réel : il devient plus difficile de l’ignorer.",
+    "signin.benefit.follow": "Suivez chaque signalement, étape par étape, jusqu’à sa réparation.",
+    "signin.show_password": "Afficher le mot de passe",
+    "signin.hide_password": "Masquer le mot de passe",
+    "signin.password_hint": "Au moins 8 caractères.",
+    "signin.terms_notice": "En créant un compte, vous acceptez les"
 }

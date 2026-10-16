@@ -413,5 +413,12 @@
     "help.contact.sent": "Message sent. We'll reply by email.",
     "help.contact.unavailable": "The contact form isn't available yet. Please try again later.",
     "nav.main": "Main navigation",
-    "nav.profile_tab": "Profile"
+    "nav.profile_tab": "Profile",
+    "signin.benefit.report": "Photograph a pothole or a broken light and report it in under a minute.",
+    "signin.benefit.confirm": "Neighbours confirm the problem is real, so it is harder to ignore.",
+    "signin.benefit.follow": "Follow each report, step by step, until it is fixed.",
+    "signin.show_password": "Show password",
+    "signin.hide_password": "Hide password",
+    "signin.password_hint": "At least 8 characters.",
+    "signin.terms_notice": "By creating an account you agree to the"
 }

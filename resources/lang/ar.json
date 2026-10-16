@@ -441,5 +441,12 @@
     "A new verification link has been sent to the email address you provided during registration.": "تم إرسال رابط تحقق جديد إلى البريد الإلكتروني الذي أدخلته عند التسجيل.",
     "Resend Verification Email": "إعادة إرسال بريد التحقق",
     "nav.profile_tab": "حسابي",
-    "Close": "إغلاق"
+    "Close": "إغلاق",
+    "signin.benefit.report": "صوّر حفرة أو إنارة معطلة وأبلغ عنها في أقل من دقيقة.",
+    "signin.benefit.confirm": "يؤكد الجيران أن المشكلة حقيقية، فيصعب تجاهلها.",
+    "signin.benefit.follow": "تابع كل بلاغ خطوة بخطوة حتى يتم إصلاحه.",
+    "signin.show_password": "إظهار كلمة المرور",
+    "signin.hide_password": "إخفاء كلمة المرور",
+    "signin.password_hint": "8 أحرف على الأقل.",
+    "signin.terms_notice": "بإنشاء حساب فإنك توافق على"
 }
