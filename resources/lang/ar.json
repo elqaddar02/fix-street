@@ -448,5 +448,11 @@
     "signin.show_password": "إظهار كلمة المرور",
     "signin.hide_password": "إخفاء كلمة المرور",
     "signin.password_hint": "8 أحرف على الأقل.",
-    "signin.terms_notice": "بإنشاء حساب فإنك توافق على"
+    "signin.terms_notice": "بإنشاء حساب فإنك توافق على",
+    "signin.forgot_subtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابطاً لاختيار كلمة مرور جديدة.",
+    "signin.reset_title": "اختر كلمة مرور جديدة",
+    "signin.reset_subtitle": "اختر كلمة مرور لا تستخدمها في مواقع أخرى.",
+    "signin.confirm_title": "أكّد كلمة المرور",
+    "signin.verify_title": "تحقق من بريدك الإلكتروني",
+    "signin.back_to_login": "العودة إلى تسجيل الدخول"
 }

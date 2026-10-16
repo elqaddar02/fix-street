@@ -420,5 +420,11 @@
     "signin.show_password": "Show password",
     "signin.hide_password": "Hide password",
     "signin.password_hint": "At least 8 characters.",
-    "signin.terms_notice": "By creating an account you agree to the"
+    "signin.terms_notice": "By creating an account you agree to the",
+    "signin.forgot_subtitle": "Enter your email and we'll send you a link to choose a new password.",
+    "signin.reset_title": "Choose a new password",
+    "signin.reset_subtitle": "Pick a password you don't use on other sites.",
+    "signin.confirm_title": "Confirm your password",
+    "signin.verify_title": "Check your email",
+    "signin.back_to_login": "Back to sign in"
 }
