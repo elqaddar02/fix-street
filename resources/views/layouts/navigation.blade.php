@@ -32,10 +32,9 @@
             {{-- LOGO --}}
             <a href="{{ route('home') }}"
                aria-label="{{ __('nav.home') }}"
-               class="flex shrink-0 items-center rounded-lg px-1.5 py-1 transition-colors hover:bg-gray-50">
-                <span class="flex h-11 items-center">
-                    <x-application-logo class="h-full w-auto" />
-                </span>
+               class="flex shrink-0 items-center gap-2 rounded-lg px-1.5 py-1 transition-colors hover:bg-gray-50">
+                <x-application-logo class="h-9 w-auto" />
+                <span class="text-lg font-semibold tracking-tight text-gray-900">{{ config('app.name', 'Madinup') }}</span>
             </a>
 
             {{-- CENTER NAV --}}
