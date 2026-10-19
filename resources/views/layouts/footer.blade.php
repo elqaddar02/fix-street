@@ -3,7 +3,7 @@
         __('footer.navigation') => [
             [route('home'), __('footer.home')],
             [route('reports.index'), __('footer.view_reports')],
-            [route('reports.create'), __('dashboard.new_report')],
+            ...(auth()->user()?->is_admin ? [] : [[route('reports.create'), __('dashboard.new_report')]]),
         ],
         __('footer.resources') => [
             [route('help'), __('footer.help')],

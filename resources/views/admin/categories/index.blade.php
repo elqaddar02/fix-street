@@ -40,7 +40,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ $category->reports->count() }}
+                                    {{ $category->reports_count }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -53,16 +53,22 @@
                                     </svg>
                                     Éditer
                                 </a>
-                                <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="inline-flex items-center" onsubmit="return confirm('Êtes-vous sûr?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center px-3 py-1 text-sm font-medium text-red-600 hover:text-red-700">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                        </svg>
+                                {{-- A category in use can't be deleted: its reports would go with it. --}}
+                                @if($category->reports_count > 0)
+                                    <span class="inline-flex cursor-not-allowed items-center px-3 py-1 text-sm font-medium text-gray-300" title="Utilisée par {{ $category->reports_count }} signalement(s)">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                         Supprimer
-                                    </button>
-                                </form>
+                                    </span>
+                                @else
+                                    <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="inline-flex items-center" onsubmit="return confirm('Supprimer définitivement la catégorie « {{ $category->name }} » ?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="inline-flex items-center px-3 py-1 text-sm font-medium text-red-600 hover:text-red-700">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @empty

@@ -50,6 +50,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // A deactivated account keeps its password but may not sign in.
+        if (Auth::user()->active === false) {
+            Auth::guard('web')->logout();
+
+            throw ValidationException::withMessages([
+                'email' => __('signin.account_disabled'),
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

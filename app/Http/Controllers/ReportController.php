@@ -124,9 +124,11 @@ class ReportController extends Controller
 
     public function create()
     {
-        // if (auth()->check() && auth()->user()->is_admin) {
-        //     abort(403, 'Admins are not allowed to create reports.');
-        // }
+        // Admins moderate reports; they don't file them (store() refuses them).
+        // Turn them away before the form, not after they've filled it in.
+        if (auth()->user()->is_admin) {
+            return redirect()->route('admin.dashboard')->with('error', 'Les comptes administrateurs ne peuvent pas créer de signalement.');
+        }
 
         $categories = Category::all();
         $cities = City::where('active', true)->get();
@@ -138,6 +140,11 @@ class ReportController extends Controller
 
     public function store(Request $request)
     {
+        // Checked first: this used to run after the photo upload, leaving the file behind.
+        if (auth()->user()->is_admin) {
+            abort(403, 'Admins cannot store reports.');
+        }
+
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -163,10 +170,6 @@ class ReportController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image'] = $this->uploads->store($request->file('image'), 'reports');
-        }
-
-        if (auth()->check() && auth()->user()->is_admin) {
-            abort(403, 'Admins cannot store reports.');
         }
 
         // The form only asks for one piece of text; mirror it into

@@ -15,10 +15,11 @@ class UserController extends Controller
     {
         $search = $request->input('search');
 
-        $users = User::when($search, function ($query) use ($search) {
-            return $query->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
-        })->orderBy('created_at', 'desc')
+        $users = User::withCount('reports')
+            ->when($search, function ($query) use ($search) {
+                $query->where(fn ($q) => $q->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
+            })
+            ->orderBy('created_at', 'desc')
             ->paginate(15)
             ->withQueryString();
 
@@ -27,6 +28,8 @@ class UserController extends Controller
 
     public function show(User $user)
     {
+        $user->loadCount('reports');
+
         return view('admin.users.show', compact('user'));
     }
 
@@ -34,7 +37,13 @@ class UserController extends Controller
     {
         $request->validate(['active' => 'required|boolean']);
 
+        if ($refusal = $this->protectedAccountReason($user)) {
+            return $this->statusRefused($request, $refusal);
+        }
+
         $user->update(['active' => (bool) $request->active]);
+
+        logAdminAction($user->active ? 'Activate' : 'Deactivate', 'User', $user->id, "{$user->email}");
 
         return $this->statusResponse(
             $request,
@@ -45,8 +54,38 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        if ($refusal = $this->protectedAccountReason($user)) {
+            return back()->with('error', $refusal);
+        }
+
+        $email = $user->email;
+        $reports = $user->reports()->count();
+
+        // Their reports stay (reports.user_id is set to null): they are part of
+        // the public record and other citizens may have confirmed them.
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'Utilisateur supprimé.');
+        logAdminAction('Delete', 'User', $user->id, "{$email} ({$reports} report(s) kept, now anonymous)");
+
+        return redirect()->route('admin.users.index')->with('success', $reports > 0
+            ? "Utilisateur supprimé. Ses {$reports} signalement(s) sont conservés et apparaissent comme anonymes."
+            : 'Utilisateur supprimé.');
+    }
+
+    /**
+     * Admin accounts can't be deactivated or deleted from here: it would let an
+     * admin lock themselves (or every other admin) out of the panel.
+     */
+    private function protectedAccountReason(User $user): ?string
+    {
+        if ($user->is(auth()->user())) {
+            return 'Vous ne pouvez pas désactiver ou supprimer votre propre compte.';
+        }
+
+        if ($user->is_admin) {
+            return 'Les comptes administrateurs ne peuvent pas être désactivés ou supprimés ici.';
+        }
+
+        return null;
     }
 }

@@ -45,6 +45,7 @@
                 <thead>
                     <tr class="border-b border-slate-200 bg-slate-50/80">
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Nom</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Signalements</th>
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
                     </tr>
@@ -55,6 +56,7 @@
                             <td class="px-6 py-3.5">
                                 <span class="text-sm font-medium">{{ $city->name }}</span>
                             </td>
+                            <td class="px-6 py-3.5 text-sm tabular-nums text-slate-600">{{ $city->reports_count }}</td>
                             <td class="px-6 py-3.5">
                                 <x-admin.status-toggle
                                     :action="route('admin.cities.updateStatus', $city)"
@@ -70,23 +72,30 @@
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         <span class="sr-only">Modifier {{ $city->name }}</span>
                                     </a>
-                                    <form action="{{ route('admin.cities.destroy', $city) }}" method="POST"
-                                          onsubmit="return confirm('Supprimer définitivement « {{ $city->name }} » ?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
-                                                title="Supprimer">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                            <span class="sr-only">Supprimer {{ $city->name }}</span>
-                                        </button>
-                                    </form>
+                                    {{-- A city in use can't be deleted (its reports would go with it): deactivate it instead. --}}
+                                    @if($city->reports_count > 0)
+                                        <span class="cursor-not-allowed rounded-lg p-2 text-slate-200" title="Utilisée par {{ $city->reports_count }} signalement(s) : désactivez-la plutôt">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        </span>
+                                    @else
+                                        <form action="{{ route('admin.cities.destroy', $city) }}" method="POST"
+                                              onsubmit="return confirm('Supprimer définitivement « {{ $city->name }} » et ses arrondissements ?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+                                                    title="Supprimer">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                <span class="sr-only">Supprimer {{ $city->name }}</span>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-6 py-16 text-center">
+                            <td colspan="4" class="px-6 py-16 text-center">
                                 <p class="text-sm font-medium text-slate-600">Aucune ville</p>
                                 <p class="mt-1 text-sm text-slate-400">Ajoutez-en une avec le formulaire ci-dessus.</p>
                             </td>
