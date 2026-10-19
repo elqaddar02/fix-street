@@ -105,7 +105,6 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
 
     Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
     Route::post('/reports/bulk-status', [\App\Http\Controllers\Admin\ReportController::class, 'bulkUpdateStatus'])->name('reports.bulkUpdateStatus');
-        Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::get('/reports/{report}', [\App\Http\Controllers\Admin\ReportController::class, 'show'])->name('reports.show');
 
 
@@ -113,7 +112,9 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
     Route::delete('/reports/{report}', [\App\Http\Controllers\Admin\ReportController::class, 'destroy'])->name('reports.destroy');
 
     // Categories
-    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+    // No "show" page exists for a category; the route used to crash with a 500.
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->except(['show']);
+    Route::get('/categories/{category}', fn (\App\Models\Category $category) => redirect()->route('admin.categories.edit', $category))->name('categories.show');
 
     // Comments
     Route::get('/comments', [\App\Http\Controllers\Admin\CommentController::class, 'index'])->name('comments.index');

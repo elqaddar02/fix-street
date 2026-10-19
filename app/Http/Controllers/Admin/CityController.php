@@ -13,7 +13,7 @@ class CityController extends Controller
 
     public function index()
     {
-        $cities = City::orderBy('name')->paginate(10);
+        $cities = City::withCount('reports')->orderBy('name')->paginate(10);
 
         return view('admin.cities.index', compact('cities'));
     }
@@ -62,7 +62,17 @@ class CityController extends Controller
 
     public function destroy(City $city)
     {
+        // Deleting used to take every report in the city with it. A city that's
+        // in use can be deactivated instead, which hides it from the report form.
+        $reports = $city->reports()->count();
+        $dossiers = \App\Models\Dossier::where('city_id', $city->id)->count();
+
+        if ($reports > 0 || $dossiers > 0) {
+            return back()->with('error', "Impossible de supprimer « {$city->name} » : {$reports} signalement(s) et {$dossiers} dossier(s) y sont rattachés. Désactivez-la plutôt.");
+        }
+
         $city->delete();
+        logAdminAction('Delete', 'City', $city->id, "Deleted city: {$city->name}");
 
         return redirect()->route('admin.cities.index')->with('success', 'Ville supprimée.');
     }

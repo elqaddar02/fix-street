@@ -473,5 +473,7 @@
     "signin.verify_banner": "Confirmez votre adresse e-mail (:email) pour publier des signalements et confirmer des problèmes.",
     "signin.resend_link": "Renvoyer le lien",
     "signin.link_sent": "Lien envoyé. Consultez votre boîte mail.",
-    "signin.email_verified": "Adresse e-mail confirmée. Vous pouvez maintenant publier des signalements."
+    "signin.email_verified": "Adresse e-mail confirmée. Vous pouvez maintenant publier des signalements.",
+    "signin.account_disabled": "Ce compte a été désactivé. Contactez-nous si vous pensez qu’il s’agit d’une erreur.",
+    "signin.session_expired": "Votre session a expiré. Veuillez réessayer."
 }

@@ -17,11 +17,13 @@
                     @include('reports.partials.summary')
                 </p>
             </div>
-            {{-- Phones reach "New report" from the tab bar. --}}
+            {{-- Phones reach "New report" from the tab bar; admins don't file reports. --}}
+            @unless(auth()->user()?->is_admin)
             <a href="{{ route('reports.create') }}" class="hidden shrink-0 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 lg:inline-flex">
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/></svg>
                 {{ __('dashboard.new_report') }}
             </a>
+            @endunless
         </header>
 
         <div class="lg:grid lg:grid-cols-4 lg:gap-6">

@@ -10,7 +10,15 @@
         'login' => 'M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75',
     ];
 
-    $tabs = auth()->check()
+    $tabs = auth()->user()?->is_admin
+        // Admins moderate rather than report: no "+", and their space is the admin panel.
+        ? [
+            ['route' => 'home', 'label' => __('nav.home'), 'icon' => 'home', 'active' => request()->routeIs('home')],
+            ['route' => 'reports.index', 'label' => __('nav.all_reports'), 'icon' => 'list', 'active' => request()->routeIs('reports.index', 'reports.show')],
+            ['route' => 'admin.dashboard', 'label' => __('nav.admin_panel'), 'icon' => 'grid', 'active' => false],
+            ['route' => 'profile.edit', 'label' => __('nav.profile_tab'), 'icon' => 'user', 'active' => request()->routeIs('profile.*')],
+        ]
+        : (auth()->check()
         ? [
             ['route' => 'home', 'label' => __('nav.home'), 'icon' => 'home', 'active' => request()->routeIs('home')],
             ['route' => 'reports.index', 'label' => __('nav.all_reports'), 'icon' => 'list', 'active' => request()->routeIs('reports.index', 'reports.show')],
@@ -24,12 +32,12 @@
             'new',
             ['route' => 'help', 'label' => __('nav.help'), 'icon' => 'help', 'active' => request()->routeIs('help')],
             ['route' => 'login', 'label' => __('Log in'), 'icon' => 'login', 'active' => request()->routeIs('login')],
-        ];
+        ]);
 @endphp
 
 <nav aria-label="{{ __('nav.main') }}"
      class="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
-    <ul class="mx-auto grid h-16 max-w-md grid-cols-5">
+    <ul @class(["mx-auto grid h-16 max-w-md", "grid-cols-5" => count($tabs) === 5, "grid-cols-4" => count($tabs) === 4])>
         @foreach($tabs as $tab)
             <li class="flex">
                 @if($tab === 'new')

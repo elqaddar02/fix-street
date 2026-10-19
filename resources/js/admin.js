@@ -122,7 +122,13 @@ async function submitStatus(form, active, { announce = true } = {}) {
             credentials: 'same-origin',
         });
 
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) {
+            // A refusal (e.g. "you can't deactivate an admin") carries its reason.
+            const refusal = await response.json().catch(() => ({}));
+            const error = new Error(`HTTP ${response.status}`);
+            error.userMessage = refusal.message;
+            throw error;
+        }
 
         const data = await response.json().catch(() => ({}));
 
@@ -145,7 +151,7 @@ async function submitStatus(form, active, { announce = true } = {}) {
     } catch (error) {
         // Roll back so the switch never shows a state the server rejected.
         paintToggle(form, previous);
-        toast("Le statut n'a pas pu être enregistré.", { tone: 'error' });
+        toast(error.userMessage || "Le statut n'a pas pu être enregistré.", { tone: 'error' });
     } finally {
         button.disabled = false;
     }

@@ -53,6 +53,11 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
+        // Deleting used to take every report in the category with it.
+        if (($count = $category->reports()->count()) > 0) {
+            return back()->with('error', "Impossible de supprimer « {$category->name} » : {$count} signalement(s) l'utilisent.");
+        }
+
         $categoryName = $category->name;
         $category->delete();
         logAdminAction('Delete', 'Category', $category->id, "Deleted category: {$categoryName}");

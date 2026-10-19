@@ -23,4 +23,17 @@ trait RespondsToStatusChange
 
         return back()->with('success', $message);
     }
+
+    /**
+     * The change was refused (e.g. an admin trying to deactivate themselves).
+     * The fetch() widgets roll back and show the reason; plain forms get a flash.
+     */
+    protected function statusRefused(Request $request, string $message): JsonResponse|RedirectResponse
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['ok' => false, 'message' => $message], 422);
+        }
+
+        return back()->with('error', $message);
+    }
 }
