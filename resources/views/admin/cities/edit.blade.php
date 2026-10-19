@@ -1,12 +1,12 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Modifier la ville')
+@section('title', __('admin.cities_edit_title'))
 
 @section('content')
 <div class="space-y-6">
     <div>
-        <h2 class="text-2xl font-semibold tracking-tight text-slate-900">Modifier la ville</h2>
-        <p class="text-slate-600">Mettre à jour le nom ou l'état activer/désactiver</p>
+        <h2 class="text-2xl font-semibold tracking-tight text-slate-900">{{ __('admin.cities_edit_title') }}</h2>
+        <p class="text-slate-600">{{ __('admin.cities_edit_intro') }}</p>
     </div>
 
     <form method="POST" action="{{ route('admin.cities.update', $city) }}" class="grid gap-3 max-w-lg">
@@ -14,21 +14,21 @@
         @method('PATCH')
 
         <div>
-            <label class="text-sm font-semibold">Nom</label>
+            <label class="text-sm font-semibold">{{ __('admin.name') }}</label>
             <input name="name" value="{{ old('name', $city->name) }}" class="mt-1 w-full rounded-lg border-2 border-slate-400 px-3 py-2" required />
         </div>
 
         <div>
-            <label class="text-sm font-semibold">Actif</label>
-            <select name="active" class="mt-1 w-full rounded-lg border-2 border-slate-400 px-3 py-2" required>
-                <option value="1" {{ old('active', $city->active) ? 'selected' : '' }}>Oui</option>
-                <option value="0" {{ ! old('active', $city->active) ? 'selected' : '' }}>Non</option>
+            <label class="text-sm font-semibold">{{ __('admin.active') }}</label>
+            <select name="active" class="mt-1 w-full rounded-lg border-2 border-slate-400 ps-3 pe-8 py-2" required>
+                <option value="1" {{ old('active', $city->active) ? 'selected' : '' }}>{{ __('admin.yes') }}</option>
+                <option value="0" {{ ! old('active', $city->active) ? 'selected' : '' }}>{{ __('admin.no') }}</option>
             </select>
         </div>
 
         <div class="flex gap-2">
-            <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-white">Enregistrer</button>
-            <a href="{{ route('admin.cities.index') }}" class="rounded-lg bg-slate-100 px-4 py-2">Annuler</a>
+            <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-white">{{ __('admin.save') }}</button>
+            <a href="{{ route('admin.cities.index') }}" class="rounded-lg bg-slate-100 px-4 py-2">{{ __('admin.cancel') }}</a>
         </div>
     </form>
 </div>

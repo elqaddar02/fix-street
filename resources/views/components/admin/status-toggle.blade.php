@@ -36,14 +36,14 @@
             aria-checked="{{ $active ? 'true' : 'false' }}"
             data-status-switch
             class="group relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 disabled:cursor-wait disabled:opacity-60 {{ $active ? 'bg-emerald-500' : 'bg-slate-300' }}">
-        <span class="sr-only">{{ $label ? __('Changer le statut de') . ' ' . $label : __('Changer le statut') }}</span>
+        <span class="sr-only">{{ $label ? __('admin.change_status_of', ['name' => $label]) : __('admin.change_status') }}</span>
         <span aria-hidden="true"
               data-status-knob
-              class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $active ? 'translate-x-5' : 'translate-x-0' }}"></span>
+              class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $active ? 'translate-x-5 rtl:-translate-x-5' : 'translate-x-0' }}"></span>
     </button>
 
     <span data-status-text
           class="text-sm font-medium tabular-nums {{ $active ? 'text-emerald-700' : 'text-slate-500' }}">
-        {{ $active ? 'Actif' : 'Inactif' }}
+        {{ $active ? __('admin.active') : __('admin.inactive') }}
     </span>
 </form>

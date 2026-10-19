@@ -29,7 +29,7 @@ class CategoryController extends Controller
         $category = Category::create($validated);
         logAdminAction('Create', 'Category', $category->id, "Created category: {$category->name}");
 
-        return redirect()->route('admin.categories.index')->with('success', 'Catégorie créée avec succès.');
+        return redirect()->route('admin.categories.index')->with('success', __('admin.flash_category_created'));
     }
 
     public function edit(Category $category)
@@ -48,20 +48,20 @@ class CategoryController extends Controller
         $category->update($validated);
         logAdminAction('Update', 'Category', $category->id, "Updated category from '{$oldName}' to '{$category->name}'");
 
-        return redirect()->route('admin.categories.index')->with('success', 'Catégorie mise à jour.');
+        return redirect()->route('admin.categories.index')->with('success', __('admin.flash_category_updated'));
     }
 
     public function destroy(Category $category)
     {
         // Deleting used to take every report in the category with it.
         if (($count = $category->reports()->count()) > 0) {
-            return back()->with('error', "Impossible de supprimer « {$category->name} » : {$count} signalement(s) l'utilisent.");
+            return back()->with('error', __('admin.flash_category_in_use', ['name' => $category->name, 'count' => $count]));
         }
 
         $categoryName = $category->name;
         $category->delete();
         logAdminAction('Delete', 'Category', $category->id, "Deleted category: {$categoryName}");
 
-        return redirect()->route('admin.categories.index')->with('success', 'Catégorie supprimée.');
+        return redirect()->route('admin.categories.index')->with('success', __('admin.flash_category_deleted'));
     }
 }

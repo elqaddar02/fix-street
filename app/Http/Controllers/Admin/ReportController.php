@@ -93,7 +93,7 @@ class ReportController extends Controller
 
         return $this->statusResponse(
             $request,
-            'Statut du signalement mis à jour.',
+            __('admin.flash_report_status'),
             ['status' => $report->status]
         );
     }
@@ -109,19 +109,19 @@ class ReportController extends Controller
         $reports = Report::whereIn('id', $data['report_ids'])->where('status', '!=', $data['status'])->get(['id', 'status']);
 
         foreach ($reports as $report) {
-            logAdminAction('Status', 'Report', $report->id, "{$report->status} → {$data['status']} (lot)");
+            logAdminAction('Status', 'Report', $report->id, "{$report->status} → {$data['status']} (bulk)");
         }
 
         $updatedCount = Report::whereIn('id', $reports->pluck('id'))->update(['status' => $data['status']]);
 
-        return back()->with('success', "Statut appliqué à {$updatedCount} signalement(s).");
+        return back()->with('success', __('admin.flash_bulk_status', ['count' => $updatedCount]));
     }
 
     public function destroy(Report $report)
     {
         // A report attached to a case is evidence; the public side protects it too.
         if ($report->dossier_id) {
-            return back()->with('error', 'Ce signalement fait partie d’un dossier et ne peut pas être supprimé. Rejetez-le plutôt.');
+            return back()->with('error', __('admin.flash_report_in_dossier'));
         }
 
         $title = $report->title;
@@ -130,6 +130,6 @@ class ReportController extends Controller
 
         logAdminAction('Delete', 'Report', $report->id, $title);
 
-        return redirect()->route('admin.reports.index')->with('success', 'Signalement supprimé.');
+        return redirect()->route('admin.reports.index')->with('success', __('admin.flash_report_deleted'));
     }
 }

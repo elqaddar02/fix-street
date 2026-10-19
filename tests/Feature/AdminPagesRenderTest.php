@@ -25,7 +25,7 @@ class AdminPagesRenderTest extends TestCase
         $this->actingAs($this->admin())
             ->get(route('admin.dashboard'))
             ->assertOk()
-            ->assertSee('Vue d\'ensemble', false);
+            ->assertSee(__('admin.overview'));
     }
 
     public function test_dashboard_renders_with_data(): void
@@ -69,6 +69,49 @@ class AdminPagesRenderTest extends TestCase
                 ->get(route($route))
                 ->assertOk();
         }
+    }
+
+    public function test_admin_pages_are_translated_in_every_language(): void
+    {
+        $admin = $this->admin();
+        $city = City::create(['name' => 'Tanger', 'active' => true]);
+        $report = Report::create([
+            'title' => 'Lampadaire cassé',
+            'description' => 'Lampadaire cassé',
+            'status' => 'OPEN',
+            'user_id' => $admin->id,
+            'category_id' => Category::create(['name' => 'Éclairage'])->id,
+            'city_id' => $city->id,
+        ]);
+
+        $pages = [
+            route('admin.dashboard'),
+            route('admin.reports.index'),
+            route('admin.reports.show', $report),
+            route('admin.users.index'),
+            route('admin.users.show', $admin),
+            route('admin.categories.index'),
+            route('admin.categories.create'),
+            route('admin.cities.index'),
+            route('admin.cities.edit', $city),
+            route('admin.ads.index'),
+            route('admin.ads.create'),
+            route('admin.comments.index'),
+        ];
+
+        foreach (['en', 'fr', 'ar'] as $locale) {
+            foreach ($pages as $page) {
+                // A raw "admin.something" in the HTML means a key is missing for this locale.
+                $this->actingAs($admin)->withSession(['locale' => $locale])->get($page)
+                    ->assertOk()
+                    ->assertDontSee("'admin.", false)
+                    ->assertDontSeeText('admin.');
+            }
+        }
+
+        $this->actingAs($admin)->withSession(['locale' => 'ar'])->get(route('admin.dashboard'))
+            ->assertSee('dir="rtl"', false)
+            ->assertSee('لوحة التحكم');
     }
 
     public function test_city_status_toggle_returns_json_for_ajax(): void

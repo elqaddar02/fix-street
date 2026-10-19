@@ -1,19 +1,19 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Publicités')
+@section('title', __('admin.ads'))
 
 @section('content')
 <div class="space-y-8">
     <div class="flex items-center justify-between">
         <div>
-            <h2 class="text-2xl font-semibold tracking-tight text-slate-900">Publicités</h2>
-            <p class="text-slate-600">Gérer les publicités par emplacement</p>
+            <h2 class="text-2xl font-semibold tracking-tight text-slate-900">{{ __('admin.ads') }}</h2>
+            <p class="text-slate-600">{{ __('admin.ads_intro') }}</p>
         </div>
         <a href="{{ route('admin.ads.create') }}" class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
-            Nouvelle publicité
+            {{ __('admin.ads_new') }}
         </a>
     </div>
 
@@ -22,13 +22,13 @@
             <table class="w-full">
                 <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Publicité</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Emplacement</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Fenêtre</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Impressions</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">Clics</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-slate-700 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-start text-xs font-medium text-slate-700 uppercase tracking-wider">{{ __('admin.ad') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-medium text-slate-700 uppercase tracking-wider">{{ __('admin.ads_placement') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-medium text-slate-700 uppercase tracking-wider">{{ __('admin.status') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-medium text-slate-700 uppercase tracking-wider">{{ __('admin.ads_window') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-medium text-slate-700 uppercase tracking-wider">{{ __('admin.ads_impressions') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-medium text-slate-700 uppercase tracking-wider">{{ __('admin.ads_clicks') }}</th>
+                        <th class="px-6 py-3 text-end text-xs font-medium text-slate-700 uppercase tracking-wider">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
@@ -63,23 +63,23 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ $ad->impressions_count }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{{ $ad->clicks_count }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                            <td class="px-6 py-4 whitespace-nowrap text-end space-x-2 rtl:space-x-reverse">
                                 <form action="{{ route('admin.ads.updateStatus', $ad) }}" method="POST" class="inline-flex items-center">
                                     @csrf
                                     @method('PATCH')
                                     <input type="hidden" name="is_active" value="{{ $ad->is_active ? 0 : 1 }}">
                                     <button type="submit" class="inline-flex items-center px-3 py-1 text-sm font-medium text-slate-600 hover:text-slate-900">
-                                        {{ $ad->is_active ? 'Désactiver' : 'Activer' }}
+                                        {{ $ad->is_active ? __('admin.deactivate') : __('admin.activate') }}
                                     </button>
                                 </form>
                                 <a href="{{ route('admin.ads.edit', $ad) }}" class="inline-flex items-center px-3 py-1 text-sm font-medium text-slate-600 hover:text-slate-900">
-                                    Éditer
+                                    {{ __('admin.edit') }}
                                 </a>
-                                <form action="{{ route('admin.ads.destroy', $ad) }}" method="POST" class="inline-flex items-center" onsubmit="return confirm('Êtes-vous sûr?');">
+                                <form action="{{ route('admin.ads.destroy', $ad) }}" method="POST" class="inline-flex items-center" onsubmit="return confirm(@js(__('admin.are_you_sure')))">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="inline-flex items-center px-3 py-1 text-sm font-medium text-red-600 hover:text-red-700">
-                                        Supprimer
+                                        {{ __('admin.delete') }}
                                     </button>
                                 </form>
                             </td>
@@ -87,7 +87,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="px-6 py-8 text-center text-slate-500">
-                                <p>Aucune publicité créée.</p>
+                                <p>{{ __('admin.ads_empty') }}</p>
                             </td>
                         </tr>
                     @endforelse

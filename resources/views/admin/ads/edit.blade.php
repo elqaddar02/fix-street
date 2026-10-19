@@ -1,11 +1,11 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Modifier la publicité')
+@section('title', __('admin.ads_edit_title'))
 
 @section('content')
 <div class="space-y-8 max-w-2xl">
     <div>
-        <h2 class="text-2xl font-semibold tracking-tight text-slate-900">Modifier la publicité</h2>
+        <h2 class="text-2xl font-semibold tracking-tight text-slate-900">{{ __('admin.ads_edit_title') }}</h2>
         <p class="text-slate-600">{{ $ad->title }}</p>
     </div>
 
@@ -17,12 +17,12 @@
             @include('admin.ads._form', ['ad' => $ad, 'placements' => $placements])
 
             <!-- Actions -->
-            <div class="flex items-center space-x-4 pt-6 border-t border-slate-200">
+            <div class="flex items-center gap-4 pt-6 border-t border-slate-200">
                 <button type="submit" class="inline-flex items-center px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                    Enregistrer
+                    {{ __('admin.save') }}
                 </button>
                 <a href="{{ route('admin.ads.index') }}" class="inline-flex items-center px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors">
-                    Annuler
+                    {{ __('admin.cancel') }}
                 </a>
             </div>
         </form>

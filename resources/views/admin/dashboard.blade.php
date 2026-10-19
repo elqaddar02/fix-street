@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Tableau de bord')
+@section('title', __('admin.dashboard'))
 
 @section('content')
 @php
@@ -9,63 +9,63 @@
     // that is why the old dashboard needed the CDN build to look right.
     $cards = [
         [
-            'title' => 'Utilisateurs',
+            'title' => __('admin.users'),
             'value' => $totalUsers,
             'trend' => $trends['users'],
-            'caption' => 'inscrits',
+            'caption' => __('admin.registered'),
             'ring' => 'bg-slate-100 text-slate-600',
             'icon' => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z',
         ],
         [
-            'title' => 'Signalements',
+            'title' => __('admin.reports'),
             'value' => $totalReports,
             'trend' => $trends['reports'],
-            'caption' => 'au total',
+            'caption' => __('admin.in_total'),
             'ring' => 'bg-red-50 text-red-600',
             'icon' => 'M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z',
         ],
         // Comments are switched off for the pilot: show what citizens do instead.
         config('features.comments')
             ? [
-                'title' => 'Commentaires',
+                'title' => __('admin.comments'),
                 'value' => $totalComments,
                 'trend' => $trends['comments'],
-                'caption' => $pendingComments . ' en attente',
+                'caption' => __('admin.count_pending', ['count' => $pendingComments]),
                 'ring' => 'bg-emerald-50 text-emerald-600',
                 'icon' => 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z',
             ]
             : [
-                'title' => 'Confirmations',
+                'title' => __('admin.confirmations'),
                 'value' => $totalConfirmations,
                 'trend' => null,
-                'caption' => 'par les voisins',
+                'caption' => __('admin.by_neighbours'),
                 'ring' => 'bg-amber-50 text-amber-600',
                 'icon' => 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
             ],
         [
-            'title' => 'Taux de résolution',
+            'title' => __('admin.resolution_rate'),
             'value' => $resolutionRate,
             'suffix' => '%',
             'trend' => null,
-            'caption' => $resolvedReports . ' résolus sur ' . $totalReports,
+            'caption' => __('admin.resolved_of', ['resolved' => $resolvedReports, 'total' => $totalReports]),
             'ring' => 'bg-emerald-50 text-emerald-600',
             'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
         ],
     ];
 
     $statusMeta = [
-        'OPEN' => ['label' => 'Ouverts', 'dot' => 'bg-amber-500'],
-        'IN_PROGRESS' => ['label' => 'En cours', 'dot' => 'bg-sky-500'],
-        'RESOLVED' => ['label' => 'Résolus', 'dot' => 'bg-emerald-500'],
-        'REJECTED' => ['label' => 'Rejetés', 'dot' => 'bg-rose-500'],
+        'OPEN' => ['label' => __('admin.status_open_plural'), 'dot' => 'bg-amber-500'],
+        'IN_PROGRESS' => ['label' => __('admin.status_in_progress'), 'dot' => 'bg-sky-500'],
+        'RESOLVED' => ['label' => __('admin.status_resolved_plural'), 'dot' => 'bg-emerald-500'],
+        'REJECTED' => ['label' => __('admin.status_rejected_plural'), 'dot' => 'bg-rose-500'],
     ];
 @endphp
 
 <div class="space-y-6">
 
     <div>
-        <h2 class="text-2xl font-bold tracking-tight">Vue d'ensemble</h2>
-        <p class="mt-1 text-sm text-slate-500">Activité de la plateforme sur les 30 derniers jours.</p>
+        <h2 class="text-2xl font-bold tracking-tight">{{ __('admin.overview') }}</h2>
+        <p class="mt-1 text-sm text-slate-500">{{ __('admin.dashboard_intro') }}</p>
     </div>
 
     {{-- Stat cards --}}
@@ -81,7 +81,7 @@
 
                     @if($card['trend'])
                         @if($card['trend']['percent'] === null)
-                            <span class="rounded-lg bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-500">nouveau</span>
+                            <span class="rounded-lg bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-500">{{ __('admin.new') }}</span>
                         @else
                             <span @class([
                                 'inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold',
@@ -111,21 +111,22 @@
         <div class="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2">
             <div class="mb-2 flex items-baseline justify-between">
                 <div>
-                    <h3 class="text-sm font-semibold">Signalements par jour</h3>
-                    <p class="text-xs text-slate-500">30 derniers jours</p>
+                    <h3 class="text-sm font-semibold">{{ __('admin.reports_per_day') }}</h3>
+                    <p class="text-xs text-slate-500">{{ __('admin.last_30_days') }}</p>
                 </div>
                 <span class="text-sm font-semibold tabular-nums text-slate-600">
-                    {{ $trends['reports']['current'] }} sur la période
+                    {{ __('admin.in_period', ['count' => $trends['reports']['current']]) }}
                 </span>
             </div>
-            <div id="chart-activity" class="-mx-2"></div>
+            {{-- ApexCharts mislays its labels inside RTL; the charts are numeric, so keep them LTR. --}}
+            <div id="chart-activity" class="-mx-2" dir="ltr"></div>
         </div>
 
         <div class="rounded-xl border border-slate-200 bg-white p-6">
-            <h3 class="text-sm font-semibold">Répartition par statut</h3>
-            <p class="text-xs text-slate-500">Tous signalements confondus</p>
+            <h3 class="text-sm font-semibold">{{ __('admin.status_breakdown') }}</h3>
+            <p class="text-xs text-slate-500">{{ __('admin.all_reports_combined') }}</p>
 
-            <div id="chart-status" class="my-2"></div>
+            <div id="chart-status" class="my-2" dir="ltr"></div>
 
             <div class="mt-4 space-y-1">
                 @foreach($statusMeta as $key => $meta)
@@ -145,19 +146,19 @@
     {{-- Categories + recent --}}
     <div class="grid gap-4 lg:grid-cols-2">
         <div class="rounded-xl border border-slate-200 bg-white p-6">
-            <h3 class="text-sm font-semibold">Catégories les plus signalées</h3>
-            <p class="mb-2 text-xs text-slate-500">Volume par catégorie</p>
+            <h3 class="text-sm font-semibold">{{ __('admin.top_categories') }}</h3>
+            <p class="mb-2 text-xs text-slate-500">{{ __('admin.volume_by_category') }}</p>
             @if(count($reportsByCategory))
-                <div id="chart-categories" class="-mx-2"></div>
+                <div id="chart-categories" class="-mx-2" dir="ltr"></div>
             @else
-                <p class="py-12 text-center text-sm text-slate-400">Aucun signalement pour le moment.</p>
+                <p class="py-12 text-center text-sm text-slate-400">{{ __('admin.no_reports_yet') }}</p>
             @endif
         </div>
 
         <div class="rounded-xl border border-slate-200 bg-white p-6">
             <div class="mb-4 flex items-center justify-between">
-                <h3 class="text-sm font-semibold">Derniers signalements</h3>
-                <a href="{{ route('admin.reports.index') }}" class="text-xs font-semibold text-red-600 hover:text-red-700">Tout voir</a>
+                <h3 class="text-sm font-semibold">{{ __('admin.latest_reports') }}</h3>
+                <a href="{{ route('admin.reports.index') }}" class="text-xs font-semibold text-red-600 hover:text-red-700">{{ __('admin.see_all') }}</a>
             </div>
 
             <ul class="divide-y divide-slate-100">
@@ -167,14 +168,14 @@
                             <div class="min-w-0 flex-1">
                                 <p class="truncate text-sm font-medium">{{ $report->title }}</p>
                                 <p class="truncate text-xs text-slate-500">
-                                    {{ $report->city->name ?? 'Ville inconnue' }} · {{ $report->created_at->diffForHumans() }}
+                                    {{ $report->city->name ?? __('admin.unknown_city') }} · {{ $report->created_at->diffForHumans() }}
                                 </p>
                             </div>
                             <x-admin.status-pill :status="$report->status" />
                         </a>
                     </li>
                 @empty
-                    <li class="py-12 text-center text-sm text-slate-400">Aucun signalement.</li>
+                    <li class="py-12 text-center text-sm text-slate-400">{{ __('admin.no_reports') }}</li>
                 @endforelse
             </ul>
         </div>
@@ -183,8 +184,8 @@
     {{-- Newest members --}}
     <div class="rounded-xl border border-slate-200 bg-white p-6">
         <div class="mb-4 flex items-center justify-between">
-            <h3 class="text-sm font-semibold">Nouveaux membres</h3>
-            <a href="{{ route('admin.users.index') }}" class="text-xs font-semibold text-red-600 hover:text-red-700">Tout voir</a>
+            <h3 class="text-sm font-semibold">{{ __('admin.new_members') }}</h3>
+            <a href="{{ route('admin.users.index') }}" class="text-xs font-semibold text-red-600 hover:text-red-700">{{ __('admin.see_all') }}</a>
         </div>
         <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             @forelse($latestUsers as $user)
@@ -198,7 +199,7 @@
                     </div>
                 </a>
             @empty
-                <p class="py-8 text-center text-sm text-slate-400 sm:col-span-2 xl:col-span-4">Aucun membre.</p>
+                <p class="py-8 text-center text-sm text-slate-400 sm:col-span-2 xl:col-span-4">{{ __('admin.no_members') }}</p>
             @endforelse
         </div>
     </div>

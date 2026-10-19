@@ -47,7 +47,7 @@ class UserController extends Controller
 
         return $this->statusResponse(
             $request,
-            $user->active ? 'Compte activé.' : 'Compte désactivé.',
+            $user->active ? __('admin.flash_user_activated') : __('admin.flash_user_deactivated'),
             ['active' => $user->active]
         );
     }
@@ -68,8 +68,8 @@ class UserController extends Controller
         logAdminAction('Delete', 'User', $user->id, "{$email} ({$reports} report(s) kept, now anonymous)");
 
         return redirect()->route('admin.users.index')->with('success', $reports > 0
-            ? "Utilisateur supprimé. Ses {$reports} signalement(s) sont conservés et apparaissent comme anonymes."
-            : 'Utilisateur supprimé.');
+            ? __('admin.flash_user_deleted_reports', ['count' => $reports])
+            : __('admin.flash_user_deleted'));
     }
 
     /**
@@ -79,11 +79,11 @@ class UserController extends Controller
     private function protectedAccountReason(User $user): ?string
     {
         if ($user->is(auth()->user())) {
-            return 'Vous ne pouvez pas désactiver ou supprimer votre propre compte.';
+            return __('admin.flash_user_self');
         }
 
         if ($user->is_admin) {
-            return 'Les comptes administrateurs ne peuvent pas être désactivés ou supprimés ici.';
+            return __('admin.flash_user_admin');
         }
 
         return null;

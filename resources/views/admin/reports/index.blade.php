@@ -1,14 +1,14 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Signalements')
+@section('title', __('admin.reports'))
 
 @section('content')
 @php
     $statusOptions = [
-        'OPEN' => 'Ouvert',
-        'IN_PROGRESS' => 'En cours',
-        'RESOLVED' => 'Résolu',
-        'REJECTED' => 'Rejeté',
+        'OPEN' => __('admin.status_open'),
+        'IN_PROGRESS' => __('admin.status_in_progress'),
+        'RESOLVED' => __('admin.status_resolved'),
+        'REJECTED' => __('admin.status_rejected'),
     ];
     $currentStatus = request('status');
 @endphp
@@ -17,8 +17,8 @@
 
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h2 class="text-2xl font-bold tracking-tight">Signalements</h2>
-            <p class="mt-1 text-sm text-slate-500">{{ $reports->total() }} signalement(s)</p>
+            <h2 class="text-2xl font-bold tracking-tight">{{ __('admin.reports') }}</h2>
+            <p class="mt-1 text-sm text-slate-500">{{ __('admin.reports_count', ['count' => $reports->total()]) }}</p>
         </div>
     </div>
 
@@ -30,7 +30,7 @@
                    'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
                    'bg-slate-900 text-white' => ! $currentStatus,
                    'text-slate-600 hover:bg-slate-100' => (bool) $currentStatus,
-               ])>Tous</a>
+               ])>{{ __('admin.all') }}</a>
             @foreach($statusOptions as $value => $label)
                 <a href="{{ route('admin.reports.index', array_filter(['status' => $value, 'sort' => $sortBy, 'q' => $search, 'category' => $categoryId, 'city' => $cityId])) }}"
                    @class([
@@ -45,34 +45,34 @@
             @if($currentStatus)
                 <input type="hidden" name="status" value="{{ $currentStatus }}">
             @endif
-            <label for="q" class="sr-only">Rechercher</label>
+            <label for="q" class="sr-only">{{ __('admin.search') }}</label>
             <div class="relative min-w-0 basis-full lg:w-56 lg:basis-auto">
                 <svg class="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-                <input id="q" name="q" type="search" value="{{ $search }}" placeholder="Titre, #réf., utilisateur…"
+                <input id="q" name="q" type="search" value="{{ $search }}" placeholder="{{ __('admin.reports_search_placeholder') }}"
                        class="w-full rounded-lg border border-slate-300 py-1.5 ps-8 pe-3 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
             </div>
-            <label for="category" class="sr-only">Catégorie</label>
+            <label for="category" class="sr-only">{{ __('admin.category') }}</label>
             <select id="category" name="category" onchange="this.form.submit()"
                     class="rounded-lg border border-slate-300 py-1.5 ps-3 pe-8 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
-                <option value="">Toutes catégories</option>
+                <option value="">{{ __('admin.all_categories') }}</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}" @selected((string) $categoryId === (string) $category->id)>{{ $category->display_name }}</option>
                 @endforeach
             </select>
-            <label for="city" class="sr-only">Ville</label>
+            <label for="city" class="sr-only">{{ __('admin.city') }}</label>
             <select id="city" name="city" onchange="this.form.submit()"
                     class="rounded-lg border border-slate-300 py-1.5 ps-3 pe-8 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
-                <option value="">Toutes villes</option>
+                <option value="">{{ __('admin.all_cities') }}</option>
                 @foreach($cities as $city)
                     <option value="{{ $city->id }}" @selected((string) $cityId === (string) $city->id)>{{ $city->display_name }}</option>
                 @endforeach
             </select>
-            <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Trier</label>
+            <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.sort') }}</label>
             <select id="sort" name="sort" onchange="this.form.submit()"
-                    class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
-                <option value="latest" @selected($sortBy === 'latest')>Plus récents</option>
-                <option value="oldest" @selected($sortBy === 'oldest')>Plus anciens</option>
-                <option value="mostLiked" @selected($sortBy === 'mostLiked')>Plus soutenus</option>
+                    class="rounded-lg border border-slate-300 ps-3 pe-8 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                <option value="latest" @selected($sortBy === 'latest')>{{ __('admin.sort_latest') }}</option>
+                <option value="oldest" @selected($sortBy === 'oldest')>{{ __('admin.sort_oldest') }}</option>
+                <option value="mostLiked" @selected($sortBy === 'mostLiked')>{{ __('admin.sort_most_confirmed') }}</option>
             </select>
         </div>
     </form>
@@ -85,36 +85,36 @@
         <div id="bulk-bar"
              class="hidden flex-wrap items-center gap-3 border-b border-slate-200 bg-slate-50 px-6 py-3">
             <span class="text-sm font-medium text-slate-700">
-                <span id="bulk-count">0</span> sélectionné(s)
+                <span id="bulk-count">0</span> {{ __('admin.selected') }}
             </span>
-            <label for="bulk-status" class="sr-only">Statut à appliquer</label>
+            <label for="bulk-status" class="sr-only">{{ __('admin.status_to_apply') }}</label>
             <select id="bulk-status" name="status"
-                    class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
-                <option value="">Choisir un statut…</option>
+                    class="rounded-lg border border-slate-300 ps-3 pe-8 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                <option value="">{{ __('admin.choose_status') }}</option>
                 @foreach($statusOptions as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>
                 @endforeach
             </select>
             <button type="submit" class="rounded-lg bg-red-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700">
-                Appliquer
+                {{ __('admin.apply') }}
             </button>
         </div>
 
         <div class="overflow-x-auto">
             {{-- Below md the rows stack into cards; same cells, so no duplicate inputs inside the bulk form. --}}
-            <table class="block min-w-full text-left md:table">
+            <table class="block min-w-full text-start md:table">
                 <thead class="hidden md:table-header-group">
                     <tr class="border-b border-slate-200 bg-slate-50/80">
                         <th scope="col" class="w-10 px-6 py-3">
                             <input id="select-all" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500">
-                            <label for="select-all" class="sr-only">Tout sélectionner</label>
+                            <label for="select-all" class="sr-only">{{ __('admin.select_all') }}</label>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Signalement</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Ville</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Date</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Confirmations</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.report') }}</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.city') }}</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.date') }}</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.status') }}</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.confirmations') }}</th>
+                        <th scope="col" class="px-6 py-3 text-end text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="block divide-y divide-slate-100 md:table-row-group">
@@ -123,7 +123,7 @@
                             <td class="self-start pt-3.5 md:px-6 md:py-3.5">
                                 <input type="checkbox" name="report_ids[]" value="{{ $report->id }}"
                                        class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500">
-                                <span class="sr-only">Sélectionner {{ $report->title }}</span>
+                                <span class="sr-only">{{ __('admin.select_name', ['name' => $report->title]) }}</span>
                             </td>
                             <td class="col-span-3 min-w-0 md:px-6 md:py-3">
                                 @php($hasImage = $report->image && file_exists(storage_path('app/public/' . $report->image)))
@@ -146,7 +146,7 @@
                             <td class="col-start-2 md:px-6 md:py-3.5">
                                 <span class="text-xs text-slate-500 md:text-sm md:text-slate-600">{{ $report->city->display_name ?? '—' }}</span>
                             </td>
-                            <td class="col-span-2 whitespace-nowrap text-right md:px-6 md:py-3.5 md:text-left">
+                            <td class="col-span-2 whitespace-nowrap text-end md:px-6 md:py-3.5 md:text-start">
                                 <time class="text-xs text-slate-500 md:text-sm md:text-slate-600" datetime="{{ $report->created_at->toIso8601String() }}" title="{{ $report->created_at->format('d/m/Y H:i') }}">{{ $report->created_at->format('d/m/Y') }}</time>
                             </td>
                             <td class="col-start-2 md:px-6 md:py-3.5">
@@ -154,7 +154,7 @@
                                     No nested <form> here: this row sits inside the bulk form and
                                     nested forms are invalid HTML. The select posts on its own.
                                 --}}
-                                <label class="sr-only" for="status-{{ $report->id }}">Statut de {{ $report->title }}</label>
+                                <label class="sr-only" for="status-{{ $report->id }}">{{ __('admin.status_of', ['name' => $report->title]) }}</label>
                                 <select id="status-{{ $report->id }}"
                                         name="status"
                                         data-status-select
@@ -185,17 +185,17 @@
                                 <div class="-me-2 flex items-center justify-end gap-1 md:me-0">
                                     <a href="{{ route('admin.reports.show', $report) }}"
                                        class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                                       title="Détails">
+                                       title="{{ __('admin.details') }}">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        <span class="sr-only">Détails de {{ $report->title }}</span>
+                                        <span class="sr-only">{{ __('admin.details_of', ['name' => $report->title]) }}</span>
                                     </a>
                                     <button type="button"
                                             data-delete-report="{{ route('admin.reports.destroy', $report) }}"
                                             data-delete-label="{{ $report->title }}"
                                             class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
-                                            title="Supprimer">
+                                            title="{{ __('admin.delete') }}">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                        <span class="sr-only">Supprimer {{ $report->title }}</span>
+                                        <span class="sr-only">{{ __('admin.delete_name', ['name' => $report->title]) }}</span>
                                     </button>
                                 </div>
                             </td>
@@ -204,9 +204,9 @@
                         <tr class="block md:table-row">
                             <td colspan="7" class="block px-6 py-16 text-center md:table-cell">
                                 <svg class="mx-auto mb-3 h-10 w-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                <p class="text-sm font-medium text-slate-600">Aucun signalement trouvé</p>
+                                <p class="text-sm font-medium text-slate-600">{{ __('admin.reports_empty') }}</p>
                                 @if($currentStatus || $search || $categoryId || $cityId)
-                                    <a href="{{ route('admin.reports.index') }}" class="mt-1 inline-block text-sm text-red-600 hover:text-red-700">Retirer les filtres</a>
+                                    <a href="{{ route('admin.reports.index') }}" class="mt-1 inline-block text-sm text-red-600 hover:text-red-700">{{ __('admin.clear_filters') }}</a>
                                 @endif
                             </td>
                         </tr>
@@ -264,7 +264,7 @@
                 event.preventDefault();
                 return;
             }
-            if (!confirm(`Appliquer ce statut à ${count} signalement(s) ?`)) {
+            if (!confirm(@js(__('admin.confirm_bulk')).replace(':count', count))) {
                 event.preventDefault();
             }
         });
@@ -273,7 +273,7 @@
         const deleteForm = document.getElementById('delete-report-form');
         document.querySelectorAll('[data-delete-report]').forEach((button) => {
             button.addEventListener('click', () => {
-                if (!confirm(`Supprimer définitivement « ${button.dataset.deleteLabel} » ?`)) return;
+                if (!confirm(@js(__('admin.confirm_delete_named')).replace(':name', button.dataset.deleteLabel))) return;
                 deleteForm.action = button.dataset.deleteReport;
                 deleteForm.submit();
             });
