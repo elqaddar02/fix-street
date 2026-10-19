@@ -28,17 +28,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Check if there's an intended URL (like from trying to like a report)
-        if ($request->session()->has('url.intended')) {
-            return redirect()->intended();
+        // Admins always land on the admin dashboard, unless they were on their
+        // way to another admin page. The citizen pages are not their workspace.
+        if (Auth::user()->is_admin) {
+            $intended = $request->session()->pull('url.intended');
+
+            return is_string($intended) && str_starts_with($intended, url('/admin'))
+                ? redirect()->to($intended)
+                : redirect()->route('admin.dashboard');
         }
 
-        if (Auth::user()->is_admin) {
-            if (\Illuminate\Support\Facades\Route::has('admin.dashboard')) {
-                return redirect()->route('admin.dashboard');
-            }
-
-            return redirect()->to(url('/admin/dashboard'));
+        // Citizens go back to where they were (e.g. a report they tried to confirm).
+        if ($request->session()->has('url.intended')) {
+            return redirect()->intended();
         }
 
         if (\Illuminate\Support\Facades\Route::has('dashboard')) {
