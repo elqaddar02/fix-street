@@ -25,14 +25,14 @@
     {{-- Filters --}}
     <form method="GET" class="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-3">
         <div class="flex flex-wrap items-center gap-1.5">
-            <a href="{{ route('admin.reports.index', array_filter(['sort' => $sortBy])) }}"
+            <a href="{{ route('admin.reports.index', array_filter(['sort' => $sortBy, 'q' => $search, 'category' => $categoryId, 'city' => $cityId])) }}"
                @class([
                    'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
                    'bg-slate-900 text-white' => ! $currentStatus,
                    'text-slate-600 hover:bg-slate-100' => (bool) $currentStatus,
                ])>Tous</a>
             @foreach($statusOptions as $value => $label)
-                <a href="{{ route('admin.reports.index', array_filter(['status' => $value, 'sort' => $sortBy])) }}"
+                <a href="{{ route('admin.reports.index', array_filter(['status' => $value, 'sort' => $sortBy, 'q' => $search, 'category' => $categoryId, 'city' => $cityId])) }}"
                    @class([
                        'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
                        'bg-slate-900 text-white' => $currentStatus === $value,
@@ -41,10 +41,32 @@
             @endforeach
         </div>
 
-        <div class="ml-auto flex items-center gap-2">
+        <div class="flex w-full flex-wrap items-center gap-2 lg:ms-auto lg:w-auto">
             @if($currentStatus)
                 <input type="hidden" name="status" value="{{ $currentStatus }}">
             @endif
+            <label for="q" class="sr-only">Rechercher</label>
+            <div class="relative min-w-0 flex-1 lg:w-56 lg:flex-none">
+                <svg class="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+                <input id="q" name="q" type="search" value="{{ $search }}" placeholder="Titre, #réf., utilisateur…"
+                       class="w-full rounded-lg border border-slate-300 py-1.5 ps-8 pe-3 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+            </div>
+            <label for="category" class="sr-only">Catégorie</label>
+            <select id="category" name="category" onchange="this.form.submit()"
+                    class="rounded-lg border border-slate-300 py-1.5 ps-3 pe-8 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                <option value="">Toutes catégories</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}" @selected((string) $categoryId === (string) $category->id)>{{ $category->display_name }}</option>
+                @endforeach
+            </select>
+            <label for="city" class="sr-only">Ville</label>
+            <select id="city" name="city" onchange="this.form.submit()"
+                    class="rounded-lg border border-slate-300 py-1.5 ps-3 pe-8 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                <option value="">Toutes villes</option>
+                @foreach($cities as $city)
+                    <option value="{{ $city->id }}" @selected((string) $cityId === (string) $city->id)>{{ $city->display_name }}</option>
+                @endforeach
+            </select>
             <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Trier</label>
             <select id="sort" name="sort" onchange="this.form.submit()"
                     class="rounded-xl border border-slate-300 px-3 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
@@ -60,8 +82,8 @@
         @csrf
 
         {{-- Bulk bar: only meaningful once rows are selected, so it stays out of the way until then. --}}
-        <div id="bulk-bar" hidden
-             class="flex flex-wrap items-center gap-3 border-b border-slate-200 bg-slate-50 px-6 py-3">
+        <div id="bulk-bar"
+             class="hidden flex-wrap items-center gap-3 border-b border-slate-200 bg-slate-50 px-6 py-3">
             <span class="text-sm font-medium text-slate-700">
                 <span id="bulk-count">0</span> sélectionné(s)
             </span>
@@ -88,6 +110,7 @@
                         </th>
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Signalement</th>
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Ville</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Date</th>
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</th>
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Confirmations</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
@@ -101,12 +124,29 @@
                                        class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500">
                                 <span class="sr-only">Sélectionner {{ $report->title }}</span>
                             </td>
-                            <td class="px-6 py-3.5">
-                                <p class="text-sm font-medium">{{ $report->title }}</p>
-                                <p class="text-xs text-slate-500">{{ Str::limit($report->description, 60) }}</p>
+                            <td class="px-6 py-3">
+                                @php($hasImage = $report->image && file_exists(storage_path('app/public/' . $report->image)))
+                                <a href="{{ route('admin.reports.show', $report) }}" class="group flex min-w-0 items-center gap-3">
+                                    <span class="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-inset ring-slate-200">
+                                        @if($hasImage)
+                                            <img src="{{ asset('storage/' . $report->image) }}" alt="" loading="lazy" class="h-full w-full object-cover">
+                                        @else
+                                            <span class="flex h-full w-full items-center justify-center text-slate-300">
+                                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Z"/></svg>
+                                            </span>
+                                        @endif
+                                    </span>
+                                    <span class="min-w-0">
+                                        <span class="block max-w-xs truncate text-sm font-medium text-slate-900 group-hover:text-red-700">{{ $report->title }}</span>
+                                        <span class="block truncate text-xs text-slate-500"><span class="font-mono">#{{ str_pad((string) $report->id, 6, '0', STR_PAD_LEFT) }}</span> · {{ $report->category->display_name ?? '—' }}</span>
+                                    </span>
+                                </a>
                             </td>
                             <td class="px-6 py-3.5">
                                 <span class="text-sm text-slate-600">{{ $report->city->display_name ?? '—' }}</span>
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-3.5">
+                                <time class="text-sm text-slate-600" datetime="{{ $report->created_at->toIso8601String() }}" title="{{ $report->created_at->format('d/m/Y H:i') }}">{{ $report->created_at->format('d/m/Y') }}</time>
                             </td>
                             <td class="px-6 py-3.5">
                                 {{--
@@ -136,7 +176,7 @@
                                     'bg-amber-50 text-amber-700' => $report->likes_count > 0,
                                     'bg-slate-50 text-slate-400' => ! $report->likes_count,
                                 ])>
-                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
                                     {{ $report->likes_count ?? 0 }}
                                 </span>
                             </td>
@@ -161,11 +201,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-16 text-center">
+                            <td colspan="7" class="px-6 py-16 text-center">
                                 <svg class="mx-auto mb-3 h-10 w-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 <p class="text-sm font-medium text-slate-600">Aucun signalement trouvé</p>
-                                @if($currentStatus)
-                                    <a href="{{ route('admin.reports.index') }}" class="mt-1 inline-block text-sm text-red-600 hover:text-red-700">Retirer le filtre</a>
+                                @if($currentStatus || $search || $categoryId || $cityId)
+                                    <a href="{{ route('admin.reports.index') }}" class="mt-1 inline-block text-sm text-red-600 hover:text-red-700">Retirer les filtres</a>
                                 @endif
                             </td>
                         </tr>
@@ -201,7 +241,9 @@
             const all = boxes();
             const count = bulkForm.querySelectorAll('input[name="report_ids[]"]:checked').length;
             counter.textContent = count;
-            bar.hidden = count === 0;
+            // Toggle classes, not the hidden attribute: the bar's display:flex overrode it.
+            bar.classList.toggle('hidden', count === 0);
+            bar.classList.toggle('flex', count > 0);
             selectAll.checked = count > 0 && count === all.length;
             selectAll.indeterminate = count > 0 && count < all.length;
         }
