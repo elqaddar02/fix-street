@@ -35,7 +35,7 @@
             role="switch"
             aria-checked="{{ $active ? 'true' : 'false' }}"
             data-status-switch
-            class="group relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 disabled:cursor-wait disabled:opacity-60 {{ $active ? 'bg-emerald-500' : 'bg-slate-300' }}">
+            class="group relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 disabled:cursor-wait disabled:opacity-60 {{ $active ? 'bg-emerald-500' : 'bg-slate-300' }}">
         <span class="sr-only">{{ $label ? __('Changer le statut de') . ' ' . $label : __('Changer le statut') }}</span>
         <span aria-hidden="true"
               data-status-knob

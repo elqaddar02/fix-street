@@ -18,23 +18,24 @@
                 </span>
                 <input name="search" value="{{ $search ?? '' }}"
                        placeholder="Nom ou email"
-                       class="w-full rounded-xl border border-slate-300 py-2 pl-9 pr-3 text-sm placeholder:text-slate-400 focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                       class="w-full rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm placeholder:text-slate-400 focus:border-red-500 focus:ring-1 focus:ring-red-500">
             </div>
-            <button type="submit" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-800">
+            <button type="submit" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-slate-800">
                 Chercher
             </button>
             @if($search ?? false)
-                <a href="{{ route('admin.users.index') }}" class="flex items-center rounded-xl px-3 text-sm font-medium text-slate-500 hover:text-slate-800">
+                <a href="{{ route('admin.users.index') }}" class="flex items-center rounded-lg px-3 text-sm font-medium text-slate-500 hover:text-slate-800">
                     Effacer
                 </a>
             @endif
         </form>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
         <div class="overflow-x-auto">
-            <table class="min-w-full text-left">
-                <thead>
+            {{-- Below md the rows stack into cards. --}}
+            <table class="block min-w-full text-left md:table">
+                <thead class="hidden md:table-header-group">
                     <tr class="border-b border-slate-200 bg-slate-50/80">
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Utilisateur</th>
                         <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Inscrit</th>
@@ -43,10 +44,10 @@
                         <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="block divide-y divide-slate-100 md:table-row-group">
                     @forelse($users as $user)
-                        <tr class="transition-colors hover:bg-slate-50/60">
-                            <td class="px-6 py-3.5">
+                        <tr class="grid grid-cols-[auto_auto_1fr] items-center gap-x-4 gap-y-2 px-4 py-3 transition-colors hover:bg-slate-50/60 md:table-row md:p-0">
+                            <td class="order-1 col-span-2 min-w-0 md:order-none md:px-6 md:py-3.5">
                                 <div class="flex items-center gap-3">
                                     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
                                         {{ strtoupper(substr($user->name, 0, 2)) }}
@@ -55,18 +56,18 @@
                                         <p class="truncate text-sm font-medium">
                                             {{ $user->name }}
                                             @if($user->is_admin)
-                                                <span class="ml-1 rounded bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-indigo-700">admin</span>
+                                                <span class="ml-1 rounded bg-red-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-red-700">admin</span>
                                             @endif
                                         </p>
                                         <p class="truncate text-xs text-slate-500">{{ $user->email }}</p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-3.5">
-                                <span class="text-sm text-slate-500">{{ $user->created_at->format('d/m/Y') }}</span>
+                            <td class="order-3 md:order-none md:px-6 md:py-3.5">
+                                <span class="whitespace-nowrap text-xs text-slate-500 md:text-sm"><span class="md:hidden">Inscrit le </span>{{ $user->created_at->format('d/m/Y') }}</span>
                             </td>
-                            <td class="px-6 py-3.5 text-sm tabular-nums text-slate-600">{{ $user->reports_count }}</td>
-                            <td class="px-6 py-3.5">
+                            <td class="order-4 text-xs tabular-nums text-slate-500 md:order-none md:px-6 md:py-3.5 md:text-sm md:text-slate-600">{{ $user->reports_count }}<span class="md:hidden"> signalement(s)</span></td>
+                            <td class="order-5 justify-self-end md:order-none md:px-6 md:py-3.5">
                                 @php($protected = $user->is_admin || $user->is(auth()->user()))
                                 @if($protected)
                                     {{-- Admins (and you) can't be deactivated from here, so nobody locks the panel. --}}
@@ -81,8 +82,8 @@
                                         :label="$user->name" />
                                 @endif
                             </td>
-                            <td class="px-6 py-3.5">
-                                <div class="flex items-center justify-end gap-1">
+                            <td class="order-2 md:order-none md:px-6 md:py-3.5">
+                                <div class="-me-2 flex items-center justify-end gap-1 md:me-0">
                                     <a href="{{ route('admin.users.show', $user) }}"
                                        class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                                        title="Voir">
@@ -106,8 +107,8 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="5" class="px-6 py-16 text-center">
+                        <tr class="block md:table-row">
+                            <td colspan="5" class="block px-6 py-16 text-center md:table-cell">
                                 <p class="text-sm font-medium text-slate-600">Aucun utilisateur trouvé</p>
                                 @if($search ?? false)
                                     <p class="mt-1 text-sm text-slate-400">Aucun résultat pour « {{ $search }} ».</p>
