@@ -13,7 +13,7 @@ class CityController extends Controller
 
     public function index()
     {
-        $cities = City::withCount('reports')->orderBy('name')->paginate(10);
+        $cities = City::withCount(['reports', 'districts'])->orderBy('name')->paginate(10);
 
         return view('admin.cities.index', compact('cities'));
     }

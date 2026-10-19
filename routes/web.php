@@ -129,6 +129,21 @@ Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix
     Route::patch('/cities/{city}/status', [\App\Http\Controllers\Admin\CityController::class, 'updateStatus'])->name('cities.updateStatus');
     Route::delete('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'destroy'])->name('cities.destroy');
 
+    // Districts and quartiers of a city. Bound by id: the public side keys districts by slug.
+    Route::controller(\App\Http\Controllers\Admin\PlaceController::class)->group(function () {
+        Route::get('/cities/{city}/districts', 'index')->name('cities.places');
+        Route::get('/cities/{city}/districts/create', 'createDistrict')->name('districts.create');
+        Route::post('/cities/{city}/districts', 'storeDistrict')->name('districts.store');
+        Route::get('/districts/{district:id}/edit', 'editDistrict')->name('districts.edit');
+        Route::patch('/districts/{district:id}', 'updateDistrict')->name('districts.update');
+        Route::delete('/districts/{district:id}', 'destroyDistrict')->name('districts.destroy');
+        Route::get('/districts/{district:id}/quartiers/create', 'createQuartier')->name('quartiers.create');
+        Route::post('/districts/{district:id}/quartiers', 'storeQuartier')->name('quartiers.store');
+        Route::get('/quartiers/{quartier}/edit', 'editQuartier')->name('quartiers.edit');
+        Route::patch('/quartiers/{quartier}', 'updateQuartier')->name('quartiers.update');
+        Route::delete('/quartiers/{quartier}', 'destroyQuartier')->name('quartiers.destroy');
+    });
+
     // Ads
     Route::get('/ads', [\App\Http\Controllers\Admin\AdController::class, 'index'])->name('ads.index');
     Route::get('/ads/create', [\App\Http\Controllers\Admin\AdController::class, 'create'])->name('ads.create');

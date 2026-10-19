@@ -109,11 +109,11 @@
                             <input id="select-all" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500">
                             <label for="select-all" class="sr-only">{{ __('admin.select_all') }}</label>
                         </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.report') }}</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.city') }}</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.date') }}</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.status') }}</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.confirmations') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.report') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.city') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.date') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.status') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.confirmations') }}</th>
                         <th scope="col" class="px-6 py-3 text-end text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>

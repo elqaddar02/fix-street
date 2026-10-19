@@ -37,10 +37,10 @@
             <table class="block min-w-full text-start md:table">
                 <thead class="hidden md:table-header-group">
                     <tr class="border-b border-slate-200 bg-slate-50/80">
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.user') }}</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.joined') }}</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.reports') }}</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.status') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.user') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.joined') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.reports') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.status') }}</th>
                         <th scope="col" class="px-6 py-3 text-end text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>

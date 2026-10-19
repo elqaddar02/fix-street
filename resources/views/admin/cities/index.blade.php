@@ -44,9 +44,9 @@
             <table class="min-w-full text-start">
                 <thead>
                     <tr class="border-b border-slate-200 bg-slate-50/80">
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.name') }}</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.reports') }}</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.status') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.name') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.reports') }}</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.status') }}</th>
                         <th scope="col" class="px-6 py-3 text-end text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
@@ -54,7 +54,10 @@
                     @forelse($cities as $city)
                         <tr class="transition-colors hover:bg-slate-50/60">
                             <td class="px-6 py-3.5">
-                                <span class="text-sm font-medium">{{ $city->name }}</span>
+                                <span class="block text-sm font-medium">{{ $city->name }}</span>
+                                <a href="{{ route('admin.cities.places', $city) }}" @class(['text-xs font-medium hover:underline', 'text-red-700' => $city->districts_count, 'text-slate-400 hover:text-slate-700' => ! $city->districts_count])>
+                                    {{ $city->districts_count ? __('admin.districts_count', ['count' => $city->districts_count]) : __('admin.districts_add') }}
+                                </a>
                             </td>
                             <td class="px-6 py-3.5 text-sm tabular-nums text-slate-600">{{ $city->reports_count }}</td>
                             <td class="px-6 py-3.5">
