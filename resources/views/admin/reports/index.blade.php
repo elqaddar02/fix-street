@@ -23,7 +23,7 @@
     </div>
 
     {{-- Filters --}}
-    <form method="GET" class="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-3">
+    <form method="GET" class="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white p-3">
         <div class="flex flex-wrap items-center gap-1.5">
             <a href="{{ route('admin.reports.index', array_filter(['sort' => $sortBy, 'q' => $search, 'category' => $categoryId, 'city' => $cityId])) }}"
                @class([
@@ -46,7 +46,7 @@
                 <input type="hidden" name="status" value="{{ $currentStatus }}">
             @endif
             <label for="q" class="sr-only">Rechercher</label>
-            <div class="relative min-w-0 flex-1 lg:w-56 lg:flex-none">
+            <div class="relative min-w-0 basis-full lg:w-56 lg:basis-auto">
                 <svg class="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
                 <input id="q" name="q" type="search" value="{{ $search }}" placeholder="Titre, #réf., utilisateur…"
                        class="w-full rounded-lg border border-slate-300 py-1.5 ps-8 pe-3 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
@@ -69,7 +69,7 @@
             </select>
             <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Trier</label>
             <select id="sort" name="sort" onchange="this.form.submit()"
-                    class="rounded-xl border border-slate-300 px-3 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                    class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
                 <option value="latest" @selected($sortBy === 'latest')>Plus récents</option>
                 <option value="oldest" @selected($sortBy === 'oldest')>Plus anciens</option>
                 <option value="mostLiked" @selected($sortBy === 'mostLiked')>Plus soutenus</option>
@@ -78,7 +78,7 @@
     </form>
 
     <form method="POST" action="{{ route('admin.reports.bulkUpdateStatus') }}" id="bulk-action-form"
-          class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          class="overflow-hidden rounded-xl border border-slate-200 bg-white">
         @csrf
 
         {{-- Bulk bar: only meaningful once rows are selected, so it stays out of the way until then. --}}
@@ -89,20 +89,21 @@
             </span>
             <label for="bulk-status" class="sr-only">Statut à appliquer</label>
             <select id="bulk-status" name="status"
-                    class="rounded-xl border border-slate-300 px-3 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                    class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
                 <option value="">Choisir un statut…</option>
                 @foreach($statusOptions as $value => $label)
                     <option value="{{ $value }}">{{ $label }}</option>
                 @endforeach
             </select>
-            <button type="submit" class="rounded-xl bg-red-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700">
+            <button type="submit" class="rounded-lg bg-red-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-red-700">
                 Appliquer
             </button>
         </div>
 
         <div class="overflow-x-auto">
-            <table class="min-w-full text-left">
-                <thead>
+            {{-- Below md the rows stack into cards; same cells, so no duplicate inputs inside the bulk form. --}}
+            <table class="block min-w-full text-left md:table">
+                <thead class="hidden md:table-header-group">
                     <tr class="border-b border-slate-200 bg-slate-50/80">
                         <th scope="col" class="w-10 px-6 py-3">
                             <input id="select-all" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500">
@@ -116,15 +117,15 @@
                         <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody class="block divide-y divide-slate-100 md:table-row-group">
                     @forelse($reports as $report)
-                        <tr class="transition-colors hover:bg-slate-50/60">
-                            <td class="px-6 py-3.5">
+                        <tr class="grid grid-cols-[1rem_1fr_auto_auto] items-center gap-x-3 gap-y-2 px-4 py-3 transition-colors hover:bg-slate-50/60 md:table-row md:p-0">
+                            <td class="self-start pt-3.5 md:px-6 md:py-3.5">
                                 <input type="checkbox" name="report_ids[]" value="{{ $report->id }}"
                                        class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500">
                                 <span class="sr-only">Sélectionner {{ $report->title }}</span>
                             </td>
-                            <td class="px-6 py-3">
+                            <td class="col-span-3 min-w-0 md:px-6 md:py-3">
                                 @php($hasImage = $report->image && file_exists(storage_path('app/public/' . $report->image)))
                                 <a href="{{ route('admin.reports.show', $report) }}" class="group flex min-w-0 items-center gap-3">
                                     <span class="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-inset ring-slate-200">
@@ -142,13 +143,13 @@
                                     </span>
                                 </a>
                             </td>
-                            <td class="px-6 py-3.5">
-                                <span class="text-sm text-slate-600">{{ $report->city->display_name ?? '—' }}</span>
+                            <td class="col-start-2 md:px-6 md:py-3.5">
+                                <span class="text-xs text-slate-500 md:text-sm md:text-slate-600">{{ $report->city->display_name ?? '—' }}</span>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-3.5">
-                                <time class="text-sm text-slate-600" datetime="{{ $report->created_at->toIso8601String() }}" title="{{ $report->created_at->format('d/m/Y H:i') }}">{{ $report->created_at->format('d/m/Y') }}</time>
+                            <td class="col-span-2 whitespace-nowrap text-right md:px-6 md:py-3.5 md:text-left">
+                                <time class="text-xs text-slate-500 md:text-sm md:text-slate-600" datetime="{{ $report->created_at->toIso8601String() }}" title="{{ $report->created_at->format('d/m/Y H:i') }}">{{ $report->created_at->format('d/m/Y') }}</time>
                             </td>
-                            <td class="px-6 py-3.5">
+                            <td class="col-start-2 md:px-6 md:py-3.5">
                                 {{--
                                     No nested <form> here: this row sits inside the bulk form and
                                     nested forms are invalid HTML. The select posts on its own.
@@ -159,7 +160,7 @@
                                         data-status-select
                                         data-action="{{ route('admin.reports.updateStatus', $report) }}"
                                         @class([
-                                            'rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors focus:ring-1 disabled:opacity-50',
+                                            'rounded-lg border py-1.5 ps-2.5 pe-8 text-xs font-medium transition-colors focus:ring-1 disabled:opacity-50',
                                             'border-amber-200 bg-amber-50 text-amber-800 focus:border-amber-500 focus:ring-amber-500' => $report->status === 'OPEN',
                                             'border-sky-200 bg-sky-50 text-sky-800 focus:border-sky-500 focus:ring-sky-500' => $report->status === 'IN_PROGRESS',
                                             'border-emerald-200 bg-emerald-50 text-emerald-800 focus:border-emerald-500 focus:ring-emerald-500' => $report->status === 'RESOLVED',
@@ -170,7 +171,7 @@
                                     @endforeach
                                 </select>
                             </td>
-                            <td class="px-6 py-3.5">
+                            <td class="md:px-6 md:py-3.5">
                                 <span @class([
                                     'inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold',
                                     'bg-amber-50 text-amber-700' => $report->likes_count > 0,
@@ -180,8 +181,8 @@
                                     {{ $report->likes_count ?? 0 }}
                                 </span>
                             </td>
-                            <td class="px-6 py-3.5">
-                                <div class="flex items-center justify-end gap-1">
+                            <td class="md:px-6 md:py-3.5">
+                                <div class="-me-2 flex items-center justify-end gap-1 md:me-0">
                                     <a href="{{ route('admin.reports.show', $report) }}"
                                        class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                                        title="Détails">
@@ -200,8 +201,8 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="7" class="px-6 py-16 text-center">
+                        <tr class="block md:table-row">
+                            <td colspan="7" class="block px-6 py-16 text-center md:table-cell">
                                 <svg class="mx-auto mb-3 h-10 w-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 <p class="text-sm font-medium text-slate-600">Aucun signalement trouvé</p>
                                 @if($currentStatus || $search || $categoryId || $cityId)

@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\City;
 use App\Models\Report;
 use App\Models\ReportComment;
+use App\Models\ReportLike;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 
@@ -40,6 +41,8 @@ class DashboardController extends Controller
         // Comment statistics
         $totalComments = ReportComment::count();
         $pendingComments = ReportComment::whereNull('approved')->count();
+        // Shown instead of comments while that feature is switched off.
+        $totalConfirmations = ReportLike::count();
 
         // Status counts for chart
         $statusCounts = [
@@ -107,6 +110,7 @@ class DashboardController extends Controller
             'inactiveUsers',
             'totalComments',
             'pendingComments',
+            'totalConfirmations',
             'openReports',
             'inProgressReports',
             'resolvedReports',

@@ -14,23 +14,23 @@
 
     {{-- Create --}}
     <form method="POST" action="{{ route('admin.cities.store') }}"
-          class="flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+          class="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4">
         @csrf
         <div class="min-w-[220px] flex-1">
             <label for="city-name" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nouvelle ville</label>
             <input id="city-name" name="name" required
                    placeholder="Nom de la ville"
-                   class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-red-500 focus:ring-1 focus:ring-red-500">
         </div>
         <div>
             <label for="city-active" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</label>
             <select id="city-active" name="active"
-                    class="rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                    class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
                 <option value="1">Actif</option>
                 <option value="0">Inactif</option>
             </select>
         </div>
-        <button type="submit" class="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700">
+        <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700">
             Ajouter
         </button>
         @error('name')
@@ -39,7 +39,7 @@
     </form>
 
     {{-- List --}}
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
         <div class="overflow-x-auto">
             <table class="min-w-full text-left">
                 <thead>

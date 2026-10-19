@@ -13,7 +13,7 @@
             'value' => $totalUsers,
             'trend' => $trends['users'],
             'caption' => 'inscrits',
-            'ring' => 'bg-blue-50 text-blue-600',
+            'ring' => 'bg-slate-100 text-slate-600',
             'icon' => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8z',
         ],
         [
@@ -21,24 +21,34 @@
             'value' => $totalReports,
             'trend' => $trends['reports'],
             'caption' => 'au total',
-            'ring' => 'bg-amber-50 text-amber-600',
+            'ring' => 'bg-red-50 text-red-600',
             'icon' => 'M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z',
         ],
-        [
-            'title' => 'Commentaires',
-            'value' => $totalComments,
-            'trend' => $trends['comments'],
-            'caption' => $pendingComments . ' en attente',
-            'ring' => 'bg-emerald-50 text-emerald-600',
-            'icon' => 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z',
-        ],
+        // Comments are switched off for the pilot: show what citizens do instead.
+        config('features.comments')
+            ? [
+                'title' => 'Commentaires',
+                'value' => $totalComments,
+                'trend' => $trends['comments'],
+                'caption' => $pendingComments . ' en attente',
+                'ring' => 'bg-emerald-50 text-emerald-600',
+                'icon' => 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z',
+            ]
+            : [
+                'title' => 'Confirmations',
+                'value' => $totalConfirmations,
+                'trend' => null,
+                'caption' => 'par les voisins',
+                'ring' => 'bg-amber-50 text-amber-600',
+                'icon' => 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+            ],
         [
             'title' => 'Taux de résolution',
             'value' => $resolutionRate,
             'suffix' => '%',
             'trend' => null,
             'caption' => $resolvedReports . ' résolus sur ' . $totalReports,
-            'ring' => 'bg-indigo-50 text-indigo-600',
+            'ring' => 'bg-emerald-50 text-emerald-600',
             'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
         ],
     ];
@@ -61,9 +71,9 @@
     {{-- Stat cards --}}
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach($cards as $card)
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-sm">
+            <div class="rounded-xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-sm">
                 <div class="flex items-start justify-between">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-xl {{ $card['ring'] }}">
+                    <span class="flex h-10 w-10 items-center justify-center rounded-lg {{ $card['ring'] }}">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="{{ $card['icon'] }}"/>
                         </svg>
@@ -98,7 +108,7 @@
 
     {{-- Activity + status --}}
     <div class="grid gap-4 lg:grid-cols-3">
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 lg:col-span-2">
+        <div class="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2">
             <div class="mb-2 flex items-baseline justify-between">
                 <div>
                     <h3 class="text-sm font-semibold">Signalements par jour</h3>
@@ -111,7 +121,7 @@
             <div id="chart-activity" class="-mx-2"></div>
         </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-white p-6">
+        <div class="rounded-xl border border-slate-200 bg-white p-6">
             <h3 class="text-sm font-semibold">Répartition par statut</h3>
             <p class="text-xs text-slate-500">Tous signalements confondus</p>
 
@@ -134,7 +144,7 @@
 
     {{-- Categories + recent --}}
     <div class="grid gap-4 lg:grid-cols-2">
-        <div class="rounded-2xl border border-slate-200 bg-white p-6">
+        <div class="rounded-xl border border-slate-200 bg-white p-6">
             <h3 class="text-sm font-semibold">Catégories les plus signalées</h3>
             <p class="mb-2 text-xs text-slate-500">Volume par catégorie</p>
             @if(count($reportsByCategory))
@@ -144,7 +154,7 @@
             @endif
         </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-white p-6">
+        <div class="rounded-xl border border-slate-200 bg-white p-6">
             <div class="mb-4 flex items-center justify-between">
                 <h3 class="text-sm font-semibold">Derniers signalements</h3>
                 <a href="{{ route('admin.reports.index') }}" class="text-xs font-semibold text-red-600 hover:text-red-700">Tout voir</a>
@@ -171,14 +181,14 @@
     </div>
 
     {{-- Newest members --}}
-    <div class="rounded-2xl border border-slate-200 bg-white p-6">
+    <div class="rounded-xl border border-slate-200 bg-white p-6">
         <div class="mb-4 flex items-center justify-between">
             <h3 class="text-sm font-semibold">Nouveaux membres</h3>
             <a href="{{ route('admin.users.index') }}" class="text-xs font-semibold text-red-600 hover:text-red-700">Tout voir</a>
         </div>
         <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             @forelse($latestUsers as $user)
-                <a href="{{ route('admin.users.show', $user) }}" class="flex items-center gap-3 rounded-xl border border-slate-100 p-3 transition-colors hover:border-slate-200 hover:bg-slate-50">
+                <a href="{{ route('admin.users.show', $user) }}" class="flex items-center gap-3 rounded-lg border border-slate-100 p-3 transition-colors hover:border-slate-200 hover:bg-slate-50">
                     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
                         {{ strtoupper(substr($user->name, 0, 2)) }}
                     </span>

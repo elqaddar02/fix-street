@@ -38,7 +38,7 @@ export function toast(message, { tone = 'success', action = null, duration = 600
     if (action) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'ml-auto shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 transition-colors';
+        btn.className = 'ml-auto shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold text-red-700 hover:bg-red-50 transition-colors';
         btn.textContent = action.label;
         btn.addEventListener('click', () => {
             dismiss();
@@ -244,7 +244,8 @@ function initStatusSelects() {
  * ------------------------------------------------------------------ */
 
 const PALETTE = {
-    indigo: '#6366f1',
+    red: '#dc2626',
+    redSoft: '#fecaca',
     amber: '#f59e0b',
     sky: '#0ea5e9',
     emerald: '#10b981',
@@ -254,7 +255,7 @@ const PALETTE = {
 
 const BASE = {
     chart: {
-        fontFamily: 'Figtree, ui-sans-serif, system-ui, sans-serif',
+        fontFamily: '"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif',
         toolbar: { show: false },
         zoom: { enabled: false },
         animations: { easing: 'easeinout', speed: 500 },
@@ -301,6 +302,11 @@ function render(Apex, selector, options) {
     return chart;
 }
 
+/** "2026-10-19" → "19 oct." */
+function shortDay(isoDate) {
+    return new Date(isoDate + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
 async function initCharts() {
     const data = window.dashboardData;
     if (!data) return;
@@ -309,25 +315,28 @@ async function initCharts() {
 
     // Daily report volume.
     render(Apex, '#chart-activity', {
-        chart: { type: 'area', height: 300, sparkline: { enabled: false } },
+        // Bars, not a smoothed line: one report on one day is a count, not a spike.
+        chart: { type: 'bar', height: 300, sparkline: { enabled: false } },
         series: [{ name: 'Signalements', data: data.activity.map((d) => d.count) }],
+        // Plain day labels: a datetime axis squeezes each bar to a hairline.
         xaxis: {
-            type: 'datetime',
-            categories: data.activity.map((d) => d.date),
-            labels: { style: { colors: '#94a3b8', fontSize: '11px' } },
+            categories: data.activity.map((d) => shortDay(d.date)),
+            tickAmount: 6,
+            labels: { rotate: 0, hideOverlappingLabels: true, style: { colors: '#94a3b8', fontSize: '11px' } },
+            tooltip: { enabled: false },
             axisBorder: { show: false },
             axisTicks: { show: false },
         },
+        // Whole numbers only: with small counts the axis used to read 1, 1, 1, 0, 0, 0.
         yaxis: {
+            min: 0,
+            forceNiceScale: true,
+            tickAmount: Math.max(1, Math.min(5, Math.max(...data.activity.map((d) => d.count)))),
             labels: { style: { colors: '#94a3b8', fontSize: '11px' }, formatter: (v) => Math.round(v) },
         },
-        colors: [PALETTE.indigo],
-        stroke: { curve: 'smooth', width: 2.5 },
-        fill: {
-            type: 'gradient',
-            gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.02, stops: [0, 100] },
-        },
-        tooltip: { x: { format: 'dd MMM yyyy' } },
+        colors: [PALETTE.red],
+        plotOptions: { bar: { columnWidth: '55%', borderRadius: 3, borderRadiusApplication: 'end' } },
+        dataLabels: { enabled: false },
     });
 
     // Status split.
@@ -370,15 +379,17 @@ async function initCharts() {
         series: [{ name: 'Signalements', data: data.categories.values }],
         xaxis: {
             categories: data.categories.labels,
-            labels: { style: { colors: '#94a3b8', fontSize: '11px' } },
+            tickAmount: Math.max(1, Math.min(5, Math.max(0, ...data.categories.values))),
+            labels: { style: { colors: '#94a3b8', fontSize: '11px' }, formatter: (v) => Math.round(v) },
             axisBorder: { show: false },
             axisTicks: { show: false },
         },
         yaxis: { labels: { style: { colors: '#64748b', fontSize: '12px' } } },
-        colors: [PALETTE.indigo],
+        colors: [PALETTE.red],
         plotOptions: {
-            bar: { horizontal: true, borderRadius: 6, borderRadiusApplication: 'end', barHeight: '62%' },
+            bar: { horizontal: true, borderRadius: 3, borderRadiusApplication: 'end', barHeight: '55%' },
         },
+        dataLabels: { enabled: false },
         grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: false } } },
     });
 }
