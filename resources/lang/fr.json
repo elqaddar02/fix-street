@@ -738,5 +738,11 @@
     "admin.flash_quartier_created": "Quartier ajouté.",
     "admin.flash_quartier_updated": "Quartier mis à jour.",
     "admin.flash_quartier_deleted": "Quartier supprimé.",
-    "admin.flash_quartier_in_use": "Impossible de supprimer « :name » : :count signalement(s) ou dossier(s) l’utilisent."
+    "admin.flash_quartier_in_use": "Impossible de supprimer « :name » : :count signalement(s) ou dossier(s) l’utilisent.",
+    "pagination.label": "Pagination",
+    "pagination.summary": ":first–:last sur :total",
+    "pagination.page_of": "Page :page sur :last",
+    "pagination.previous": "Page précédente",
+    "pagination.next": "Page suivante",
+    "pagination.go_to": "Aller à la page :page"
 }

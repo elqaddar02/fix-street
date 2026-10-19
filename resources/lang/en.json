@@ -695,5 +695,11 @@
     "admin.flash_quartier_created": "Quartier added.",
     "admin.flash_quartier_updated": "Quartier updated.",
     "admin.flash_quartier_deleted": "Quartier deleted.",
-    "admin.flash_quartier_in_use": "Cannot delete “:name”: :count report(s) or case file(s) use it."
+    "admin.flash_quartier_in_use": "Cannot delete “:name”: :count report(s) or case file(s) use it.",
+    "pagination.label": "Pagination",
+    "pagination.summary": ":first–:last of :total",
+    "pagination.page_of": "Page :page of :last",
+    "pagination.previous": "Previous page",
+    "pagination.next": "Next page",
+    "pagination.go_to": "Go to page :page"
 }
