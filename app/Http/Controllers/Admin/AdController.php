@@ -44,7 +44,7 @@ class AdController extends Controller
         $ad = Ad::create($validated);
         logAdminAction('Create', 'Ad', $ad->id, "Created ad: {$ad->title}");
 
-        return redirect()->route('admin.ads.index')->with('success', 'Publicité créée avec succès.');
+        return redirect()->route('admin.ads.index')->with('success', __('admin.flash_ad_created'));
     }
 
     public function edit(Ad $ad)
@@ -67,7 +67,7 @@ class AdController extends Controller
         $ad->update($validated);
         logAdminAction('Update', 'Ad', $ad->id, "Updated ad: {$ad->title}");
 
-        return redirect()->route('admin.ads.index')->with('success', 'Publicité mise à jour.');
+        return redirect()->route('admin.ads.index')->with('success', __('admin.flash_ad_updated'));
     }
 
     public function updateStatus(Request $request, Ad $ad)
@@ -82,7 +82,7 @@ class AdController extends Controller
             "Ad '{$ad->title}' set to " . ($ad->is_active ? 'active' : 'inactive')
         );
 
-        return back()->with('success', 'Statut de la publicité mis à jour.');
+        return back()->with('success', __('admin.flash_ad_status'));
     }
 
     public function destroy(Ad $ad)
@@ -92,7 +92,7 @@ class AdController extends Controller
         $ad->delete();
         logAdminAction('Delete', 'Ad', $ad->id, "Deleted ad: {$title}");
 
-        return redirect()->route('admin.ads.index')->with('success', 'Publicité supprimée.');
+        return redirect()->route('admin.ads.index')->with('success', __('admin.flash_ad_deleted'));
     }
 
     private function validateAd(Request $request, ?Ad $ad = null): array

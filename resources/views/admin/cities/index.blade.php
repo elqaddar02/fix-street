@@ -1,14 +1,14 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Villes')
+@section('title', __('admin.cities'))
 
 @section('content')
 <div class="space-y-6">
 
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h2 class="text-2xl font-bold tracking-tight">Villes</h2>
-            <p class="mt-1 text-sm text-slate-500">{{ $cities->total() }} ville(s) · activez ou désactivez directement dans la liste.</p>
+            <h2 class="text-2xl font-bold tracking-tight">{{ __('admin.cities') }}</h2>
+            <p class="mt-1 text-sm text-slate-500">{{ __('admin.cities_intro', ['count' => $cities->total()]) }}</p>
         </div>
     </div>
 
@@ -17,21 +17,21 @@
           class="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4">
         @csrf
         <div class="min-w-[220px] flex-1">
-            <label for="city-name" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nouvelle ville</label>
+            <label for="city-name" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.cities_new') }}</label>
             <input id="city-name" name="name" required
-                   placeholder="Nom de la ville"
+                   placeholder="{{ __('admin.cities_name') }}"
                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-red-500 focus:ring-1 focus:ring-red-500">
         </div>
         <div>
-            <label for="city-active" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</label>
+            <label for="city-active" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.status') }}</label>
             <select id="city-active" name="active"
-                    class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
-                <option value="1">Actif</option>
-                <option value="0">Inactif</option>
+                    class="rounded-lg border border-slate-300 ps-3 pe-8 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+                <option value="1">{{ __('admin.active') }}</option>
+                <option value="0">{{ __('admin.inactive') }}</option>
             </select>
         </div>
         <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700">
-            Ajouter
+            {{ __('admin.add') }}
         </button>
         @error('name')
             <p class="w-full text-sm text-rose-600">{{ $message }}</p>
@@ -41,13 +41,13 @@
     {{-- List --}}
     <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
         <div class="overflow-x-auto">
-            <table class="min-w-full text-left">
+            <table class="min-w-full text-start">
                 <thead>
                     <tr class="border-b border-slate-200 bg-slate-50/80">
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Nom</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Signalements</th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Statut</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.name') }}</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.reports') }}</th>
+                        <th scope="col" class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.status') }}</th>
+                        <th scope="col" class="px-6 py-3 text-end text-xs font-semibold uppercase tracking-wide text-slate-500">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -68,25 +68,25 @@
                                 <div class="flex items-center justify-end gap-1">
                                     <a href="{{ route('admin.cities.edit', $city) }}"
                                        class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                                       title="Modifier">
+                                       title="{{ __('admin.edit') }}">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                        <span class="sr-only">Modifier {{ $city->name }}</span>
+                                        <span class="sr-only">{{ __('admin.edit_name', ['name' => $city->name]) }}</span>
                                     </a>
                                     {{-- A city in use can't be deleted (its reports would go with it): deactivate it instead. --}}
                                     @if($city->reports_count > 0)
-                                        <span class="cursor-not-allowed rounded-lg p-2 text-slate-200" title="Utilisée par {{ $city->reports_count }} signalement(s) : désactivez-la plutôt">
+                                        <span class="cursor-not-allowed rounded-lg p-2 text-slate-200" title="{{ __('admin.city_in_use', ['count' => $city->reports_count]) }}">
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                         </span>
                                     @else
                                         <form action="{{ route('admin.cities.destroy', $city) }}" method="POST"
-                                              onsubmit="return confirm('Supprimer définitivement « {{ $city->name }} » et ses arrondissements ?')">
+                                              onsubmit="return confirm(@js(__('admin.confirm_delete_city', ['name' => $city->name])))">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
                                                     class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
-                                                    title="Supprimer">
+                                                    title="{{ __('admin.delete') }}">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                                <span class="sr-only">Supprimer {{ $city->name }}</span>
+                                                <span class="sr-only">{{ __('admin.delete_name', ['name' => $city->name]) }}</span>
                                             </button>
                                         </form>
                                     @endif
@@ -96,8 +96,8 @@
                     @empty
                         <tr>
                             <td colspan="4" class="px-6 py-16 text-center">
-                                <p class="text-sm font-medium text-slate-600">Aucune ville</p>
-                                <p class="mt-1 text-sm text-slate-400">Ajoutez-en une avec le formulaire ci-dessus.</p>
+                                <p class="text-sm font-medium text-slate-600">{{ __('admin.cities_empty') }}</p>
+                                <p class="mt-1 text-sm text-slate-400">{{ __('admin.cities_empty_hint') }}</p>
                             </td>
                         </tr>
                     @endforelse

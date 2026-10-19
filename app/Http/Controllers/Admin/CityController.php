@@ -27,7 +27,7 @@ class CityController extends Controller
 
         City::create($data);
 
-        return redirect()->route('admin.cities.index')->with('success', 'Ville ajoutée.');
+        return redirect()->route('admin.cities.index')->with('success', __('admin.flash_city_created'));
     }
 
     public function edit(City $city)
@@ -44,7 +44,7 @@ class CityController extends Controller
 
         $city->update($data);
 
-        return redirect()->route('admin.cities.index')->with('success', 'Ville mise à jour.');
+        return redirect()->route('admin.cities.index')->with('success', __('admin.flash_city_updated'));
     }
 
     public function updateStatus(Request $request, City $city)
@@ -55,7 +55,7 @@ class CityController extends Controller
 
         return $this->statusResponse(
             $request,
-            $city->active ? 'Ville activée.' : 'Ville désactivée.',
+            $city->active ? __('admin.flash_city_activated') : __('admin.flash_city_deactivated'),
             ['active' => $city->active]
         );
     }
@@ -68,12 +68,12 @@ class CityController extends Controller
         $dossiers = \App\Models\Dossier::where('city_id', $city->id)->count();
 
         if ($reports > 0 || $dossiers > 0) {
-            return back()->with('error', "Impossible de supprimer « {$city->name} » : {$reports} signalement(s) et {$dossiers} dossier(s) y sont rattachés. Désactivez-la plutôt.");
+            return back()->with('error', __('admin.flash_city_in_use', ['name' => $city->name, 'reports' => $reports, 'dossiers' => $dossiers]));
         }
 
         $city->delete();
         logAdminAction('Delete', 'City', $city->id, "Deleted city: {$city->name}");
 
-        return redirect()->route('admin.cities.index')->with('success', 'Ville supprimée.');
+        return redirect()->route('admin.cities.index')->with('success', __('admin.flash_city_deleted'));
     }
 }

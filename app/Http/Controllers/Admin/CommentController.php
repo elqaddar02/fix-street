@@ -32,14 +32,14 @@ class CommentController extends Controller
     {
         $comment->update(['approved' => true]);
         logAdminAction('Approve', 'Comment', $comment->id, "Approved comment on report #{$comment->report_id}");
-        return back()->with('success', 'Commentaire approuvé.');
+        return back()->with('success', __('admin.flash_comment_approved'));
     }
 
     public function reject(ReportComment $comment)
     {
         $comment->update(['approved' => false]);
         logAdminAction('Reject', 'Comment', $comment->id, "Rejected comment on report #{$comment->report_id}");
-        return back()->with('success', 'Commentaire rejeté.');
+        return back()->with('success', __('admin.flash_comment_rejected'));
     }
 
     public function destroy(ReportComment $comment)
@@ -47,6 +47,6 @@ class CommentController extends Controller
         $reportId = $comment->report_id;
         $comment->delete();
         logAdminAction('Delete', 'Comment', $comment->id, "Deleted comment from report #{$reportId}");
-        return back()->with('success', 'Commentaire supprimé.');
+        return back()->with('success', __('admin.flash_comment_deleted'));
     }
 }

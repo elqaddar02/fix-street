@@ -1,29 +1,29 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Modération des commentaires')
+@section('title', __('admin.comments_title'))
 
 @section('content')
 <div class="space-y-8">
     <div class="flex items-center justify-between">
         <div>
-            <h2 class="text-2xl font-semibold tracking-tight text-slate-900">Commentaires</h2>
-            <p class="text-slate-600">Modérer et approuver les commentaires des utilisateurs</p>
+            <h2 class="text-2xl font-semibold tracking-tight text-slate-900">{{ __('admin.comments') }}</h2>
+            <p class="text-slate-600">{{ __('admin.comments_intro') }}</p>
         </div>
     </div>
 
     <!-- Filter Tabs -->
-    <div class="flex space-x-2 border-b border-slate-200">
+    <div class="flex gap-2 border-b border-slate-200">
         <a href="{{ route('admin.comments.index') }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 border-b-2 border-transparent hover:border-slate-300 {{ !request('status') ? 'border-red-600 text-red-600' : '' }}">
-            Tous
+            {{ __('admin.all') }}
         </a>
         <a href="{{ route('admin.comments.index', ['status' => 'pending']) }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 border-b-2 border-transparent hover:border-slate-300 {{ request('status') === 'pending' ? 'border-red-600 text-red-600' : '' }}">
-            En attente
+            {{ __('admin.pending') }}
         </a>
         <a href="{{ route('admin.comments.index', ['status' => 'approved']) }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 border-b-2 border-transparent hover:border-slate-300 {{ request('status') === 'approved' ? 'border-red-600 text-red-600' : '' }}">
-            Approuvés
+            {{ __('admin.approved_plural') }}
         </a>
         <a href="{{ route('admin.comments.index', ['status' => 'rejected']) }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 border-b-2 border-transparent hover:border-slate-300 {{ request('status') === 'rejected' ? 'border-red-600 text-red-600' : '' }}">
-            Rejetés
+            {{ __('admin.status_rejected_plural') }}
         </a>
     </div>
 
@@ -31,26 +31,26 @@
         @forelse($comments as $comment)
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-start justify-between mb-4">
-                    <div class="flex items-start space-x-4 flex-1">
+                    <div class="flex items-start gap-4 flex-1">
                         <div class="flex-shrink-0">
                             <div class="w-10 h-10 bg-slate-500 rounded-full flex items-center justify-center text-white font-semibold">
                                 {{ strtoupper(substr($comment->user?->name ?? 'U', 0, 1)) }}
                             </div>
                         </div>
                         <div class="flex-1">
-                            <div class="flex items-center space-x-3">
-                                <p class="text-sm font-semibold text-slate-900">{{ $comment->user?->name ?? 'Utilisateur anonyme' }}</p>
+                            <div class="flex items-center gap-3">
+                                <p class="text-sm font-semibold text-slate-900">{{ $comment->user?->name ?? __('admin.anonymous_user') }}</p>
                                 <span class="text-xs text-slate-500">{{ $comment->created_at->format('d/m/Y H:i') }}</span>
                                 @if($comment->approved === null)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">En attente</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">{{ __('admin.pending') }}</span>
                                 @elseif($comment->approved === true)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Approuvé</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ __('admin.approved') }}</span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Rejeté</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">{{ __('admin.status_rejected') }}</span>
                                 @endif
                             </div>
                             <p class="text-xs text-slate-500 mt-1">
-                                Sur le signalement: <a href="{{ route('admin.reports.show', $comment->report) }}" class="text-slate-600 hover:text-slate-900">{{ $comment->report?->title ?? 'Signalement supprimé' }}</a>
+                                {{ __('admin.on_report') }} <a href="{{ route('admin.reports.show', $comment->report) }}" class="text-slate-600 hover:text-slate-900">{{ $comment->report?->title ?? __('admin.deleted_report') }}</a>
                             </p>
                         </div>
                     </div>
@@ -60,15 +60,15 @@
                     <p class="text-sm text-slate-700">{{ $comment->comment }}</p>
                 </div>
 
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center gap-3">
                     @if($comment->approved !== true)
                         <form action="{{ route('admin.comments.approve', $comment) }}" method="POST" class="inline-flex items-center">
                             @csrf
                             <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium">
-                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
-                                Approuver
+                                {{ __('admin.approve') }}
                             </button>
                         </form>
                     @endif
@@ -77,22 +77,22 @@
                         <form action="{{ route('admin.comments.reject', $comment) }}" method="POST" class="inline-flex items-center">
                             @csrf
                             <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium">
-                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
-                                Rejeter
+                                {{ __('admin.reject') }}
                             </button>
                         </form>
                     @endif
 
-                    <form action="{{ route('admin.comments.destroy', $comment) }}" method="POST" class="inline-flex items-center ml-auto" onsubmit="return confirm('Êtes-vous sûr?');">
+                    <form action="{{ route('admin.comments.destroy', $comment) }}" method="POST" class="inline-flex items-center ms-auto" onsubmit="return confirm(@js(__('admin.are_you_sure')))">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="inline-flex items-center px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
-                            Supprimer
+                            {{ __('admin.delete') }}
                         </button>
                     </form>
                 </div>
@@ -102,7 +102,7 @@
                 <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2l-4 4z"></path>
                 </svg>
-                <p class="text-slate-500 text-lg">Aucun commentaire trouvé pour ce filtre.</p>
+                <p class="text-slate-500 text-lg">{{ __('admin.comments_empty') }}</p>
             </div>
         @endforelse
     </div>

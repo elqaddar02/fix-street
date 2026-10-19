@@ -4,6 +4,31 @@ window.Alpine = Alpine;
 Alpine.start();
 
 /* ------------------------------------------------------------------ *
+ * Strings
+ *
+ * The layout prints the admin strings for the current locale as JSON;
+ * ":name"-style placeholders are filled in by t().
+ * ------------------------------------------------------------------ */
+
+const STRINGS = (() => {
+    try {
+        return JSON.parse(document.getElementById('admin-i18n')?.textContent || '{}');
+    } catch {
+        return {};
+    }
+})();
+
+function t(key, replace = {}) {
+    let text = STRINGS[key] ?? key;
+    for (const [name, value] of Object.entries(replace)) {
+        text = text.replace(`:${name}`, value);
+    }
+    return text;
+}
+
+const LOCALE = document.documentElement.lang || 'fr';
+
+/* ------------------------------------------------------------------ *
  * Toasts
  *
  * Small stack in the corner. Each toast can carry one action, which is
@@ -15,7 +40,7 @@ function toastRoot() {
     if (!root) {
         root = document.createElement('div');
         root.id = 'admin-toasts';
-        root.className = 'fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none';
+        root.className = 'fixed bottom-6 end-6 z-50 flex flex-col gap-3 pointer-events-none';
         document.body.appendChild(root);
     }
     return root;
@@ -38,7 +63,7 @@ export function toast(message, { tone = 'success', action = null, duration = 600
     if (action) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'ml-auto shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold text-red-700 hover:bg-red-50 transition-colors';
+        btn.className = 'ms-auto shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold text-red-700 hover:bg-red-50 transition-colors';
         btn.textContent = action.label;
         btn.addEventListener('click', () => {
             dismiss();
@@ -88,8 +113,9 @@ function paintToggle(form, active) {
     button.classList.toggle('bg-emerald-500', active);
     button.classList.toggle('bg-slate-300', !active);
     knob.classList.toggle('translate-x-5', active);
+    knob.classList.toggle('rtl:-translate-x-5', active);
     knob.classList.toggle('translate-x-0', !active);
-    text.textContent = active ? 'Actif' : 'Inactif';
+    text.textContent = active ? t('active') : t('inactive');
     text.classList.toggle('text-emerald-700', active);
     text.classList.toggle('text-slate-500', !active);
 
@@ -139,11 +165,13 @@ async function submitStatus(form, active, { announce = true } = {}) {
 
         if (announce) {
             const label = form.dataset.label;
-            const agreed = form.dataset.feminine === '1' ? 'e' : '';
-            const verb = active ? `activé${agreed}` : `désactivé${agreed}`;
-            toast(label ? `${label} ${verb}.` : data.message || 'Statut mis à jour.', {
+            const feminine = form.dataset.feminine === '1' ? '_f' : '';
+            const message = label
+                ? t((active ? 'enabled' : 'disabled') + feminine, { name: label })
+                : data.message || t('status_saved');
+            toast(message, {
                 action: {
-                    label: 'Annuler',
+                    label: t('undo'),
                     onClick: () => submitStatus(form, previous, { announce: false }),
                 },
             });
@@ -151,7 +179,7 @@ async function submitStatus(form, active, { announce = true } = {}) {
     } catch (error) {
         // Roll back so the switch never shows a state the server rejected.
         paintToggle(form, previous);
-        toast(error.userMessage || "Le statut n'a pas pu être enregistré.", { tone: 'error' });
+        toast(error.userMessage || t('status_failed'), { tone: 'error' });
     } finally {
         button.disabled = false;
     }
@@ -217,9 +245,9 @@ function initStatusSelects() {
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 const chosenLabel = select.options[select.selectedIndex].text;
-                toast(`Statut : ${chosenLabel}.`, {
+                toast(t('status_set', { status: chosenLabel }), {
                     action: {
-                        label: 'Annuler',
+                        label: t('undo'),
                         onClick: () => {
                             select.value = priorValue;
                             previous = priorValue;
@@ -231,7 +259,7 @@ function initStatusSelects() {
                 select.value = priorValue;
                 previous = priorValue;
                 paintSelect(select);
-                toast("Le statut n'a pas pu être enregistré.", { tone: 'error' });
+                toast(t('status_failed'), { tone: 'error' });
             } finally {
                 select.disabled = false;
             }
@@ -302,9 +330,9 @@ function render(Apex, selector, options) {
     return chart;
 }
 
-/** "2026-10-19" → "19 oct." */
+/** "2026-10-19" → "19 oct." in the page's language. */
 function shortDay(isoDate) {
-    return new Date(isoDate + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    return new Date(isoDate + 'T00:00:00').toLocaleDateString(LOCALE, { day: 'numeric', month: 'short' });
 }
 
 async function initCharts() {
@@ -317,7 +345,7 @@ async function initCharts() {
     render(Apex, '#chart-activity', {
         // Bars, not a smoothed line: one report on one day is a count, not a spike.
         chart: { type: 'bar', height: 300, sparkline: { enabled: false } },
-        series: [{ name: 'Signalements', data: data.activity.map((d) => d.count) }],
+        series: [{ name: t('reports'), data: data.activity.map((d) => d.count) }],
         // Plain day labels: a datetime axis squeezes each bar to a hairline.
         xaxis: {
             categories: data.activity.map((d) => shortDay(d.date)),
@@ -361,7 +389,7 @@ async function initCharts() {
                         },
                         total: {
                             show: true,
-                            label: 'Total',
+                            label: t('total'),
                             fontSize: '11px',
                             fontWeight: 600,
                             color: '#94a3b8',
@@ -376,7 +404,7 @@ async function initCharts() {
     // Volume per category.
     render(Apex, '#chart-categories', {
         chart: { type: 'bar', height: 320 },
-        series: [{ name: 'Signalements', data: data.categories.values }],
+        series: [{ name: t('reports'), data: data.categories.values }],
         xaxis: {
             categories: data.categories.labels,
             tickAmount: Math.max(1, Math.min(5, Math.max(0, ...data.categories.values))),
