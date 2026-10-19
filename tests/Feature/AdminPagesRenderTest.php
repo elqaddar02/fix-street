@@ -94,6 +94,8 @@ class AdminPagesRenderTest extends TestCase
             route('admin.categories.create'),
             route('admin.cities.index'),
             route('admin.cities.edit', $city),
+            route('admin.cities.places', $city),
+            route('admin.districts.create', $city),
             route('admin.ads.index'),
             route('admin.ads.create'),
             route('admin.comments.index'),
