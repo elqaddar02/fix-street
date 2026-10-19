@@ -12,6 +12,11 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        // "My Reports" is the citizen space; admins work from the admin dashboard.
+        if ($user->is_admin) {
+            return redirect()->route('admin.dashboard');
+        }
+
         // Get user's reports
         $reports = Report::where('user_id', $user->id)
             ->with(['category', 'city', 'district', 'dossier.events'])
