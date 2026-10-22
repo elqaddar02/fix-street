@@ -723,5 +723,11 @@
     "admin.flash_quartier_created": "تمت إضافة الحي.",
     "admin.flash_quartier_updated": "تم تحديث الحي.",
     "admin.flash_quartier_deleted": "تم حذف الحي.",
-    "admin.flash_quartier_in_use": "لا يمكن حذف «:name»: يستخدمه :count بلاغ أو ملف."
+    "admin.flash_quartier_in_use": "لا يمكن حذف «:name»: يستخدمه :count بلاغ أو ملف.",
+    "pagination.label": "ترقيم الصفحات",
+    "pagination.summary": "⁦:first–:last⁩ من :total",
+    "pagination.page_of": "الصفحة :page من :last",
+    "pagination.previous": "الصفحة السابقة",
+    "pagination.next": "الصفحة التالية",
+    "pagination.go_to": "الانتقال إلى الصفحة :page"
 }
