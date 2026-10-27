@@ -5,8 +5,9 @@
     $message = session('success') ?? (request()->boolean('verified') ? __('signin.email_verified') : null);
     $isNotice = false;
 
-    if (! $message && session('notice')) {
-        $message = session('notice');
+    // A refusal ("you can't confirm your own report") reads as a notice, not a success.
+    if (! $message && (session('notice') || session('error'))) {
+        $message = session('notice') ?? session('error');
         $isNotice = true;
     }
 @endphp

@@ -148,22 +148,25 @@ class ReportController extends Controller
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'city_id'     => 'required|exists:cities,id',
+            // Only cities Madinup covers; the form lists no others, so this guards direct posts.
+            'city_id'     => ['required', Rule::exists('cities', 'id')->where('active', true)],
             'district_id' => ['nullable', Rule::exists('districts', 'id')->where('city_id', $request->input('city_id'))],
             'quartier_id' => ['nullable', Rule::exists('quartiers', 'id')->where('district_id', $request->input('district_id'))],
-            'latitude'    => 'required|numeric|between:-90,90',
-            'longitude'   => 'required|numeric|between:-180,180',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:6144',
+            ...$this->pointRules(required: true),
+            // A report is evidence: one photo is required.
+            'image'       => 'required|image|mimes:jpeg,png,jpg|max:6144',
         ], [
+            'city_id.exists' => __('validation.city_not_covered'),
+            'image.required' => __('validation.image_missing'),
             'image.image' => __('validation.image_required'),
             'image.mimes' => __('validation.image_types'),
             'image.max' => __('validation.image_size'),
             'latitude.required' => __('validation.latitude_required'),
             'latitude.numeric' => __('validation.latitude_numeric'),
-            'latitude.between' => __('validation.latitude_range'),
+            'latitude.between' => __('validation.outside_morocco'),
             'longitude.required' => __('validation.longitude_required'),
             'longitude.numeric' => __('validation.longitude_numeric'),
-            'longitude.between' => __('validation.longitude_range'),
+            'longitude.between' => __('validation.outside_morocco'),
             'district_id.exists' => __('validation.district_city_mismatch'),
             'quartier_id.exists' => __('validation.quartier_district_mismatch'),
         ]);
@@ -177,13 +180,10 @@ class ReportController extends Controller
         // still render both.
         $validated['description'] = $validated['title'];
 
-        // city_id/district_id/quartier_id arrive directly from the form:
-        // either the auto-locked panel's hidden inputs (populated
-        // client-side from /api/resolve-location against the same map
-        // pin) or the manual cascade selects. Validation above already
-        // guarantees the three are internally consistent with each other
-        // (district belongs to the submitted city, quartier belongs to
-        // the submitted district) regardless of which path produced them.
+        // city_id/district_id/quartier_id arrive from the form, already
+        // checked for consistency above. Where the citizen left the area
+        // empty, the server works it out from the pin itself.
+        $validated = $this->fillAreaFromPin($validated);
 
         $validated['status'] = 'OPEN';
         $validated['user_id'] = Auth::id();
@@ -230,16 +230,19 @@ class ReportController extends Controller
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'city_id'     => [Rule::requiredIf($locationEditable), 'nullable', 'exists:cities,id'],
+            // A report can keep a city that was switched off later, but not move into one.
+            'city_id'     => [Rule::requiredIf($locationEditable), 'nullable', Rule::exists('cities', 'id')->where(fn ($q) => $q->where('active', true)->orWhere('id', $report->city_id))],
             'district_id' => ['nullable', Rule::exists('districts', 'id')->where('city_id', $request->input('city_id'))],
             'quartier_id' => ['nullable', Rule::exists('quartiers', 'id')->where('district_id', $request->input('district_id'))],
             'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:6144',
-            'latitude'    => 'nullable|numeric|between:-90,90',
-            'longitude'   => 'nullable|numeric|between:-180,180',
+            ...$this->pointRules(required: false),
         ], [
+            'city_id.exists' => __('validation.city_not_covered'),
             'image.image' => __('validation.image_required'),
             'image.mimes' => __('validation.image_types'),
             'image.max' => __('validation.image_size'),
+            'latitude.between' => __('validation.outside_morocco'),
+            'longitude.between' => __('validation.outside_morocco'),
             'district_id.exists' => __('validation.district_city_mismatch'),
             'quartier_id.exists' => __('validation.quartier_district_mismatch'),
         ]);
@@ -256,9 +259,13 @@ class ReportController extends Controller
         // A report that is part of a case is evidence: its photo and location can no longer change.
         if (! $locationEditable) {
             unset($validated['image'], $validated['latitude'], $validated['longitude'], $validated['city_id'], $validated['district_id'], $validated['quartier_id']);
-        } elseif ($request->hasFile('image')) {
-            $this->uploads->delete($report->image);
-            $validated['image'] = $this->uploads->store($request->file('image'), 'reports');
+        } else {
+            $validated = $this->fillAreaFromPin($validated);
+
+            if ($request->hasFile('image')) {
+                $this->uploads->delete($report->image);
+                $validated['image'] = $this->uploads->store($request->file('image'), 'reports');
+            }
         }
 
         $report->update($validated);
@@ -282,6 +289,46 @@ class ReportController extends Controller
         $report->delete();
 
         return redirect()->route('dashboard')->with('success', __('flash.report_deleted'));
+    }
+
+    /**
+     * Pin rules shared by store() and update(): the same box LocationResolver
+     * accepts, so a point the resolver could never place is refused up front.
+     *
+     * @return array<string, string>
+     */
+    private function pointRules(bool $required): array
+    {
+        $presence = $required ? 'required' : 'nullable';
+        [$minLat, $maxLat, $minLng, $maxLng] = LocationResolver::SUPPORTED_AREA;
+
+        return [
+            'latitude' => "{$presence}|numeric|between:{$minLat},{$maxLat}",
+            'longitude' => "{$presence}|numeric|between:{$minLng},{$maxLng}",
+        ];
+    }
+
+    /**
+     * Fill in district and quartier from the pin when the form left them empty
+     * (a pin placed by hand, or JavaScript that never ran). A choice the
+     * citizen made in the dropdowns is kept: validation already checked it
+     * belongs to the chosen city.
+     */
+    private function fillAreaFromPin(array $validated): array
+    {
+        if (! isset($validated['latitude'], $validated['longitude']) || filled($validated['district_id'] ?? null)) {
+            return $validated;
+        }
+
+        $resolved = $this->locationResolver->resolve((float) $validated['latitude'], (float) $validated['longitude']);
+
+        // Only when the pin really sits in the city the citizen chose.
+        if ((int) $resolved['city_id'] === (int) ($validated['city_id'] ?? 0)) {
+            $validated['district_id'] = $resolved['district_id'];
+            $validated['quartier_id'] = $resolved['quartier_id'];
+        }
+
+        return $validated;
     }
 
     public function getQuartierCoordinates(Quartier $quartier)

@@ -38,6 +38,9 @@ class LocationResolver
     // photos in real coverage gaps). This only rejects coordinates that are
     // clearly not Morocco at all: another continent, the ocean, (0,0)
     // "null island" from a corrupted EXIF tag, etc.
+    /** [min lat, max lat, min lng, max lng]: shared with the report and place forms. */
+    public const SUPPORTED_AREA = [20.0, 36.0, -18.0, -1.0];
+
     private const MIN_LAT = 20.0;
     private const MAX_LAT = 36.0;
     private const MIN_LNG = -18.0;

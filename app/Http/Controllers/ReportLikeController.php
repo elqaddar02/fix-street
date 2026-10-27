@@ -17,6 +17,16 @@ class ReportLikeController extends Controller
     {
         $user = Auth::user();
 
+        // A confirmation means "a neighbour saw it too": the reporter and the
+        // moderators confirming would inflate the count the admin relies on.
+        if ($report->user_id === $user->id || $user->is_admin) {
+            $message = __('report.confirm_not_allowed');
+
+            return $request->expectsJson()
+                ? response()->json(['message' => $message], 403)
+                : redirect()->back()->with('error', $message);
+        }
+
         // Check if user has already liked this report
         $like = $report->likes()->where('user_id', $user->id)->first();
 
@@ -41,6 +51,6 @@ class ReportLikeController extends Controller
         }
 
         // Otherwise, redirect back
-        return redirect()->back()->with('success', $liked ? 'Report liked!' : 'Report unliked!');
+        return redirect()->back()->with('success', __($liked ? 'report.confirmed_flash' : 'report.unconfirmed_flash'));
     }
 }

@@ -105,7 +105,16 @@ function rejectImage(message) {
 
 // Don't submit while the photo is still being prepared, or the original file would be sent.
 imageInput?.form?.addEventListener('submit', (event) => {
-    if (imageProcessing) event.preventDefault();
+    if (imageProcessing) {
+        event.preventDefault();
+        return;
+    }
+    // The server refuses a new report without a photo; say so before the round trip.
+    if (window.reportConfig?.photoRequired && !(imageInput.files && imageInput.files[0])) {
+        event.preventDefault();
+        showImageAlert(window.reportConfig.translations.photoMissing);
+        imageInput.closest('section, div')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 });
 
 const imageAlert = document.getElementById('image-alert');
@@ -431,9 +440,8 @@ function initMap() {
         shadowUrl: markerBase + '/marker-shadow.png',
     });
 
-    const defaultLat = 31.7917;
-    const defaultLng = -7.0926;
-    const zoom = 6;
+    // The covered city when there is only one, otherwise the whole of Morocco.
+    const [defaultLat, defaultLng, zoom] = window.reportConfig?.defaultCenter || [31.7917, -7.0926, 6];
 
     map = L.map('map').setView([defaultLat, defaultLng], zoom);
 

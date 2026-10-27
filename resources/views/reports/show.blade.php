@@ -44,8 +44,10 @@
 
         @php
             $userHasLiked = auth()->check() && auth()->user()->likedReports()->where('report_id', $report->id)->exists();
+            // The reporter and moderators see the count but can't add to it.
+            $mayNotConfirm = $isOwner || (auth()->user()?->is_admin ?? false);
             // Only a verified account can confirm; others are sent to sign in or to check their email.
-            $canConfirm = auth()->check() && auth()->user()->hasVerifiedEmail();
+            $canConfirm = ! $mayNotConfirm && auth()->check() && auth()->user()->hasVerifiedEmail();
             $guestConfirmUrl = auth()->check() ? route('verification.notice') : route('login.redirect', ['intended' => url()->current()]);
             $checkIcon = 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z';
         @endphp
@@ -129,6 +131,13 @@
                             <p class="mt-2 text-center text-sm font-medium text-gray-700" x-text="countLabel()"></p>
                             <p x-show="failed" x-cloak class="mt-2 text-center text-sm text-rose-600" role="alert">{{ __('report.confirm_failed') }}</p>
                         </div>
+                    @elseif($mayNotConfirm)
+                        <p class="mt-4 text-center text-sm font-medium text-gray-700">
+                            {{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}
+                        </p>
+                        @if($isOwner)
+                            <p class="mt-1 text-center text-xs text-gray-500">{{ __('report.own_report_note') }}</p>
+                        @endif
                     @else
                         <a href="{{ $guestConfirmUrl }}" class="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $checkIcon }}"/></svg>
@@ -195,6 +204,13 @@
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $checkIcon }}"/></svg>
                     <span x-text="liked ? @js(__('report.confirmed')) : @js(__('report.confirm'))"></span>
                 </button>
+            </div>
+        @elseif($mayNotConfirm)
+            <div class="min-w-0">
+                <p class="truncate text-sm font-medium text-gray-900">{{ trans_choice('report.confirmations_count', $report->likes_count ?? 0, ['count' => $report->likes_count ?? 0]) }}</p>
+                @if($isOwner)
+                    <p class="truncate text-xs text-gray-500">{{ __('report.own_report_note') }}</p>
+                @endif
             </div>
         @else
             <div class="flex items-center gap-3">

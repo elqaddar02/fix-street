@@ -32,7 +32,12 @@
 
     {{-- PHOTO --}}
     <section class="{{ $section }}">
-        <h2 class="{{ $sectionTitle }}">{{ $report ? __('Current Photo') : __('Upload Photo') }}</h2>
+        <h2 class="{{ $sectionTitle }}">
+            {{ $report ? __('Current Photo') : __('Upload Photo') }}
+            @unless($report)
+                <span class="ms-1 text-xs font-medium text-red-600">{{ __('report.photo_required_label') }}</span>
+            @endunless
+        </h2>
 
         @if($locked)
             <div class="mt-4 flex items-center gap-4">

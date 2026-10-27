@@ -7,11 +7,20 @@ use App\Models\City;
 use App\Models\District;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Tests\Concerns\MakesReportPhotos;
 use Tests\TestCase;
 
 class ReportLocationConsistencyTest extends TestCase
 {
+    use MakesReportPhotos;
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Storage::fake('public');
+    }
 
     /**
      * City/District/Quartier can arrive from either the auto-locked panel
@@ -36,6 +45,7 @@ class ReportLocationConsistencyTest extends TestCase
             'district_id' => $saleDistrict->id,
             'latitude' => 31.6295,
             'longitude' => -7.9811,
+            'image' => $this->reportPhoto(),
         ]);
 
         $response->assertSessionHasErrors('district_id');
@@ -56,6 +66,7 @@ class ReportLocationConsistencyTest extends TestCase
             'city_id' => $marrakech->id,
             'latitude' => 31.6295,
             'longitude' => -7.9811,
+            'image' => $this->reportPhoto(),
         ]);
 
         $response->assertSessionDoesntHaveErrors();
@@ -84,6 +95,7 @@ class ReportLocationConsistencyTest extends TestCase
             'quartier_id' => $quartier->id,
             'latitude' => (float) $quartier->latitude,
             'longitude' => (float) $quartier->longitude,
+            'image' => $this->reportPhoto(),
         ]);
 
         $response->assertSessionDoesntHaveErrors();

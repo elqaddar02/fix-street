@@ -2,10 +2,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
 
 <script>
+@php
+    // While Madinup covers a single city, open the map on it rather than on all of Morocco.
+    $coveredCities = ($cities ?? collect())->filter(fn ($city) => $city->latitude && $city->longitude);
+    $defaultCenter = $coveredCities->count() === 1
+        ? [(float) $coveredCities->first()->latitude, (float) $coveredCities->first()->longitude, 13]
+        : null;
+@endphp
     window.reportConfig = {
         resolveUrl: "{{ route('location.resolve') }}",
         markerBase: "{{ asset('images') }}",
+        // A new report needs a photo; an edit keeps the current one.
+        photoRequired: @json(! isset($report)),
+        defaultCenter: @json($defaultCenter),
         translations: {
+            photoMissing: @json(__('validation.image_missing')),
             imageTypes: @json(__('validation.image_types')),
             imageSize: @json(__('validation.image_size')),
             imageUnreadable: @json(__('validation.image_unreadable')),

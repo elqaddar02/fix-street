@@ -7,6 +7,7 @@ use App\Models\City;
 use App\Models\District;
 use App\Models\Dossier;
 use App\Models\Quartier;
+use App\Services\LocationResolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -206,8 +207,8 @@ class PlaceController extends Controller
         return $request->validate([
             'name_fr' => ['required', 'string', 'max:255'],
             'name_ar' => [$nameArRequired ? 'required' : 'nullable', 'string', 'max:255'],
-            'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:20,36'],
-            'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:-18,-1'],
+            'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:' . LocationResolver::SUPPORTED_AREA[0] . ',' . LocationResolver::SUPPORTED_AREA[1]],
+            'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:' . LocationResolver::SUPPORTED_AREA[2] . ',' . LocationResolver::SUPPORTED_AREA[3]],
         ]);
     }
 

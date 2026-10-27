@@ -701,5 +701,13 @@
     "pagination.page_of": "Page :page of :last",
     "pagination.previous": "Previous page",
     "pagination.next": "Next page",
-    "pagination.go_to": "Go to page :page"
+    "pagination.go_to": "Go to page :page",
+    "validation.image_missing": "Please add a photo of the problem.",
+    "validation.city_not_covered": "Madinup does not cover this city yet.",
+    "validation.outside_morocco": "This location is outside Morocco. Place the pin where the problem is.",
+    "report.confirm_not_allowed": "Confirmations come from neighbours: you cannot confirm your own report, and moderators cannot confirm.",
+    "report.own_report_note": "This is your report: your neighbours can confirm it.",
+    "report.confirmed_flash": "Thank you, your confirmation is recorded.",
+    "report.unconfirmed_flash": "Your confirmation was removed.",
+    "report.photo_required_label": "required"
 }
