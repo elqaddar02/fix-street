@@ -65,10 +65,19 @@
             <div id="place-map" class="h-80 lg:h-full lg:min-h-[28rem]" dir="ltr"
                  data-center='@json($center)'
                  data-neighbours='@json($neighbours)'
+                 data-boundary='@json($city->boundary)'
                  data-zoom="{{ $isDistrict ? 12 : 14 }}"></div>
-            <p class="flex items-center gap-2 border-t border-slate-200 px-4 py-2 text-xs text-slate-500">
-                <span class="inline-block h-2.5 w-2.5 rounded-full border-2 border-slate-700 bg-white"></span>
-                {{ $isDistrict ? __('admin.map_other_districts') : __('admin.map_other_quartiers') }}
+            <p class="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-slate-200 px-4 py-2 text-xs text-slate-500">
+                <span class="inline-flex items-center gap-2">
+                    <span class="inline-block h-2.5 w-2.5 rounded-full border-2 border-slate-700 bg-white"></span>
+                    {{ $isDistrict ? __('admin.map_other_districts') : __('admin.map_other_quartiers') }}
+                </span>
+                @if($city->boundary)
+                    <span class="inline-flex items-center gap-2">
+                        <span class="inline-block h-0 w-4 border-t-2 border-dashed border-red-600"></span>
+                        {{ __('admin.map_city_boundary', ['city' => $city->display_name]) }}
+                    </span>
+                @endif
             </p>
         </div>
     </form>
@@ -94,6 +103,12 @@
 
             const map = L.map(el).setView(current() || center || [31.8, -7.1], current() || center ? Number(el.dataset.zoom) : 6);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+
+            // The city's boundary: points outside it are refused, and reports outside it don't belong to the city.
+            const boundary = JSON.parse(el.dataset.boundary || 'null');
+            if (boundary) {
+                L.geoJSON(boundary, { interactive: false, style: { color: '#dc2626', weight: 2, dashArray: '6 4', fillColor: '#dc2626', fillOpacity: 0.04 } }).addTo(map);
+            }
 
             // The other places: the automatic location picks whichever point is nearest to a report.
             neighbours.forEach((place) => {

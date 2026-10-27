@@ -9,23 +9,17 @@ use App\Models\Quartier;
 /**
  * Resolves a City/District/Quartier from a map lat/lng.
  *
- * Bottom-up by design: find the nearest quartier (or, failing that, the
- * nearest district) and walk its real Eloquent relations up to get its
- * district and city, rather than matching each tier independently. Two
- * independently-nearest tiers can disagree — e.g. a pin can be closer to
- * Rabat's city centroid while actually sitting inside a Salé quartier,
- * since Rabat and Salé sit on opposite banks of the same river a few km
- * apart. Walking up from the quartier avoids that: whatever quartier is
- * closest, its own district and city are what gets returned, always
- * consistent with what's already in the database.
+ * City first, by boundary: an active city with a boundary (GeoJSON from
+ * OpenStreetMap) claims exactly the pins inside it. Rabat and Salé face
+ * each other across the Bouregreg, a few hundred metres apart, so
+ * nearest-point matching filed Rabat pins under Salé; a boundary can't.
+ * A pin inside no covered city resolves to nothing ("outside the area").
  *
- * District/Quartier coverage is sparse (only seeded for one city today),
- * so those two are always "best effort" — only returned when the nearest
- * known row is within a plausible distance for that tier, and only when
- * its parent city is active. City on its own always resolves to the
- * nearest active city with coordinates as a last resort; callers should
- * still treat a null return as "no confident match" rather than assume
- * one always exists.
+ * Inside the city, district and quartier are best effort: the nearest one
+ * within a plausible distance, walking up its real relations so the three
+ * levels always agree. Cities without a boundary yet fall back to the
+ * older nearest-point matching, with the nearest active city as a last
+ * resort; callers should treat a null city as "no confident match".
  */
 class LocationResolver
 {
@@ -57,51 +51,81 @@ class LocationResolver
      */
     public function resolve(float $lat, float $lng): array
     {
+        $none = ['city_id' => null, 'district_id' => null, 'quartier_id' => null];
+
         if (!$this->isWithinSupportedArea($lat, $lng)) {
-            return ['city_id' => null, 'district_id' => null, 'quartier_id' => null];
+            return $none;
         }
 
+        $active = City::where('active', true)->get();
+
+        // A city with a known boundary claims every point inside it, and only
+        // those: a pin across the river in Rabat is not Salé, however close.
+        $city = $active->first(fn (City $city) => $city->contains($lat, $lng));
+        if ($city) {
+            return $this->placeWithin(collect([$city->id]), $lat, $lng, fallbackCity: $city);
+        }
+
+        // Cities without a boundary yet keep the older nearest-point matching.
+        $unbounded = $active->reject(fn (City $city) => $city->hasBoundary());
+        if ($unbounded->isEmpty()) {
+            return $none;
+        }
+
+        $nearestCity = $this->nearest(
+            $unbounded->filter(fn (City $city) => $city->latitude && $city->longitude),
+            $lat,
+            $lng,
+            fn ($c) => [$c->latitude, $c->longitude]
+        );
+
+        return $this->placeWithin($unbounded->pluck('id'), $lat, $lng, fallbackCity: $nearestCity);
+    }
+
+    /**
+     * Nearest quartier, then nearest district, among the given cities; the
+     * fallback city alone when neither is close enough.
+     *
+     * @return array{city_id: int|null, district_id: int|null, quartier_id: int|null}
+     */
+    private function placeWithin($cityIds, float $lat, float $lng, ?City $fallbackCity): array
+    {
         $quartier = $this->nearestWithin(
-            Quartier::with('district.city')->whereNotNull('latitude')->whereNotNull('longitude')->get(),
+            Quartier::with('district')
+                ->whereHas('district', fn ($q) => $q->whereIn('city_id', $cityIds))
+                ->whereNotNull('latitude')->whereNotNull('longitude')->get(),
             $lat,
             $lng,
             fn ($q) => [$q->latitude, $q->longitude],
             self::MAX_QUARTIER_KM
         );
 
-        if ($quartier && $quartier->district && $quartier->district->city?->active) {
+        if ($quartier) {
             return [
-                'city_id' => $quartier->district->city->id,
-                'district_id' => $quartier->district->id,
+                'city_id' => $quartier->district->city_id,
+                'district_id' => $quartier->district_id,
                 'quartier_id' => $quartier->id,
             ];
         }
 
         $district = $this->nearestWithin(
-            District::with('city')->whereNotNull('lat')->whereNotNull('lng')->get(),
+            District::whereIn('city_id', $cityIds)->whereNotNull('lat')->whereNotNull('lng')->get(),
             $lat,
             $lng,
             fn ($d) => [$d->lat, $d->lng],
             self::MAX_DISTRICT_KM
         );
 
-        if ($district && $district->city?->active) {
+        if ($district) {
             return [
-                'city_id' => $district->city->id,
+                'city_id' => $district->city_id,
                 'district_id' => $district->id,
                 'quartier_id' => null,
             ];
         }
 
-        $city = $this->nearest(
-            City::where('active', true)->whereNotNull('latitude')->whereNotNull('longitude')->get(),
-            $lat,
-            $lng,
-            fn ($c) => [$c->latitude, $c->longitude]
-        );
-
         return [
-            'city_id' => $city?->id,
+            'city_id' => $fallbackCity?->id,
             'district_id' => null,
             'quartier_id' => null,
         ];

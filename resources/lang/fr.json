@@ -752,5 +752,8 @@
     "report.own_report_note": "C’est votre signalement : vos voisins peuvent le confirmer.",
     "report.confirmed_flash": "Merci, votre confirmation est enregistrée.",
     "report.unconfirmed_flash": "Votre confirmation a été retirée.",
-    "report.photo_required_label": "obligatoire"
+    "report.photo_required_label": "obligatoire",
+    "validation.outside_coverage": "Madinup ne couvre pas encore cet endroit. Les signalements sont ouverts à : :cities.",
+    "admin.point_outside_city": "Ce point est en dehors des limites de :city.",
+    "admin.map_city_boundary": "Limites de :city"
 }

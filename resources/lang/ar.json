@@ -737,5 +737,8 @@
     "report.own_report_note": "هذا بلاغك: يمكن لجيرانك تأكيده.",
     "report.confirmed_flash": "شكرًا، تم تسجيل تأكيدك.",
     "report.unconfirmed_flash": "تم سحب تأكيدك.",
-    "report.photo_required_label": "إلزامية"
+    "report.photo_required_label": "إلزامية",
+    "validation.outside_coverage": "لا تغطي Madinup هذا المكان بعد. البلاغات متاحة حاليًا في: :cities.",
+    "admin.point_outside_city": "هذه النقطة خارج حدود :city.",
+    "admin.map_city_boundary": "حدود :city"
 }

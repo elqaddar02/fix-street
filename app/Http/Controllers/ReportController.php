@@ -12,6 +12,7 @@ use App\Services\PublicUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class ReportController extends Controller
 {
@@ -183,6 +184,7 @@ class ReportController extends Controller
         // city_id/district_id/quartier_id arrive from the form, already
         // checked for consistency above. Where the citizen left the area
         // empty, the server works it out from the pin itself.
+        $this->ensurePinInCity($validated);
         $validated = $this->fillAreaFromPin($validated);
 
         $validated['status'] = 'OPEN';
@@ -260,6 +262,7 @@ class ReportController extends Controller
         if (! $locationEditable) {
             unset($validated['image'], $validated['latitude'], $validated['longitude'], $validated['city_id'], $validated['district_id'], $validated['quartier_id']);
         } else {
+            $this->ensurePinInCity($validated);
             $validated = $this->fillAreaFromPin($validated);
 
             if ($request->hasFile('image')) {
@@ -306,6 +309,27 @@ class ReportController extends Controller
             'latitude' => "{$presence}|numeric|between:{$minLat},{$maxLat}",
             'longitude' => "{$presence}|numeric|between:{$minLng},{$maxLng}",
         ];
+    }
+
+    /**
+     * A city with a known boundary only takes pins inside it: the form can
+     * still send "Salé" with a pin across the river in Rabat.
+     */
+    private function ensurePinInCity(array $validated): void
+    {
+        if (! isset($validated['latitude'], $validated['longitude'], $validated['city_id'])) {
+            return;
+        }
+
+        $city = City::find($validated['city_id']);
+
+        if ($city?->hasBoundary() && ! $city->contains((float) $validated['latitude'], (float) $validated['longitude'])) {
+            throw ValidationException::withMessages([
+                'latitude' => __('validation.outside_coverage', [
+                    'cities' => City::where('active', true)->get()->pluck('display_name')->join(app()->getLocale() === 'ar' ? '، ' : ', '),
+                ]),
+            ]);
+        }
     }
 
     /**
@@ -367,6 +391,16 @@ class ReportController extends Controller
         }
 
         $resolved = $this->locationResolver->resolve($lat, $lng);
+
+        // In Morocco but in no city Madinup covers (e.g. Rabat, across the river from Salé).
+        if (! $resolved['city_id']) {
+            return response()->json([
+                'outside_area' => true,
+                'city_id' => null, 'city' => null,
+                'district_id' => null, 'district' => null,
+                'quartier_id' => null, 'quartier' => null,
+            ]);
+        }
 
         $city = $resolved['city_id'] ? City::find($resolved['city_id']) : null;
         $district = $resolved['district_id'] ? District::find($resolved['district_id']) : null;

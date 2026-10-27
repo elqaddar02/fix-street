@@ -11,6 +11,7 @@ use App\Services\LocationResolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Districts and quartiers of a city.
@@ -48,7 +49,7 @@ class PlaceController extends Controller
 
     public function storeDistrict(Request $request, City $city)
     {
-        $data = $this->validated($request, nameArRequired: true);
+        $data = $this->validated($request, nameArRequired: true, city: $city);
 
         $district = $city->districts()->create([
             'name_fr' => $data['name_fr'],
@@ -79,7 +80,7 @@ class PlaceController extends Controller
 
     public function updateDistrict(Request $request, District $district)
     {
-        $data = $this->validated($request, nameArRequired: true);
+        $data = $this->validated($request, nameArRequired: true, city: $district->city);
 
         $district->update([
             'name_fr' => $data['name_fr'],
@@ -133,7 +134,7 @@ class PlaceController extends Controller
 
     public function storeQuartier(Request $request, District $district)
     {
-        $data = $this->validated($request, nameArRequired: false);
+        $data = $this->validated($request, nameArRequired: false, city: $district->city);
 
         $quartier = $district->quartiers()->create([
             'name_fr' => $data['name_fr'],
@@ -165,7 +166,7 @@ class PlaceController extends Controller
 
     public function updateQuartier(Request $request, Quartier $quartier)
     {
-        $data = $this->validated($request, nameArRequired: false);
+        $data = $this->validated($request, nameArRequired: false, city: $quartier->district->city);
 
         $quartier->update([
             'name_fr' => $data['name_fr'],
@@ -201,15 +202,23 @@ class PlaceController extends Controller
     /**
      * @return array{name_fr: string, name_ar: string|null, latitude: float|null, longitude: float|null}
      */
-    private function validated(Request $request, bool $nameArRequired): array
+    private function validated(Request $request, bool $nameArRequired, City $city): array
     {
         // Same bounding box LocationResolver accepts: a point outside it could never be matched.
-        return $request->validate([
+        $data = $request->validate([
             'name_fr' => ['required', 'string', 'max:255'],
             'name_ar' => [$nameArRequired ? 'required' : 'nullable', 'string', 'max:255'],
             'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:' . LocationResolver::SUPPORTED_AREA[0] . ',' . LocationResolver::SUPPORTED_AREA[1]],
             'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:' . LocationResolver::SUPPORTED_AREA[2] . ',' . LocationResolver::SUPPORTED_AREA[3]],
         ]);
+
+        // A point across the city line would pull in reports from the neighbouring city.
+        if (isset($data['latitude'], $data['longitude']) && $city->hasBoundary()
+            && ! $city->contains((float) $data['latitude'], (float) $data['longitude'])) {
+            throw ValidationException::withMessages(['latitude' => __('admin.point_outside_city', ['city' => $city->display_name])]);
+        }
+
+        return $data;
     }
 
     /** @param class-string<Model> $model */
