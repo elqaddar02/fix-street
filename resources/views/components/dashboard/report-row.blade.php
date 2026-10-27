@@ -50,7 +50,9 @@
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828z"/></svg>
                 <span class="sr-only">{{ __('dashboard.actions.edit') }}</span>
             </a>
-            <form method="POST" action="{{ route('reports.destroy', $report) }}" onsubmit='return confirm({{ json_encode(__('dashboard.confirm.delete_report')) }})' class="inline">
+            {{-- A report in a case file is evidence and cannot be deleted. --}}
+            @unless($report->dossier_id)
+            <form method="POST" action="{{ route('reports.destroy', $report) }}" onsubmit="return confirm(@js(__('dashboard.confirm.delete_report')))" class="inline">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500" title="{{ __('dashboard.actions.delete') }}">
@@ -58,6 +60,7 @@
                     <span class="sr-only">{{ __('dashboard.actions.delete') }}</span>
                 </button>
             </form>
+            @endunless
         </div>
     </td>
 </tr>

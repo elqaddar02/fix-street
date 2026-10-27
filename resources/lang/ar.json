@@ -729,5 +729,13 @@
     "pagination.page_of": "الصفحة :page من :last",
     "pagination.previous": "الصفحة السابقة",
     "pagination.next": "الصفحة التالية",
-    "pagination.go_to": "الانتقال إلى الصفحة :page"
+    "pagination.go_to": "الانتقال إلى الصفحة :page",
+    "validation.image_missing": "أضف صورة للمشكلة.",
+    "validation.city_not_covered": "لا تغطي Madinup هذه المدينة بعد.",
+    "validation.outside_morocco": "هذا الموقع خارج المغرب. ضع العلامة في مكان المشكلة.",
+    "report.confirm_not_allowed": "التأكيدات تأتي من الجيران: لا يمكنك تأكيد بلاغك، ولا يقوم المشرفون بالتأكيد.",
+    "report.own_report_note": "هذا بلاغك: يمكن لجيرانك تأكيده.",
+    "report.confirmed_flash": "شكرًا، تم تسجيل تأكيدك.",
+    "report.unconfirmed_flash": "تم سحب تأكيدك.",
+    "report.photo_required_label": "إلزامية"
 }
