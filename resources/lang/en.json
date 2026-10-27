@@ -709,5 +709,8 @@
     "report.own_report_note": "This is your report: your neighbours can confirm it.",
     "report.confirmed_flash": "Thank you, your confirmation is recorded.",
     "report.unconfirmed_flash": "Your confirmation was removed.",
-    "report.photo_required_label": "required"
+    "report.photo_required_label": "required",
+    "validation.outside_coverage": "Madinup does not cover this place yet. Reports are open in: :cities.",
+    "admin.point_outside_city": "This point is outside the boundary of :city.",
+    "admin.map_city_boundary": "Boundary of :city"
 }

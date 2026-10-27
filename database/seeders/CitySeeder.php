@@ -11,7 +11,8 @@ class CitySeeder extends Seeder
     {
         $cities = [
             ['name' => 'Rabat', 'name_ar' => 'الرباط', 'active' => true, 'latitude' => 34.0209, 'longitude' => -6.8416],
-            ['name' => 'Salé', 'name_ar' => 'سلا', 'active' => true, 'latitude' => 34.0386, 'longitude' => -6.8159],
+            ['name' => 'Salé', 'name_ar' => 'سلا', 'active' => true, 'latitude' => 34.0386, 'longitude' => -6.8159,
+                'boundary' => json_decode(file_get_contents(database_path('data/sale-boundary.geojson')), true)],
             ['name' => 'Casablanca', 'name_ar' => 'الدار البيضاء', 'active' => true, 'latitude' => 33.5731, 'longitude' => -7.5898],
             ['name' => 'Marrakech', 'name_ar' => 'مراكش', 'active' => true, 'latitude' => 31.6295, 'longitude' => -7.9811],
             ['name' => 'Fès', 'name_ar' => 'فاس', 'active' => true, 'latitude' => 34.0181, 'longitude' => -5.0078],

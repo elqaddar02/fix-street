@@ -17,11 +17,11 @@ class QuartierCoordinatesSeeder extends Seeder
     public function run(): void
     {
         $coordinates = [
-            'Bab Lamrissa' => ['latitude' => 34.028, 'longitude' => -6.824],
-            'Bettana' => ['latitude' => 34.022, 'longitude' => -6.811],
-            'Tabriquet' => ['latitude' => 34.041, 'longitude' => -6.805],
-            'Layayda' => ['latitude' => 34.062, 'longitude' => -6.791],
-            'Hssaine' => ['latitude' => 34.004, 'longitude' => -6.748],
+            'Bab Lamrissa' => ['latitude' => 34.0331, 'longitude' => -6.8203],
+            'Bettana' => ['latitude' => 34.0313, 'longitude' => -6.8108],
+            'Tabriquet' => ['latitude' => 34.0555, 'longitude' => -6.7887],
+            'Layayda' => ['latitude' => 34.0596, 'longitude' => -6.7698],
+            'Hssaine' => ['latitude' => 33.9827, 'longitude' => -6.7422],
         ];
 
         foreach ($coordinates as $districtName => $coords) {

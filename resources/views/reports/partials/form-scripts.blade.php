@@ -36,7 +36,7 @@
             checkingArea: "{{ __('Checking area...') }}",
             areaUnknown: "{{ __('Area could not be determined — drag the pin closer to the street.') }}",
             cityLevelOnly: "{{ __('city level only, no district data for this area yet') }}",
-            outsideArea: "{{ __('This location is outside our coverage area. Please set it manually.') }}",
+            outsideArea: @json(__('validation.outside_coverage', ['cities' => ($cities ?? collect())->pluck('display_name')->join(app()->getLocale() === 'ar' ? '، ' : ', ')])),
             notAvailable: "{{ __('Not available') }}",
             correctedManually: "{{ __('Pin corrected. Location updated.') }}",
             selectDistrict: "{{ __('-- Select a district --') }}",
