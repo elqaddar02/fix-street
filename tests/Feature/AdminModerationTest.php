@@ -64,7 +64,7 @@ class AdminModerationTest extends TestCase
         $this->actingAs($admin)->patchJson(route('admin.reports.updateStatus', $report), ['status' => 'RESOLVED'])->assertOk();
 
         $this->actingAs($admin)->get(route('admin.reports.show', $report))
-            ->assertSee('OPEN → RESOLVED')
+            ->assertSee(__('admin.status_open') . ' → ' . __('admin.status_resolved'))
             ->assertSee($admin->name);
     }
 

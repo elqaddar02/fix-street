@@ -69,7 +69,7 @@
     </div>
 
     {{-- Stat cards --}}
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach($cards as $card)
             <div class="rounded-xl border border-slate-200 bg-white p-5 transition-shadow hover:shadow-sm">
                 <div class="flex items-start justify-between">
@@ -107,7 +107,7 @@
     </div>
 
     {{-- Activity + status --}}
-    <div class="grid gap-4 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div class="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2">
             <div class="mb-2 flex items-baseline justify-between">
                 <div>
@@ -144,7 +144,7 @@
     </div>
 
     {{-- Categories + recent --}}
-    <div class="grid gap-4 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div class="rounded-xl border border-slate-200 bg-white p-6">
             <h3 class="text-sm font-semibold">{{ __('admin.top_categories') }}</h3>
             <p class="mb-2 text-xs text-slate-500">{{ __('admin.volume_by_category') }}</p>
@@ -187,7 +187,7 @@
             <h3 class="text-sm font-semibold">{{ __('admin.new_members') }}</h3>
             <a href="{{ route('admin.users.index') }}" class="text-xs font-semibold text-red-600 hover:text-red-700">{{ __('admin.see_all') }}</a>
         </div>
-        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             @forelse($latestUsers as $user)
                 <a href="{{ route('admin.users.show', $user) }}" class="flex items-center gap-3 rounded-lg border border-slate-100 p-3 transition-colors hover:border-slate-200 hover:bg-slate-50">
                     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">

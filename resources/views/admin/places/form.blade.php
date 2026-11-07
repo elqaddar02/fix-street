@@ -24,7 +24,7 @@
         <h2 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900">{{ $title }}</h2>
     </div>
 
-    <form method="POST" action="{{ $action }}" class="grid gap-6 lg:grid-cols-5">
+    <form method="POST" action="{{ $action }}" class="grid grid-cols-1 gap-6 lg:grid-cols-5">
         @csrf
         @if($editing) @method('PATCH') @endif
 

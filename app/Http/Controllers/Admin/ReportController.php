@@ -100,19 +100,22 @@ class ReportController extends Controller
 
     public function bulkUpdateStatus(Request $request)
     {
+        // Its own field name: every row's status menu sits inside the same form
+        // and is also called "status", so a shared name let the last row win.
         $data = $request->validate([
             'report_ids' => 'required|array|min:1',
             'report_ids.*' => 'integer|exists:reports,id',
-            'status' => 'required|in:' . implode(',', self::STATUSES),
+            'bulk_status' => 'required|in:' . implode(',', self::STATUSES),
         ]);
+        $status = $data['bulk_status'];
 
-        $reports = Report::whereIn('id', $data['report_ids'])->where('status', '!=', $data['status'])->get(['id', 'status']);
+        $reports = Report::whereIn('id', $data['report_ids'])->where('status', '!=', $status)->get(['id', 'status']);
 
         foreach ($reports as $report) {
-            logAdminAction('Status', 'Report', $report->id, "{$report->status} → {$data['status']} (bulk)");
+            logAdminAction('Status', 'Report', $report->id, "{$report->status} → {$status} (bulk)");
         }
 
-        $updatedCount = Report::whereIn('id', $reports->pluck('id'))->update(['status' => $data['status']]);
+        $updatedCount = Report::whereIn('id', $reports->pluck('id'))->update(['status' => $status]);
 
         return back()->with('success', __('admin.flash_bulk_status', ['count' => $updatedCount]));
     }

@@ -755,5 +755,6 @@
     "report.photo_required_label": "obligatoire",
     "validation.outside_coverage": "Madinup ne couvre pas encore cet endroit. Les signalements sont ouverts à : :cities.",
     "admin.point_outside_city": "Ce point est en dehors des limites de :city.",
-    "admin.map_city_boundary": "Limites de :city"
+    "admin.map_city_boundary": "Limites de :city",
+    "admin.history_bulk": "en lot"
 }

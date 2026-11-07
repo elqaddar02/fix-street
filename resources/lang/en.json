@@ -712,5 +712,6 @@
     "report.photo_required_label": "required",
     "validation.outside_coverage": "Madinup does not cover this place yet. Reports are open in: :cities.",
     "admin.point_outside_city": "This point is outside the boundary of :city.",
-    "admin.map_city_boundary": "Boundary of :city"
+    "admin.map_city_boundary": "Boundary of :city",
+    "admin.history_bulk": "bulk"
 }

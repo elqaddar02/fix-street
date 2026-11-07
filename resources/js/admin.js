@@ -49,6 +49,8 @@ function toastRoot() {
 const TOAST_TONES = {
     success: 'border-emerald-200 bg-white text-slate-800',
     error: 'border-rose-200 bg-white text-rose-800',
+    // Not an error, but worth reading: e.g. "your session expired, please try again".
+    notice: 'border-amber-200 bg-white text-amber-900',
 };
 
 export function toast(message, { tone = 'success', action = null, duration = 6000 } = {}) {

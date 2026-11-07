@@ -32,7 +32,7 @@
     </div>
 
     <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <div class="overflow-x-auto">
+        <div class="relative overflow-x-auto">
             {{-- Below md the rows stack into cards. --}}
             <table class="block min-w-full text-start md:table">
                 <thead class="hidden md:table-header-group">

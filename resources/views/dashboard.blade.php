@@ -251,7 +251,7 @@
                     @endforeach
                 </ul>
 
-                <div class="hidden overflow-x-auto rounded-xl border border-gray-200 bg-white sm:block">
+                <div class="relative hidden overflow-x-auto rounded-xl border border-gray-200 bg-white sm:block">
                     <table class="w-full min-w-[640px] text-start">
                         <thead>
                             <tr class="border-b border-gray-200 bg-gray-50/80">
