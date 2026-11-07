@@ -11,6 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
         $middleware->web(\App\Http\Middleware\SetLocale::class);
         $middleware->web(\App\Http\Middleware\EnsureUserIsActive::class);
     })
@@ -18,8 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // An expired form token (e.g. a sign-in page left open, or a second
         // submit after the first one already signed you in) shouldn't end on a
         // bare "419 Page Expired": send people back with a clear message.
-        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, \Illuminate\Http\Request $request) {
-            if ($request->expectsJson()) {
+        // Laravel turns TokenMismatchException into a plain 419 HttpException
+        // before render callbacks run, so this has to match the 419 itself.
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e, \Illuminate\Http\Request $request) {
+            if ($e->getStatusCode() !== 419 || $request->expectsJson()) {
                 return null;
             }
 

@@ -75,4 +75,23 @@ class NavigationTest extends TestCase
         $this->assertStringContainsString(route('logout'), $mobileMenu);
         $this->assertStringContainsString(route('dashboard'), $mobileMenu);
     }
+
+    public function test_language_switch_persists_in_cookie_and_survives_logout(): void
+    {
+        $user = User::factory()->create();
+
+        // Switch to Arabic
+        $response = $this->actingAs($user)->get(route('language.switch', 'ar'));
+        $response->assertCookie('locale', 'ar');
+
+        // Log out
+        $this->post(route('logout'))->assertRedirect('/');
+
+        // Next request with the cookie retains Arabic locale
+        $this->withCookie('locale', 'ar')
+            ->get(route('home'))
+            ->assertOk();
+
+        $this->assertSame('ar', app()->getLocale());
+    }
 }

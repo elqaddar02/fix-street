@@ -4,6 +4,12 @@
 
 @php
     $statusOptions = ['OPEN' => __('admin.status_open'), 'IN_PROGRESS' => __('admin.status_in_progress'), 'RESOLVED' => __('admin.status_resolved'), 'REJECTED' => __('admin.status_rejected')];
+    // History lines are stored as "OPEN → RESOLVED (bulk)"; shown in the page's language,
+    // with the arrow following the reading direction.
+    $historyWords = $statusOptions + [
+        '→' => app()->getLocale() === 'ar' ? '←' : '→',
+        '(bulk)' => '(' . __('admin.history_bulk') . ')',
+    ];
     $hasImage = $report->image && file_exists(storage_path('app/public/' . $report->image));
     $hasMap = $report->latitude && $report->longitude;
     $card = 'rounded-xl border border-slate-200 bg-white';
@@ -56,7 +62,13 @@
         </div>
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-3">
+    @if($report->status === 'REJECTED' && $report->rejection_reason)
+        <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+            <span class="font-semibold">{{ __('admin.rejection_reason') }}:</span> {{ $report->rejection_reason }}
+        </div>
+    @endif
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {{-- MAIN: what the citizen saw --}}
         <div class="space-y-6 lg:col-span-2">
             <figure class="{{ $card }} overflow-hidden">
@@ -171,7 +183,7 @@
                             <li class="relative ps-4 text-sm before:absolute before:start-0 before:top-1.5 before:h-2 before:w-2 before:rounded-full before:bg-slate-300">
                                 <p class="text-slate-900">
                                     <span class="font-medium">{{ $historyLabels[$entry->action] ?? $entry->action }}</span>
-                                    @if($entry->description)<span class="text-slate-600"> : {{ $entry->description }}</span>@endif
+                                    @if($entry->description)<span class="text-slate-600"> : {{ strtr($entry->description, $historyWords) }}</span>@endif
                                 </p>
                                 <p class="text-xs text-slate-400">{{ $entry->admin->name ?? __('admin.admin') }} · {{ $entry->created_at->format('d/m/Y H:i') }}</p>
                             </li>

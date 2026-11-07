@@ -49,6 +49,8 @@ function toastRoot() {
 const TOAST_TONES = {
     success: 'border-emerald-200 bg-white text-slate-800',
     error: 'border-rose-200 bg-white text-rose-800',
+    // Not an error, but worth reading: e.g. "your session expired, please try again".
+    notice: 'border-amber-200 bg-white text-amber-900',
 };
 
 export function toast(message, { tone = 'success', action = null, duration = 6000 } = {}) {
@@ -229,6 +231,13 @@ function initStatusSelects() {
             const body = new FormData();
             body.set('_method', 'PATCH');
             body.set(select.name, chosen);
+
+            if (chosen === 'REJECTED') {
+                const reason = prompt(t('prompt_rejection_reason'));
+                if (reason) {
+                    body.set('rejection_reason', reason.trim());
+                }
+            }
 
             try {
                 const response = await fetch(select.dataset.action, {

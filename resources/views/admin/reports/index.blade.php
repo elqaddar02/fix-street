@@ -88,7 +88,7 @@
                 <span id="bulk-count">0</span> {{ __('admin.selected') }}
             </span>
             <label for="bulk-status" class="sr-only">{{ __('admin.status_to_apply') }}</label>
-            <select id="bulk-status" name="status"
+            <select id="bulk-status" name="bulk_status"
                     class="rounded-lg border border-slate-300 ps-3 pe-8 py-1.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
                 <option value="">{{ __('admin.choose_status') }}</option>
                 @foreach($statusOptions as $value => $label)
@@ -100,7 +100,7 @@
             </button>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="relative overflow-x-auto">
             {{-- Below md the rows stack into cards; same cells, so no duplicate inputs inside the bulk form. --}}
             <table class="block min-w-full text-start md:table">
                 <thead class="hidden md:table-header-group">

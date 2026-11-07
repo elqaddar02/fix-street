@@ -82,37 +82,58 @@ class ReportController extends Controller
 
     public function updateStatus(Request $request, Report $report)
     {
-        $request->validate(['status' => 'required|in:' . implode(',', self::STATUSES)]);
+        $validated = $request->validate([
+            'status' => 'required|in:' . implode(',', self::STATUSES),
+            'rejection_reason' => 'nullable|string|max:500',
+        ]);
 
         $previous = $report->status;
-        $report->update(['status' => $request->status]);
+        $status = $validated['status'];
+        $updates = ['status' => $status];
+
+        if ($status === 'REJECTED') {
+            if (array_key_exists('rejection_reason', $validated)) {
+                $updates['rejection_reason'] = $validated['rejection_reason'];
+            }
+        } else {
+            $updates['rejection_reason'] = null;
+        }
+
+        $report->update($updates);
 
         if ($previous !== $report->status) {
-            logAdminAction('Status', 'Report', $report->id, "{$previous} → {$report->status}");
+            $desc = "{$previous} → {$report->status}";
+            if ($report->status === 'REJECTED' && $report->rejection_reason) {
+                $desc .= " (" . $report->rejection_reason . ")";
+            }
+            logAdminAction('Status', 'Report', $report->id, $desc);
         }
 
         return $this->statusResponse(
             $request,
             __('admin.flash_report_status'),
-            ['status' => $report->status]
+            ['status' => $report->status, 'rejection_reason' => $report->rejection_reason]
         );
     }
 
     public function bulkUpdateStatus(Request $request)
     {
+        // Its own field name: every row's status menu sits inside the same form
+        // and is also called "status", so a shared name let the last row win.
         $data = $request->validate([
             'report_ids' => 'required|array|min:1',
             'report_ids.*' => 'integer|exists:reports,id',
-            'status' => 'required|in:' . implode(',', self::STATUSES),
+            'bulk_status' => 'required|in:' . implode(',', self::STATUSES),
         ]);
+        $status = $data['bulk_status'];
 
-        $reports = Report::whereIn('id', $data['report_ids'])->where('status', '!=', $data['status'])->get(['id', 'status']);
+        $reports = Report::whereIn('id', $data['report_ids'])->where('status', '!=', $status)->get(['id', 'status']);
 
         foreach ($reports as $report) {
-            logAdminAction('Status', 'Report', $report->id, "{$report->status} → {$data['status']} (bulk)");
+            logAdminAction('Status', 'Report', $report->id, "{$report->status} → {$status} (bulk)");
         }
 
-        $updatedCount = Report::whereIn('id', $reports->pluck('id'))->update(['status' => $data['status']]);
+        $updatedCount = Report::whereIn('id', $reports->pluck('id'))->update(['status' => $status]);
 
         return back()->with('success', __('admin.flash_bulk_status', ['count' => $updatedCount]));
     }

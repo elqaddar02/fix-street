@@ -14,6 +14,7 @@ class Report extends Model
         'description',
         'image',
         'status',
+        'rejection_reason',
         'user_id',
         'category_id',
         'city_id',

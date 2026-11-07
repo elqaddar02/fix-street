@@ -61,4 +61,18 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Report::class, 'report_likes', 'user_id', 'report_id')
                     ->withTimestamps();
     }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $notification = new \Illuminate\Auth\Notifications\VerifyEmail;
+        $notification->locale(app()->getLocale());
+        $this->notify($notification);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $notification = new \Illuminate\Auth\Notifications\ResetPassword($token);
+        $notification->locale(app()->getLocale());
+        $this->notify($notification);
+    }
 }

@@ -40,7 +40,7 @@
 
     {{-- List --}}
     <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
-        <div class="overflow-x-auto">
+        <div class="relative overflow-x-auto">
             <table class="min-w-full text-start">
                 <thead>
                     <tr class="border-b border-slate-200 bg-slate-50/80">

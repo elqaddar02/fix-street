@@ -32,7 +32,7 @@
                     </div>
                 </div>
 
-                @if($isOwner)
+                @if($isOwner && $report->status === 'OPEN')
                     <a href="{{ route('reports.edit', $report) }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>
                         {{ __('dashboard.actions.edit') }}
@@ -40,6 +40,20 @@
                 @endif
             </div>
         </header>
+
+        @if($report->status === 'REJECTED')
+            <div class="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900">
+                <div class="flex items-start gap-3">
+                    <svg class="h-5 w-5 flex-shrink-0 text-rose-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
+                    <div>
+                        <h3 class="font-semibold text-rose-800">{{ __('report.status_rejected_title') }}</h3>
+                        <p class="mt-1 text-rose-700">
+                            {{ $report->rejection_reason ?: __('report.no_rejection_reason_given') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
 
 
         @php

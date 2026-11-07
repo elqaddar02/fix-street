@@ -38,9 +38,11 @@ class AuthenticatedSessionController extends Controller
                 : redirect()->route('admin.dashboard');
         }
 
-        // Citizens go back to where they were (e.g. a report they tried to confirm).
-        if ($request->session()->has('url.intended')) {
-            return redirect()->intended();
+        // Citizens go back to where they were (e.g. a report they tried to confirm),
+        // but never to an admin page they opened while signed out: that ends on a 403.
+        $intended = $request->session()->pull('url.intended');
+        if (is_string($intended) && ! str_starts_with($intended, url('/admin'))) {
+            return redirect()->to($intended);
         }
 
         if (\Illuminate\Support\Facades\Route::has('dashboard')) {

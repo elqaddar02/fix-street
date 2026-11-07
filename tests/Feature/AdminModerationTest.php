@@ -64,8 +64,30 @@ class AdminModerationTest extends TestCase
         $this->actingAs($admin)->patchJson(route('admin.reports.updateStatus', $report), ['status' => 'RESOLVED'])->assertOk();
 
         $this->actingAs($admin)->get(route('admin.reports.show', $report))
-            ->assertSee('OPEN → RESOLVED')
+            ->assertSee(__('admin.status_open') . ' → ' . __('admin.status_resolved'))
             ->assertSee($admin->name);
+    }
+
+    public function test_rejection_reason_is_saved_and_shown(): void
+    {
+        $report = $this->report();
+        $admin = $this->admin();
+
+        $this->actingAs($admin)->patchJson(route('admin.reports.updateStatus', $report), [
+            'status' => 'REJECTED',
+            'rejection_reason' => 'Private property issue outside city jurisdiction.',
+        ])->assertOk();
+
+        $this->assertSame('REJECTED', $report->fresh()->status);
+        $this->assertSame('Private property issue outside city jurisdiction.', $report->fresh()->rejection_reason);
+
+        // Shown on admin report detail page
+        $this->actingAs($admin)->get(route('admin.reports.show', $report))
+            ->assertSee('Private property issue outside city jurisdiction.');
+
+        // Shown on public report page for citizens
+        $this->get(route('reports.show', $report))
+            ->assertSee('Private property issue outside city jurisdiction.');
     }
 
     public function test_reports_can_be_found_by_reference_and_filtered(): void

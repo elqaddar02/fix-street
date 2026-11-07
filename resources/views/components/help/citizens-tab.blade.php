@@ -5,11 +5,11 @@
     </div>
 
     <div class="rounded-xl border border-gray-200 bg-white shadow-[0_3px_12px_rgba(17,24,39,0.04)] p-5 sm:p-6">
-        <h3 class="mb-2 text-base font-semibold text-gray-900">{{ __('help.citizens.what_is_madinova.title') }}</h3>
+        <h3 class="mb-2 text-base font-semibold text-gray-900">{{ __('help.citizens.what_is_madinup.title') }}</h3>
         <div class="space-y-4 text-gray-700">
-            <p>{{ __('help.citizens.what_is_madinova.description1') }}</p>
-            <p>{{ __('help.citizens.what_is_madinova.description2') }}</p>
-            <p>{{ __('help.citizens.what_is_madinova.description3') }}</p>
+            <p>{{ __('help.citizens.what_is_madinup.description1') }}</p>
+            <p>{{ __('help.citizens.what_is_madinup.description2') }}</p>
+            <p>{{ __('help.citizens.what_is_madinup.description3') }}</p>
         </div>
     </div>
 

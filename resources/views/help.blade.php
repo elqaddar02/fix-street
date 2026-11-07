@@ -28,7 +28,7 @@
                 --}}
                 <div class="lg:col-span-1">
                     <nav aria-label="{{ __('Help & Support') }}" x-init="$nextTick(() => $el.querySelector('[aria-selected=true]')?.scrollIntoView({ inline: 'center', block: 'nearest' }))"
-                         class="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] lg:sticky lg:top-24 lg:mx-0 lg:overflow-visible lg:rounded-xl lg:border lg:border-gray-200 lg:bg-white lg:p-2 lg:shadow-[0_3px_12px_rgba(17,24,39,0.04)]">
+                         class="relative -mx-4 overflow-x-auto px-4 [scrollbar-width:none] lg:sticky lg:top-24 lg:mx-0 lg:overflow-visible lg:rounded-xl lg:border lg:border-gray-200 lg:bg-white lg:p-2 lg:shadow-[0_3px_12px_rgba(17,24,39,0.04)]">
                         <ul class="flex gap-2 lg:flex-col lg:gap-1" role="tablist">
                             @foreach($tabs as $key => $tabLabel)
                                 <li class="shrink-0">

@@ -90,10 +90,16 @@ class LocationResolver
      */
     private function placeWithin($cityIds, float $lat, float $lng, ?City $fallbackCity): array
     {
+        // Generous bounding box filter in SQL to avoid pulling thousands of rows into PHP memory
+        $qLatDelta = self::MAX_QUARTIER_KM / 100.0;
+        $qLngDelta = self::MAX_QUARTIER_KM / 80.0;
+
         $quartier = $this->nearestWithin(
             Quartier::with('district')
                 ->whereHas('district', fn ($q) => $q->whereIn('city_id', $cityIds))
-                ->whereNotNull('latitude')->whereNotNull('longitude')->get(),
+                ->whereBetween('latitude', [$lat - $qLatDelta, $lat + $qLatDelta])
+                ->whereBetween('longitude', [$lng - $qLngDelta, $lng + $qLngDelta])
+                ->get(),
             $lat,
             $lng,
             fn ($q) => [$q->latitude, $q->longitude],
@@ -108,8 +114,14 @@ class LocationResolver
             ];
         }
 
+        $dLatDelta = self::MAX_DISTRICT_KM / 100.0;
+        $dLngDelta = self::MAX_DISTRICT_KM / 80.0;
+
         $district = $this->nearestWithin(
-            District::whereIn('city_id', $cityIds)->whereNotNull('lat')->whereNotNull('lng')->get(),
+            District::whereIn('city_id', $cityIds)
+                ->whereBetween('lat', [$lat - $dLatDelta, $lat + $dLatDelta])
+                ->whereBetween('lng', [$lng - $dLngDelta, $lng + $dLngDelta])
+                ->get(),
             $lat,
             $lng,
             fn ($d) => [$d->lat, $d->lng],

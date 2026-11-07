@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -90,6 +89,7 @@ Route::get('/reports/{report}', [ReportController::class, 'show'])->name('report
 Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 Route::get('/api/quartier/{quartier}/coordinates', [ReportController::class, 'getQuartierCoordinates'])->name('quartier.coordinates');
 Route::get('/api/resolve-location', [ReportController::class, 'resolveLocation'])->name('location.resolve');
+Route::get('/ads/{ad}/click', [\App\Http\Controllers\AdClickController::class, 'track'])->name('ads.click');
 
 Route::middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {

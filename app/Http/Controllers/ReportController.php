@@ -210,6 +210,11 @@ class ReportController extends Controller
             abort(403);
         }
 
+        // Only open reports can be edited; resolved and rejected reports are part of the record.
+        if ($report->status !== 'OPEN') {
+            abort(403, __('report.cannot_edit_closed'));
+        }
+
         $categories = Category::all();
         $cities = City::where('active', true)->get();
         $districts = District::all();
@@ -223,6 +228,11 @@ class ReportController extends Controller
         // Ensure user owns the report
         if ($report->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        // Only open reports can be edited; resolved and rejected reports are part of the record.
+        if ($report->status !== 'OPEN') {
+            abort(403, __('report.cannot_edit_closed'));
         }
 
         // A report in a case only shows title and category on the edit form.

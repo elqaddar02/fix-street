@@ -43,7 +43,7 @@
     </button>
 
     <span data-status-text
-          class="text-sm font-medium tabular-nums {{ $active ? 'text-emerald-700' : 'text-slate-500' }}">
+          class="whitespace-nowrap text-sm font-medium tabular-nums {{ $active ? 'text-emerald-700' : 'text-slate-500' }}">
         {{ $active ? __('admin.active') : __('admin.inactive') }}
     </span>
 </form>

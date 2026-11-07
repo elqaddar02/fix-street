@@ -11,6 +11,7 @@ class LanguageController extends Controller
         if (in_array($language, ['en', 'fr', 'ar'])) {
             session(['locale' => $language]);
             app()->setLocale($language);
+            cookie()->queue(cookie()->forever('locale', $language));
         }
         
         return redirect()->back();

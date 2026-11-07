@@ -10,7 +10,7 @@
     </div>
 
     <div class="rounded-xl border border-red-200 bg-white p-6 shadow-sm">
-        <dl class="grid gap-3 md:grid-cols-2">
+        <dl class="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div>
                 <dt class="text-xs uppercase text-slate-500">{{ __('admin.name') }}</dt>
                 <dd class="mt-1 font-medium text-slate-900">{{ $user->name }}</dd>

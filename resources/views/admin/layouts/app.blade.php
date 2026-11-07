@@ -45,7 +45,7 @@
                 </span>
                 <span class="text-[15px] font-bold tracking-tight">Madinup</span>
             </a>
-            <button @click="open = false" class="ms-auto rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 lg:hidden">
+            <button type="button" @click="open = false" aria-label="{{ __('nav.close_menu') }}" class="ms-auto rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 lg:hidden">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -90,7 +90,7 @@
 
     <div class="flex min-w-0 flex-1 flex-col">
         <header class="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-slate-200 bg-white/80 px-4 backdrop-blur lg:px-8">
-            <button @click="open = true" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden">
+            <button type="button" @click="open = true" aria-label="{{ __('nav.open_menu') }}" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 lg:hidden">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
             <h1 class="truncate text-base font-semibold">@yield('title', __('admin.administration'))</h1>
@@ -131,11 +131,11 @@
 </script>
 
 {{-- Flash messages are surfaced through the same toast stack as the inline actions. --}}
-@if (session('success') || session('error'))
+@if (session('success') || session('error') || session('notice'))
     @php
         $flash = [
-            'message' => session('success') ?: session('error'),
-            'tone' => session('success') ? 'success' : 'error',
+            'message' => session('success') ?: (session('error') ?: session('notice')),
+            'tone' => session('success') ? 'success' : (session('error') ? 'error' : 'notice'),
         ];
     @endphp
     <script type="application/json" id="flash-message">
