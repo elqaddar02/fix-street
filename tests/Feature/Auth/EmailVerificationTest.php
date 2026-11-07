@@ -55,4 +55,18 @@ class EmailVerificationTest extends TestCase
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
     }
+
+    public function test_verification_email_is_translated_in_arabic(): void
+    {
+        $user = User::factory()->unverified()->create();
+        app()->setLocale('ar');
+
+        \Illuminate\Support\Facades\Notification::fake();
+        $user->sendEmailVerificationNotification();
+
+        \Illuminate\Support\Facades\Notification::assertSentTo($user, \Illuminate\Auth\Notifications\VerifyEmail::class, function ($notification) use ($user) {
+            $mail = $notification->toMail($user);
+            return $mail->subject === 'تأكيد عنوان البريد الإلكتروني';
+        });
+    }
 }
