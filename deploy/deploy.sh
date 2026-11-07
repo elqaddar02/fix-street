@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-echo "🚀 Starting Madinova Production Deployment..."
+echo "🚀 Starting Madinup Production Deployment..."
 
 # 1. Activate maintenance mode with user-friendly retry headers
 php artisan down --retry=60 || true
@@ -32,4 +32,4 @@ php artisan queue:restart || true
 # 8. Bring application back online
 php artisan up
 
-echo "✅ Madinova deployed successfully!"
+echo "✅ Madinup deployed successfully!"
