@@ -185,4 +185,32 @@ class ReportIntegrityTest extends TestCase
             ->assertSee(route('reports.destroy', $free), false)
             ->assertDontSee('action="' . route('reports.destroy', $locked) . '"', false);
     }
+
+    public function test_a_resolved_or_rejected_report_cannot_be_edited(): void
+    {
+        $owner = $this->citizen();
+        $resolved = Report::create([
+            'title' => 'Resolved issue', 'description' => 'Fixed', 'status' => 'RESOLVED', 'user_id' => $owner->id,
+            'category_id' => $this->category->id, 'city_id' => $this->sale->id, 'latitude' => 34.0481, 'longitude' => -6.7951,
+        ]);
+        $rejected = Report::create([
+            'title' => 'Rejected issue', 'description' => 'Out of scope', 'status' => 'REJECTED', 'user_id' => $owner->id,
+            'category_id' => $this->category->id, 'city_id' => $this->sale->id, 'latitude' => 34.0481, 'longitude' => -6.7951,
+        ]);
+
+        $this->actingAs($owner)->get(route('reports.edit', $resolved))->assertForbidden();
+        $this->actingAs($owner)->get(route('reports.edit', $rejected))->assertForbidden();
+
+        $this->actingAs($owner)->patch(route('reports.update', $resolved), [
+            'title' => 'Attempted Edit',
+            'category_id' => $this->category->id,
+        ])->assertForbidden();
+
+        $this->actingAs($owner)->get(route('reports.show', $resolved))
+            ->assertDontSee(route('reports.edit', $resolved), false);
+
+        $this->actingAs($owner)->get(route('dashboard'))
+            ->assertDontSee(route('reports.edit', $resolved), false)
+            ->assertDontSee(route('reports.edit', $rejected), false);
+    }
 }

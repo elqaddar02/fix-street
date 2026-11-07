@@ -62,6 +62,12 @@
         </div>
     </div>
 
+    @if($report->status === 'REJECTED' && $report->rejection_reason)
+        <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+            <span class="font-semibold">{{ __('admin.rejection_reason') }}:</span> {{ $report->rejection_reason }}
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {{-- MAIN: what the citizen saw --}}
         <div class="space-y-6 lg:col-span-2">

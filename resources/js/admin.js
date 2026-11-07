@@ -232,6 +232,13 @@ function initStatusSelects() {
             body.set('_method', 'PATCH');
             body.set(select.name, chosen);
 
+            if (chosen === 'REJECTED') {
+                const reason = prompt(t('prompt_rejection_reason'));
+                if (reason) {
+                    body.set('rejection_reason', reason.trim());
+                }
+            }
+
             try {
                 const response = await fetch(select.dataset.action, {
                     method: 'POST',

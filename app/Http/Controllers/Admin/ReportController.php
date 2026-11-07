@@ -82,19 +82,37 @@ class ReportController extends Controller
 
     public function updateStatus(Request $request, Report $report)
     {
-        $request->validate(['status' => 'required|in:' . implode(',', self::STATUSES)]);
+        $validated = $request->validate([
+            'status' => 'required|in:' . implode(',', self::STATUSES),
+            'rejection_reason' => 'nullable|string|max:500',
+        ]);
 
         $previous = $report->status;
-        $report->update(['status' => $request->status]);
+        $status = $validated['status'];
+        $updates = ['status' => $status];
+
+        if ($status === 'REJECTED') {
+            if (array_key_exists('rejection_reason', $validated)) {
+                $updates['rejection_reason'] = $validated['rejection_reason'];
+            }
+        } else {
+            $updates['rejection_reason'] = null;
+        }
+
+        $report->update($updates);
 
         if ($previous !== $report->status) {
-            logAdminAction('Status', 'Report', $report->id, "{$previous} → {$report->status}");
+            $desc = "{$previous} → {$report->status}";
+            if ($report->status === 'REJECTED' && $report->rejection_reason) {
+                $desc .= " (" . $report->rejection_reason . ")";
+            }
+            logAdminAction('Status', 'Report', $report->id, $desc);
         }
 
         return $this->statusResponse(
             $request,
             __('admin.flash_report_status'),
-            ['status' => $report->status]
+            ['status' => $report->status, 'rejection_reason' => $report->rejection_reason]
         );
     }
 
